@@ -19,7 +19,7 @@
     <module>modm:math:filter</module>
     <module>modm:math:geometry</module>
     <module>modm:math:interpolation</module>
-    <module>modm:math:saturated</module>
+    <module>modm:math:saturation</module>
     <module>modm:math:utils</module>
     <module>modm:platform:core</module>
     <module>modm:processing</module>

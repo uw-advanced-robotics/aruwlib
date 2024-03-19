@@ -28,7 +28,7 @@
     <module>modm:math:geometry</module>
     <module>modm:math:utils</module>
     <module>modm:math:interpolation</module>
-    <module>modm:math:saturated</module>
+    <module>modm:math:saturation</module>
     <module>modm:processing</module>
     <module>modm:processing:timer</module>
     <module>modm:processing:protothread</module>
