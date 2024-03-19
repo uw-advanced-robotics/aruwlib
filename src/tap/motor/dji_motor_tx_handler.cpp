@@ -58,26 +58,10 @@ void DjiMotorTxHandler::addMotorToManager(DjiMotor* motor)
 void DjiMotorTxHandler::encodeAndSendCanData()
 {
     // set up new can messages to be sent via CAN bus 1 and 2
-    modm::can::Message can1MessageLow(
-        CAN_DJI_LOW_IDENTIFIER,
-        CAN_DJI_MESSAGE_SEND_LENGTH,
-        0,
-        false);
-    modm::can::Message can1MessageHigh(
-        CAN_DJI_HIGH_IDENTIFIER,
-        CAN_DJI_MESSAGE_SEND_LENGTH,
-        0,
-        false);
-    modm::can::Message can2MessageLow(
-        CAN_DJI_LOW_IDENTIFIER,
-        CAN_DJI_MESSAGE_SEND_LENGTH,
-        0,
-        false);
-    modm::can::Message can2MessageHigh(
-        CAN_DJI_HIGH_IDENTIFIER,
-        CAN_DJI_MESSAGE_SEND_LENGTH,
-        0,
-        false);
+    modm::can::Message can1MessageLow(CAN_DJI_LOW_IDENTIFIER, CAN_DJI_MESSAGE_SEND_LENGTH);
+    modm::can::Message can1MessageHigh(CAN_DJI_HIGH_IDENTIFIER, CAN_DJI_MESSAGE_SEND_LENGTH);
+    modm::can::Message can2MessageLow(CAN_DJI_LOW_IDENTIFIER, CAN_DJI_MESSAGE_SEND_LENGTH);
+    modm::can::Message can2MessageHigh(CAN_DJI_HIGH_IDENTIFIER, CAN_DJI_MESSAGE_SEND_LENGTH);
 
     bool can1ValidMotorMessageLow = false;
     bool can1ValidMotorMessageHigh = false;

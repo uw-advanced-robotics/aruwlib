@@ -47,7 +47,7 @@ modm::can::Message CanSerializer::serializeFeedback(
     MotorId mid)
 {
     // Construct message, desginate recipient as 0-based index + first motor's ID
-    modm::can::Message out(static_cast<int>(mid), FEEDBACK_MESSAGE_SEND_LENGTH, {}, false);
+    modm::can::Message out(static_cast<int>(mid), FEEDBACK_MESSAGE_SEND_LENGTH);
 
     out.data[0] = angle >> 8;
     out.data[1] = angle & 0xFF;
