@@ -8,6 +8,7 @@
     <option name="modm:build:project.name">taproot</option>
     <option name="modm:build:openocd.cfg">openocd.cfg</option>
     <option name="modm:build:scons:include_sconstruct">False</option>
+    <option name="modm:processing:protothread:use_fiber">yes</option>
     <option name="modm:target">{{ mcu }}</option>
 
 {% for o in modm_hal_options %}    {{ o }}{% endfor %}
