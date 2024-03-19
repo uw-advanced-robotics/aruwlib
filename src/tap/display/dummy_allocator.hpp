@@ -20,7 +20,7 @@
 #ifndef TAPROOT_DUMMY_ALLOCATOR_HPP_
 #define TAPROOT_DUMMY_ALLOCATOR_HPP_
 
-#include "modm/utils/allocator/allocator_base.hpp"
+#include "modm/utils/allocator.hpp"
 
 namespace tap
 {
