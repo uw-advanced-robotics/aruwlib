@@ -34,7 +34,6 @@ namespace gpio
 void Pwm::init()
 {
 #ifndef PLATFORM_HOSTED
-
 %% for timer in timers
     %% set pins_associated_with_timer = []
     %% for pin in pins
@@ -48,9 +47,11 @@ void Pwm::init()
     {{ timer }}::setMode({{ timer }}::Mode::UpCounter);
     microseconds {{ timer|lower }}Period = microseconds(1'000'000 / DEFAULT_{{ timer|upper }}_FREQUENCY);
     {{ timer|lower }}CalculatedOverflow = {{ timer }}::setPeriod<Board::SystemClock>({{ timer|lower }}Period);
-    {{ timer }}::start();
+    %% if timer == "Timer1" or timer == "Timer8"
     {{ timer }}::enableOutput();
-
+    %% endif
+    {{ timer }}::start();
+    
 %% endfor
 #endif
     // Set all out pins to 0 duty
