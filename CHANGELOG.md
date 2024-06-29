@@ -1,5 +1,46 @@
 # Taproot Changelog
 
+## June 2024
+
+- Reduced max Ref Serial Transmission from `1280` bytes to `1000` bytes per second.
+- Improved calculation for Ref Serial Transmitter timer lengths.
+- Fixed bug where `VerticalScrollLogicHandler::getLargestIndexDisplayed()` returns index out of bounds when size is less than max entries
+- Substituted uses of `UnjamIntegralCommand` with new marker interface `UnjamCommandInterface` to allow custom agitator unjam behavior. Any desired unjam behavior can be put into an implementer of `UnjamCommandInterface` and fed into the `MoveUnjamIntegralComprisedCommand`.
+- Added copy assign operators to `transforms::Position` and `transforms::Vector`, as well as dot product, magnitude, and interpolation helpers.
+- Expand `DjiSerial` Rx buffer to 1024 bytes.
+- Remove check in `addMap()` preventing mappings with equal remote map states to allow for different command mapping implementations with different behaviors using the same remote state.
+
+## May 2024
+
+### Breaking Changes
+- Ballistics now uses `AbstractKinematicState` instead of `MeasuredKinematicState`. This is a breaking change.
+  - The previous functionality is still present in `SecondOrderKinematicState`, so migrating over 
+      would involve replacing all usages of `MeasuredKinematicState` with this.
+  - This allows teams to define custom motion models for their kinematic states by extending
+      `AbstractKinematicState` and implementing `projectForward(float dt)`
+  - Accessing the initial position has been replaced with `.projectForward(0)`
+
+## April 2024
+
+- Updated Ref Serial to support version 1.6.1. This has major breaking changes, but these are nessecary for working robots. See [this document](./extended-changelogs/ref-serial-1.6.1-changes.md) for more information.
+
+- Added in I2C support for development board type A
+- Make subsystem getName() const.
+- Replaced `ContiguousFloat` with `WrappedFloat`
+  - "`[x]=`" operators are now overloaded for arithmetic between WrappedFloats with identical bounds (Replaces `WrappedFloat.shiftUp/Down`)
+  - `WrappedFloat.difference` is now `WrappedFloat.minDifference` and returns a float
+  - `WrappedFloat.get/setValue` is now `WrappedFloat.get/setWrappedValue`, with the addition of `WrappedFloat.get/setUnwrappedValue`
+
+## March 2024
+
+- Added in constants for motor max output for the GM6020 and C620 motor controller
+- Minor change to command mapping to allow for easier extended command mappings
+
+## Febuary 2024
+
+- Updates to transform to compute roll, pitch, and yaw
+- Updated IMU with fixes to calibration and added support for variable calibration periods
+
 ## January 2024
 
 - Actually wait for semaphore to be released in ref serial transmitter before trying to write again.

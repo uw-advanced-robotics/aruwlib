@@ -19,15 +19,15 @@
 
 #include <gtest/gtest.h>
 
-#include "tap/algorithms/linear_interpolation_predictor_contiguous.hpp"
+#include "tap/algorithms/linear_interpolation_predictor_wrapped.hpp"
 
 using namespace tap::algorithms;
 
 TEST(
-    LinearInterpolationPredictorContiguous,
+    LinearInterpolationPredictorWrapped,
     update_return_same_value_as_reset_if_time_before_reset_time_used)
 {
-    LinearInterpolationPredictorContiguous li(0, 10);
+    LinearInterpolationPredictorWrapped li(0, 10);
 
     li.reset(5, 10);
     li.update(6, 5);
@@ -36,9 +36,9 @@ TEST(
     EXPECT_NEAR(5, li.getInterpolatedValue(100), 1E-3);
 }
 
-TEST(LinearInterpolationPredictorContiguous, after_reset_return_reset_initial_val)
+TEST(LinearInterpolationPredictorWrapped, after_reset_return_reset_initial_val)
 {
-    LinearInterpolationPredictorContiguous li(0, 10);
+    LinearInterpolationPredictorWrapped li(0, 10);
 
     li.reset(3, 5);
     EXPECT_NEAR(3, li.getInterpolatedValue(100), 1E-3);
@@ -46,9 +46,9 @@ TEST(LinearInterpolationPredictorContiguous, after_reset_return_reset_initial_va
     EXPECT_NEAR(7, li.getInterpolatedValue(100), 1E-3);
 }
 
-TEST(LinearInterpolationPredictorContiguous, normal_operation_no_wrapping)
+TEST(LinearInterpolationPredictorWrapped, normal_operation_no_wrapping)
 {
-    LinearInterpolationPredictorContiguous li(0, 10);
+    LinearInterpolationPredictorWrapped li(0, 10);
 
     li.reset(3, 10);
     EXPECT_NEAR(3, li.getInterpolatedValue(15), 1E-3);
@@ -60,9 +60,9 @@ TEST(LinearInterpolationPredictorContiguous, normal_operation_no_wrapping)
     EXPECT_NEAR(2, li.getInterpolatedValue(27), 1E-3);
 }
 
-TEST(LinearInterpolationPredictorContiguous, normal_operation_wrapping)
+TEST(LinearInterpolationPredictorWrapped, normal_operation_wrapping)
 {
-    LinearInterpolationPredictorContiguous li(0, 10);
+    LinearInterpolationPredictorWrapped li(0, 10);
 
     li.reset(1, 10);
     EXPECT_NEAR(1, li.getInterpolatedValue(11), 1E-3);
@@ -82,9 +82,9 @@ TEST(LinearInterpolationPredictorContiguous, normal_operation_wrapping)
     EXPECT_NEAR(0.5, li.getInterpolatedValue(13), 1E-3);
 }
 
-TEST(LinearInterpolationPredictorContiguous, after_update_with_bad_time_value_doesnt_change)
+TEST(LinearInterpolationPredictorWrapped, after_update_with_bad_time_value_doesnt_change)
 {
-    LinearInterpolationPredictorContiguous li(0, 10);
+    LinearInterpolationPredictorWrapped li(0, 10);
 
     li.reset(5, 1);
     li.update(6, 2);

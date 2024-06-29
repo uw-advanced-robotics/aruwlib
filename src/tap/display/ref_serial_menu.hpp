@@ -54,7 +54,7 @@ class RefSerialMenu : public modm::AbstractMenu<DummyAllocator<modm::IAbstractVi
 public:
     /// Time between calls to `draw`, which will redraw the referee serial menu.
     static constexpr uint32_t DISPLAY_DRAW_PERIOD = 500;
-    static constexpr int REF_SERIAL_INFO_LINES = 8;
+    static constexpr int REF_SERIAL_INFO_LINES = 7;
     static constexpr int DISPLAY_MAX_ENTRIES = 8;
 
     RefSerialMenu(modm::ViewStack<DummyAllocator<modm::IAbstractView> > *stack, Drivers *drivers);
@@ -81,9 +81,8 @@ private:
 
     void printRobotTypeId(modm::IOStream &stream);
     void printHp(modm::IOStream &stream);
-    void print17mmSpeed(modm::IOStream &stream);
-    void print17mmHeat(modm::IOStream &stream);
-    void print42mmSpeed(modm::IOStream &stream);
+    void print17mm1Heat(modm::IOStream &stream);
+    void print17mm2Heat(modm::IOStream &stream);
     void print42mmHeat(modm::IOStream &stream);
     void printPowerBuf(modm::IOStream &stream);
     void printPower(modm::IOStream &stream);
