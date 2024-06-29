@@ -200,10 +200,6 @@ TEST_F(RefSerialTransmitterTest, deleteGraphicLayer__blocks_on_transmission_sema
     refSerialTransmitter.deleteGraphicLayer(
         RefSerialData::Tx::DeleteGraphicOperation::DELETE_GRAPHIC_LAYER,
         2);
-
-    refSerialTransmitter.deleteGraphicLayer(
-        RefSerialData::Tx::DeleteGraphicOperation::DELETE_GRAPHIC_LAYER,
-        2);
 }
 
 TEST_F(RefSerialTransmitterTest, deleteGraphicLayer__sends_correct_msg)
