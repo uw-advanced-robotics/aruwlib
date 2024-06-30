@@ -146,7 +146,7 @@ void WrappedFloat::wrapValue()
     {
         this->wrapped = upperBound + fmodf(oldValue - upperBound, upperBound - lowerBound);
     }
-    else if (oldValue >= upperBound - 1E-5)
+    else if (oldValue >= upperBound - 1E-5f)
     {
         this->wrapped = lowerBound + fmodf(oldValue - lowerBound, upperBound - lowerBound);
     }

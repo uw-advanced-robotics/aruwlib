@@ -79,7 +79,7 @@ modm::Vector3f tap::algorithms::eulerAnglesFromQuaternion(modm::Quaternion<float
     // pitch (y-axis rotation)
     float sinp = std::sqrt(1 + 2 * (q.w * q.y - q.x * q.z));
     float cosp = std::sqrt(1 - 2 * (q.w * q.y - q.x * q.z));
-    eulerAngles.y = 2 * std::atan2(sinp, cosp) - M_PI / 2;
+    eulerAngles.y = 2 * std::atan2(sinp, cosp) - (float)M_PI / 2;
 
     // yaw (z-axis rotation)
     float siny_cosp = 2 * (q.w * q.z + q.x * q.y);
