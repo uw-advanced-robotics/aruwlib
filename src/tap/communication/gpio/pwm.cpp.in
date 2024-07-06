@@ -25,7 +25,6 @@
 
 using namespace Board;
 using namespace tap::algorithms;
-using microseconds = std::chrono::duration<uint32_t, std::micro>;
 
 namespace tap
 {
@@ -45,7 +44,7 @@ void Pwm::init()
     {{ timer }}::connect<{% for pin in pins_associated_with_timer %}PWMOutPin{{ pin }}::{{ pin_to_ch[pin] }}{% if not loop.last %}, {% endif %}{% endfor %}>();
     {{ timer }}::enable();
     {{ timer }}::setMode({{ timer }}::Mode::UpCounter);
-    microseconds {{ timer|lower }}Period = microseconds(1'000'000 / DEFAULT_{{ timer|upper }}_FREQUENCY);
+    std::chrono::microseconds {{ timer|lower }}Period{1'000'000 / DEFAULT_{{ timer|upper }}_FREQUENCY};
     {{ timer|lower }}CalculatedOverflow = {{ timer }}::setPeriod<Board::SystemClock>({{ timer|lower }}Period);
     %% if timer == "Timer1" or timer == "Timer8"
     {{ timer }}::enableOutput();
@@ -97,7 +96,7 @@ void Pwm::setTimerFrequency(Timer timer, uint32_t frequency)
     UNUSED(timer);
     UNUSED(frequency);
 #else
-    microseconds period = microseconds(1'000'000 / frequency);
+    std::chrono::microseconds period{1'000'000 / frequency};
     switch (timer)
     {
 %% for timer in timers
