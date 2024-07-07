@@ -114,6 +114,16 @@ def prepare(module, options):
                 name=f"uart_port_{port_num}.baud_rate",
                 description=f"Baud rate of UART port {port_num}.",
                 default=115200))
+        module.add_option(
+            NumericOption(
+                name=f"uart_port_{port_num}.tx_buffer_size",
+                description=f"TX buffer size of UART port {port_num}.",
+                default=256))
+        module.add_option(
+            NumericOption(
+                name=f"uart_port_{port_num}.rx_buffer_size",
+                description=f"RX buffer size of UART port {port_num}.",
+                default=256))
 
     return True
 
@@ -121,8 +131,11 @@ def build(env):
     uart_ports = []
     port_to_tx_pin = {}
     port_to_rx_pin = {}
-    full_port_name = {}
+    port_type = {}
     configured_baud_rate = {}
+    configured_tx_size = {}
+    configured_rx_size = {}
+
 
     metadata = board_info_parser.parse_board_info(env[":dev_board"])
     for port in metadata.find("uart-ports"):
@@ -130,15 +143,19 @@ def build(env):
         uart_ports.append(port_num)
         port_to_rx_pin[port_num] = port.get("rx")
         port_to_tx_pin[port_num] = port.get("tx")
-        full_port_name[port_num] = f"Usart{port_num}" if port.get("sync") == "true" else f"Uart{port_num}"
+        port_type[port_num] = "Usart" if port.get("sync") == "true" else "Uart"
         configured_baud_rate[port_num] = env[f":::uart_port_{port_num}.baud_rate"]
+        configured_tx_size[port_num] = env[f":::uart_port_{port_num}.tx_buffer_size"]
+        configured_rx_size[port_num] = env[f":::uart_port_{port_num}.rx_buffer_size"]
 
     env.substitutions = {
         "uart_ports": uart_ports,
         "port_to_rx_pin": port_to_rx_pin,
         "port_to_tx_pin": port_to_tx_pin,
-        "full_port_name": full_port_name,
+        "port_type": port_type,
         "configured_baud_rate": configured_baud_rate,
+        "configured_tx_size": configured_tx_size,
+        "configured_rx_size": configured_rx_size,
     }
     env.outbasepath = "taproot/src/tap/communication/serial"
     env.template("uart.cpp.in", "uart.cpp")
