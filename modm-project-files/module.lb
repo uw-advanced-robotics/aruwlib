@@ -26,26 +26,8 @@ MCU_VARIANTS_BY_BOARD = {
 }
 
 DEFAULT_MODM_OPTIONS_BY_BOARD = {
-    "rm-dev-board-a": "\
-        modm:platform:uart:1:buffer.rx 256\n\
-        modm:platform:uart:1:buffer.tx 256\n\
-        modm:platform:uart:2:buffer.rx 256\n\
-        modm:platform:uart:2:buffer.tx 256\n\
-        modm:platform:uart:3:buffer.tx 256\n\
-        modm:platform:uart:3:buffer.rx 256\n\
-        modm:platform:uart:6:buffer.rx 256\n\
-        modm:platform:uart:6:buffer.tx 256\n\
-        modm:platform:uart:7:buffer.tx 256\n\
-        modm:platform:uart:7:buffer.rx 256\n\
-        modm:platform:uart:8:buffer.tx 256\n\
-        modm:platform:uart:8:buffer.rx 256",
-    "rm-dev-board-c": "\
-        modm:platform:uart:1:buffer.rx 256\n\
-        modm:platform:uart:1:buffer.tx 256\n\
-        modm:platform:uart:3:buffer.tx 256\n\
-        modm:platform:uart:3:buffer.rx 256\n\
-        modm:platform:uart:6:buffer.rx 256\n\
-        modm:platform:uart:6:buffer.tx 256",
+    "rm-dev-board-a": "",
+    "rm-dev-board-c": "",
 }
 
 def get_modm_repo_lb_file() -> str:
