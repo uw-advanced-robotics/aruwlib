@@ -20,17 +20,17 @@
 #ifndef TAPROOT_DUMMY_ALLOCATOR_HPP_
 #define TAPROOT_DUMMY_ALLOCATOR_HPP_
 
-#include "modm/utils/allocator.hpp"
+#include <memory>
 
 namespace tap
 {
 namespace display
 {
 template <typename T>
-class DummyAllocator : public modm::allocator::AllocatorBase<T>
+class DummyAllocator : public std::allocator<T>
 {
 public:
-    DummyAllocator() : modm::allocator::AllocatorBase<T>() {}
+    DummyAllocator() : std::allocator<T>() {}
 
     DummyAllocator(const DummyAllocator& other) = default;
 
