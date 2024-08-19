@@ -68,20 +68,22 @@ TEST(DJISerial, updateSerial_parseMessage_single_byte_at_a_time_crcenforcement)
     convertToLittleEndian(calculateCRC16(rawMessage, 17), rawMessage + 17);
 
     ON_CALL(drivers.uart, read(Uart::Uart1, _, _))
-        .WillByDefault([&](Uart::UartPort, uint8_t *data, std::size_t length) {
-            if (length == 0)
+        .WillByDefault(
+            [&](Uart::UartPort, uint8_t *data, std::size_t length)
             {
-                return 0;
-            }
+                if (length == 0)
+                {
+                    return 0;
+                }
 
-            if (currByte >= sizeof(rawMessage))
-            {
-                return 0;
-            }
-            *data = rawMessage[currByte];
-            currByte++;
-            return 1;
-        });
+                if (currByte >= sizeof(rawMessage))
+                {
+                    return 0;
+                }
+                *data = rawMessage[currByte];
+                currByte++;
+                return 1;
+            });
 
     for (int i = 0; i < 100; i++)
     {
@@ -108,9 +110,8 @@ TEST(DJISerial, updateSerial_parseMessage_crc8_one_off)
     DJISerialTester serial(&drivers, Uart::Uart1, true);
 
     EXPECT_CALL(drivers.errorController, addToErrorList)
-        .WillOnce([&](const tap::errors::SystemError &error) {
-            EXPECT_TRUE(errorDescriptionContainsSubstr(error, "CRC8 failure"));
-        });
+        .WillOnce([&](const tap::errors::SystemError &error)
+                  { EXPECT_TRUE(errorDescriptionContainsSubstr(error, "CRC8 failure")); });
 
     uint8_t rawMessage[19];
     uint16_t currByte = 0;
@@ -127,20 +128,22 @@ TEST(DJISerial, updateSerial_parseMessage_crc8_one_off)
     convertToLittleEndian(calculateCRC16(rawMessage, 17), rawMessage + 17);
 
     ON_CALL(drivers.uart, read(Uart::Uart1, _, _))
-        .WillByDefault([&](Uart::UartPort, uint8_t *data, std::size_t length) {
-            if (length == 0)
+        .WillByDefault(
+            [&](Uart::UartPort, uint8_t *data, std::size_t length)
             {
-                return 0;
-            }
+                if (length == 0)
+                {
+                    return 0;
+                }
 
-            if (currByte >= sizeof(rawMessage))
-            {
-                return 0;
-            }
-            *data = rawMessage[currByte];
-            currByte++;
-            return 1;
-        });
+                if (currByte >= sizeof(rawMessage))
+                {
+                    return 0;
+                }
+                *data = rawMessage[currByte];
+                currByte++;
+                return 1;
+            });
 
     for (int i = 0; i < 100; i++)
     {
@@ -154,9 +157,8 @@ TEST(DJISerial, updateSerial_parseMessage_crc16_one_off)
     DJISerialTester serial(&drivers, Uart::Uart1, true);
 
     EXPECT_CALL(drivers.errorController, addToErrorList)
-        .WillOnce([&](const tap::errors::SystemError &error) {
-            EXPECT_TRUE(errorDescriptionContainsSubstr(error, "CRC16 failure"));
-        });
+        .WillOnce([&](const tap::errors::SystemError &error)
+                  { EXPECT_TRUE(errorDescriptionContainsSubstr(error, "CRC16 failure")); });
 
     uint8_t rawMessage[19];
     uint16_t currByte = 0;
@@ -173,20 +175,22 @@ TEST(DJISerial, updateSerial_parseMessage_crc16_one_off)
     convertToLittleEndian<uint16_t>(calculateCRC16(rawMessage, 17) - 1, rawMessage + 17);
 
     ON_CALL(drivers.uart, read(Uart::Uart1, _, _))
-        .WillByDefault([&](Uart::UartPort, uint8_t *data, std::size_t length) {
-            if (length == 0)
+        .WillByDefault(
+            [&](Uart::UartPort, uint8_t *data, std::size_t length)
             {
-                return 0;
-            }
+                if (length == 0)
+                {
+                    return 0;
+                }
 
-            if (currByte >= sizeof(rawMessage))
-            {
-                return 0;
-            }
-            *data = rawMessage[currByte];
-            currByte++;
-            return 1;
-        });
+                if (currByte >= sizeof(rawMessage))
+                {
+                    return 0;
+                }
+                *data = rawMessage[currByte];
+                currByte++;
+                return 1;
+            });
 
     for (int i = 0; i < 100; i++)
     {
@@ -212,20 +216,22 @@ TEST(DJISerial, updateSerial_parseMessage_msg_length_0)
     convertToLittleEndian(calculateCRC16(rawMessage, 7), rawMessage + 7);
 
     ON_CALL(drivers.uart, read(Uart::Uart1, _, _))
-        .WillByDefault([&](Uart::UartPort, uint8_t *data, std::size_t length) {
-            if (length == 0)
+        .WillByDefault(
+            [&](Uart::UartPort, uint8_t *data, std::size_t length)
             {
-                return 0;
-            }
+                if (length == 0)
+                {
+                    return 0;
+                }
 
-            if (currByte >= sizeof(rawMessage))
-            {
-                return 0;
-            }
-            *data = rawMessage[currByte];
-            currByte++;
-            return 1;
-        });
+                if (currByte >= sizeof(rawMessage))
+                {
+                    return 0;
+                }
+                *data = rawMessage[currByte];
+                currByte++;
+                return 1;
+            });
 
     for (int i = 0; i < 100; i++)
     {
@@ -239,11 +245,13 @@ TEST(DJISerial, updateSerial_parseMessage_msg_length_too_big)
     DJISerialTester serial(&drivers, Uart::Uart1, false);
 
     EXPECT_CALL(drivers.errorController, addToErrorList)
-        .WillOnce([&](const tap::errors::SystemError &error) {
-            EXPECT_TRUE(errorDescriptionContainsSubstr(
-                error,
-                "received message length longer than allowed max"));
-        });
+        .WillOnce(
+            [&](const tap::errors::SystemError &error)
+            {
+                EXPECT_TRUE(errorDescriptionContainsSubstr(
+                    error,
+                    "received message length longer than allowed max"));
+            });
 
     uint8_t rawMessage[19];
     uint16_t currByte = 0;
@@ -260,20 +268,22 @@ TEST(DJISerial, updateSerial_parseMessage_msg_length_too_big)
     convertToLittleEndian(calculateCRC16(rawMessage, 17), rawMessage + 17);
 
     ON_CALL(drivers.uart, read(Uart::Uart1, _, _))
-        .WillByDefault([&](Uart::UartPort, uint8_t *data, std::size_t length) {
-            if (length == 0)
+        .WillByDefault(
+            [&](Uart::UartPort, uint8_t *data, std::size_t length)
             {
-                return 0;
-            }
+                if (length == 0)
+                {
+                    return 0;
+                }
 
-            if (currByte >= sizeof(rawMessage))
-            {
-                return 0;
-            }
-            *data = rawMessage[currByte];
-            currByte++;
-            return 1;
-        });
+                if (currByte >= sizeof(rawMessage))
+                {
+                    return 0;
+                }
+                *data = rawMessage[currByte];
+                currByte++;
+                return 1;
+            });
 
     for (int i = 0; i < 100; i++)
     {
@@ -303,23 +313,25 @@ TEST(DJISerial, updateSerial_parseMessage_all_bytes_received_at_once_crcenforcem
     convertToLittleEndian(calculateCRC16(rawMessage, 17), rawMessage + 17);
 
     ON_CALL(drivers.uart, read(Uart::Uart1, _, _))
-        .WillByDefault([&](Uart::UartPort, uint8_t *data, std::size_t length) {
-            int bytesRead = 0;
-            for (std::size_t i = 0; i < length; i++)
+        .WillByDefault(
+            [&](Uart::UartPort, uint8_t *data, std::size_t length)
             {
-                if (currByte == sizeof(rawMessage))
+                int bytesRead = 0;
+                for (std::size_t i = 0; i < length; i++)
                 {
-                    return bytesRead;
+                    if (currByte == sizeof(rawMessage))
+                    {
+                        return bytesRead;
+                    }
+                    else
+                    {
+                        data[i] = rawMessage[currByte];
+                        currByte++;
+                        bytesRead++;
+                    }
                 }
-                else
-                {
-                    data[i] = rawMessage[currByte];
-                    currByte++;
-                    bytesRead++;
-                }
-            }
-            return bytesRead;
-        });
+                return bytesRead;
+            });
 
     for (int i = 0; i < 3; i++)
     {

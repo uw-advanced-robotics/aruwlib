@@ -89,7 +89,7 @@ private:
     uint32_t lastUpdateCallTime;  ///< The previous timestamp from when update was called.
     WrappedFloat previousValue;   ///< The previous data value.
     float slope;  ///< The current slope, calculated using the previous and most current data.
-};                // class LinearInterpolationPredictorWrapped
+};  // class LinearInterpolationPredictorWrapped
 
 }  // namespace tap::algorithms
 

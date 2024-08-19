@@ -85,7 +85,8 @@ bool HardwareTestMenu::hasChanged()
     std::for_each(
         drivers->commandScheduler.subMapBegin(),
         drivers->commandScheduler.subMapEnd(),
-        [&](control::Subsystem* sub) {
+        [&](control::Subsystem* sub)
+        {
             changedSubsystems += (sub->isHardwareTestComplete() ? 1UL : 0UL) << i;
             i++;
         });
@@ -114,7 +115,8 @@ void HardwareTestMenu::draw()
     std::for_each(
         drivers->commandScheduler.subMapBegin(),
         drivers->commandScheduler.subMapEnd(),
-        [&](control::Subsystem* sub) {
+        [&](control::Subsystem* sub)
+        {
             if (subsystemIndex <= vertScrollHandler.getLargestIndexDisplayed() &&
                 subsystemIndex >= vertScrollHandler.getSmallestIndexDisplayed())
             {
