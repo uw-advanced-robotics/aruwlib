@@ -38,6 +38,7 @@ RUN apt-get update -qq
     g++ \
     gcovr \
     git \
+    libcpanel-json-xs-perl \
     libgmock-dev \
     locales \
     locales-all \
