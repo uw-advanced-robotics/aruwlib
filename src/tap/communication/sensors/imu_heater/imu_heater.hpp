@@ -34,12 +34,6 @@ namespace tap::communication::sensors::imu_heater
 class ImuHeater
 {
 public:
-    /**
-     * Normal operating temperature is ~40 degrees C, and RM manual says the optimal operating
-     * temperature is ~15-20 degrees C above the normal operating temperature of the board.
-     */
-    static constexpr float IMU_DESIRED_TEMPERATURE = 50.0f;
-
     ImuHeater(Drivers *drivers);
     DISALLOW_COPY_AND_ASSIGN(ImuHeater)
     ~ImuHeater() = default;
@@ -56,6 +50,11 @@ public:
      */
     void runTemperatureController(float temperature);
 
+    inline void setImuDesiredTemperature(float temperature)
+    {
+        IMU_DESIRED_TEMPERATURE = temperature;
+    }
+
 private:
     /**
      * PID constants for temperature control.
@@ -71,6 +70,12 @@ private:
      * of controlling the temperature of the IMU.
      */
     static constexpr float HEATER_PWM_FREQUENCY = 1000.0f;
+
+    /**
+     * Normal operating temperature is ~40 degrees C, and RM manual says the optimal operating
+     * temperature is ~15-20 degrees C above the normal operating temperature of the board.
+     */
+    float IMU_DESIRED_TEMPERATURE = 50.0f;
 
     Drivers *drivers;
 

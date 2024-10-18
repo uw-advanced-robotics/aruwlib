@@ -94,3 +94,18 @@ TEST_F(ImuHeaterTest, runTemperatureController_output_always_between_0_and_1)
         }
     }
 }
+
+TEST_F(ImuHeaterTest, runTemperatureController_output_changes_with_temperature_change)
+{
+    int changedTemperature = ImuHeater::IMU_DESIRED_TEMPERATURE - 15;
+
+    heater.runTemperatureController(changedTemperature);
+
+    EXPECT_NEAR(1, imuHeaterOutput, 1E-3);
+
+    heater.setImuDesiredTemperature(changedTemperature);
+
+    heater.runTemperatureController(changedTemperature);
+
+    EXPECT_NEAR(0, imuHeaterOutput, 1E-3);
+}
