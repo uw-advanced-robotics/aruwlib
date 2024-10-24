@@ -244,6 +244,19 @@ constexpr Q round(const Q& lhs, const R& rhs) requires Isomorphic<Q, R>
 }
 
 /**
+ * @brief Wraps a quantity between two other isomorphic quantities
+ * @param value the quantity to wrap
+ * @param lower the lower bound
+ * @param upper the upper bound
+ */
+template <isQuantity Q, isQuantity R, isQuantity S>
+constexpr Q wrap(Q value, R lower, S upper) requires Isomorphic<Q, R, S>
+{
+    if (lower > upper) return wrap(value, upper, lower);
+    return (value < Q(0) ? upper : lower) + mod(value, upper - lower);
+}
+
+/**
  * @brief Calculates the trigonometric sine of an angle
  * @param rhs the angle
  * @return constexpr Number the sine of the angle
@@ -303,7 +316,7 @@ constexpr Angle<F> acos(const Q& rhs)
  * @param rhs the ratio
  * @return the angle
  */
-template <int F = 0,isQuantity Q>
+template <int F = 0, isQuantity Q>
 constexpr Angle<F> atan(const Q& rhs)
 {
     return Angle<F>(std::atan(rhs.internal()));

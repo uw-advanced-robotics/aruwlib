@@ -62,7 +62,8 @@ public:
     /**
      * @brief convenience label. Represents an isomorphic unit (equal dimensions)
      */
-    using Self = Quantity<Time, Length, Mass, Current, Temperature, Angle>;
+    template <int F>
+    using Self = Quantity<Time, Length, Mass, Current, Temperature, Angle, F>;
 
     // Constructors
     /**
@@ -78,7 +79,10 @@ public:
      * @brief Construct a new Quantity object
      * @param other The other quantity to copy
      */
-    constexpr Quantity(const Self other) : value(other.value) {}
+    template <int F>
+    constexpr Quantity(const Self<F> other) : value(other.value)
+    {
+    }
 
     /**
      * @brief Returns the value of the quantity in its base unit
@@ -90,7 +94,11 @@ public:
      * @brief Returns the value of the quantity converted to another unit
      * @param other The other unit to convert to
      */
-    constexpr float convertTo(const Self unit) const { return value / unit.value; }
+    template <int F>
+    constexpr float convertTo(const Self<F> unit) const
+    {
+        return value / unit.value;
+    }
 
     // Operators
 
@@ -98,13 +106,13 @@ public:
      * @brief Adds another quantity to this one
      * @param other The right hand addend
      */
-    constexpr void operator+=(const Self other) { value += other.value; }
+    constexpr void operator+=(const Self<Frame> other) { value += other.value; }
 
     /**
      * @brief Subtracts another quantity from this one
      * @param other The right hand minuend
      */
-    constexpr void operator-=(const Self other) { value -= other.value; }
+    constexpr void operator-=(const Self<Frame> other) { value -= other.value; }
 
     /**
      * @brief Multiplies this quantity by a unitless factor
@@ -117,6 +125,12 @@ public:
      * @param scalar The factor to divide by
      */
     constexpr void operator/=(const float dividend) { value /= dividend; }
+
+    template <int F = 0>
+    constexpr Self<F> inOtherFrame(float factor = 1)
+    {
+        return Self<F>(value * factor);
+    }
 };
 
 /**
