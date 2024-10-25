@@ -72,7 +72,7 @@ void HardwareTestMenu::shortButtonPress(modm::MenuButtons::Button button)
             {
                 if (subsystemIndex++ == vertScrollHandler.getCursorIndex())
                 {
-                    if (drivers->commandScheduler.runningTest(*it))
+                    if (drivers->commandScheduler.isRunningTest(*it))
                     {
                         drivers->commandScheduler.stopHardwareTest(*it);
                     }
@@ -150,8 +150,9 @@ void HardwareTestMenu::draw()
                     subsystemIndex >= (vertScrollHandler.getSmallestIndexDisplayed()))
                 {
                     display << ((subsystemIndex == vertScrollHandler.getCursorIndex()) ? ">" : " ")
-                            << ((sub->getTestCommand()->isFinished()) ? " + " : " x ")
-                            << (drivers->commandScheduler.runningTest(sub) ? "[stop] " : "[run]  ")
+                            << ((drivers->commandScheduler.hasPassedTest(sub)) ? " + " : " x ")
+                            << (drivers->commandScheduler.isRunningTest(sub) ? "[stop] "
+                                                                             : "[run]  ")
                             << sub->getName() << modm::endl;
                 }
                 subsystemIndex++;

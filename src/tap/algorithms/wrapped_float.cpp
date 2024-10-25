@@ -35,9 +35,7 @@ WrappedFloat::WrappedFloat(const float value, const float lowerBound, const floa
 
 bool WrappedFloat::operator==(const WrappedFloat& other) const
 {
-    if (!compareFloatClose(this->getLowerBound(), other.getLowerBound(), EPSILON) ||
-        compareFloatClose(this->getUpperBound(), other.getUpperBound(), EPSILON))
-        return false;
+    assertBoundsEqual(other);
 
     return this->wrapped == other.wrapped;
 }

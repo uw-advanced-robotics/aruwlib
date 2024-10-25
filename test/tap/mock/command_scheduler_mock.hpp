@@ -48,7 +48,8 @@ public:
     MOCK_METHOD(void, stopAllHardwareTests, (), (override));
     MOCK_METHOD(void, stopHardwareTest, (const control::Subsystem *), (override));
     MOCK_METHOD(int, countRunningHardwareTests, (), (override));
-    MOCK_METHOD(bool, runningTest, (const control::Subsystem *), (override));
+    MOCK_METHOD(bool, isRunningTest, (const control::Subsystem *), (override));
+    MOCK_METHOD(bool, hasPassedTest, (const control::Subsystem *), (override));
 
     MOCK_METHOD(int, subsystemListSize, (), (const override));
     MOCK_METHOD(int, commandListSize, (), (const override));

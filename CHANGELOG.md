@@ -12,7 +12,8 @@
     - Hardware tests now only run when the robot is out of safe disconnect mode.
     - All tests are runnable with `CommandScheduler::runAllHardwareTests`, while individual tests can be run with `CommandScheduler::runHardwareTest(const Subsystem*)`
     - Similarly, `CommandScheduler::stopAllHardwareTests` and `CommandScheduler::stopHardwareTest(const Subsystem*)` exist.
-    - `CommandScheduler::runningTest(const Subsystem*)` returns true if the subsystem is running a hardware test.
+    - `CommandScheduler::isRunningTest(const Subsystem*)` returns true if the subsystem is running a hardware test.
+    - `CommandScheduler::hasPassedTest(const Subsystem*)` returns true if the subsystem has passed a hardware test.
     - `CommandScheduler::countRunningHardwareTests()` returns the number of hardware tests currently running.
     - Hardware Test Menu:
         - The tests now must be manually run and don't start when the menu is open.

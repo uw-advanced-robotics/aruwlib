@@ -194,6 +194,19 @@ void CommandScheduler::run()
         // Refresh subsystems in the registeredSubsystemBitmap
         for (auto it = subMapBegin(); it != subMapEnd(); it++)
         {
+            Command *testCommand;
+            if (!safeDisconnected() &&
+                !(subsystemsAssociatedWithCommandBitmap &
+                  (LSB_ONE_HOT_SUBSYSTEM_BITMAP << (*it)->getGlobalIdentifier())) &&
+                (testCommand = (*it)->getTestCommand()) != nullptr)
+            {
+                if (testCommand->isFinished())
+                {
+                    this->subsystemsPassingHardwareTests |=
+                        (LSB_ONE_HOT_SUBSYSTEM_BITMAP << (*it)->getGlobalIdentifier());
+                }
+            }
+
             // Call appropriate refresh function for each of the subsystems
             if (safeDisconnected())
             {
@@ -351,6 +364,8 @@ void CommandScheduler::runHardwareTest(const Subsystem *subsystem)
     Command *testCommand = subsystem->getTestCommand();
     if (testCommand != nullptr)
     {
+        this->subsystemsPassingHardwareTests &=
+            ~(LSB_ONE_HOT_SUBSYSTEM_BITMAP << subsystem->getGlobalIdentifier());
         this->addCommand(testCommand);
     }
 }
@@ -383,7 +398,7 @@ int CommandScheduler::countRunningHardwareTests()
     int total = 0;
     for (auto it = subMapBegin(); it != subMapEnd(); it++)
     {
-        if (this->runningTest(*it))
+        if (this->isRunningTest(*it))
         {
             total += 1;
         }
@@ -392,9 +407,15 @@ int CommandScheduler::countRunningHardwareTests()
     return total;
 }
 
-bool CommandScheduler::runningTest(const Subsystem *subsystem)
+bool CommandScheduler::isRunningTest(const Subsystem *subsystem)
 {
     return this->isCommandScheduled(subsystem->getTestCommand());
+}
+
+bool CommandScheduler::hasPassedTest(const Subsystem *subsystem)
+{
+    return (this->subsystemsPassingHardwareTests &
+            (LSB_ONE_HOT_SUBSYSTEM_BITMAP << subsystem->getGlobalIdentifier())) != 0;
 }
 
 int CommandScheduler::subsystemListSize() const

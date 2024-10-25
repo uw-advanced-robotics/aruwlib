@@ -242,7 +242,13 @@ public:
      * @param[in] subsystem the subsystem to check
      * @return `true` if the test command is running, `false` otherwise.
      */
-    mockable bool runningTest(const Subsystem* subsystem);
+    mockable bool isRunningTest(const Subsystem* subsystem);
+
+    /**
+     * @param[in] subsystem the subsystem to check
+     * @return `true` if the test command has passed, `false` otherwise.
+     */
+    mockable bool hasPassedTest(const Subsystem* subsystem);
 
     /**
      * @return The number of subsystems registered with the scheduler.
@@ -398,9 +404,16 @@ private:
     /**
      * Each bit in the bitmap corresponds to an index into the subsystem registrar. If a
      * bit is set, it means that the subsystem in the registrar has a command associated
-     * in in this scheduler.
+     * in this scheduler.
      */
     subsystem_scheduler_bitmap_t subsystemsAssociatedWithCommandBitmap = 0;
+
+    /**
+     * Each bit in the bitmap corresponds to an index into the subsystem registrar. If a
+     * bit is set, it means that the subsystem in the registrar has passed a hardware test
+     * in this scheduler.
+     */
+    subsystem_scheduler_bitmap_t subsystemsPassingHardwareTests = 0;
 
     /**
      * If a command has been added and is running, the associated bit in this bitmap will
