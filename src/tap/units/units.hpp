@@ -22,118 +22,149 @@
 #include "temperature.hpp"
 #include "unit_macros.hpp"
 
-
 namespace tap::units
 {
 #define M_PI_F 3.14159265358979323846f
 #define M_2PI_F 6.28318530717958647692f
 
 // Number
-NEW_UNIT(Number, number, n, 0, 0, 0, 0, 0, 0)
-NEW_UNIT_LITERAL(Number, percent, pct, number<F> * 0.01f);
+NEW_UNIT(Number, NUMBER, Number, n, 0, 0, 0, 0, 0, 0)
+NEW_UNIT_LITERAL(Number, PERCENT, Percent, pct, NUMBER<F> * 0.01f);
 
 // Time, Frequency
-NEW_UNIT(Time, second, s, 1, 0, 0, 0, 0, 0)
-UNIT_METRIC_PREFIXES_SMALL(Time, second, s)
-NEW_UNIT_LITERAL(Time, minute, min, second<F> * 60.0f)
-NEW_UNIT_LITERAL(Time, hour, min, minute<F> * 60.0f)
-NEW_UNIT_LITERAL(Time, day, min, hour<F> * 24.0f)
+NEW_UNIT(Time, SECOND, Second, s, 1, 0, 0, 0, 0, 0)
+UNIT_METRIC_PREFIXES_SMALL(Time, SECOND, second, s)
+NEW_UNIT_LITERAL(Time, MINUTE, Minute, min, SECOND<F> * 60.0f)
+NEW_UNIT_LITERAL(Time, HOUR, Hour, min, MINUTE<F> * 60.0f)
+NEW_UNIT_LITERAL(Time, DAY, Day, min, HOUR<F> * 24.0f)
 
-NEW_UNIT(Frequency, hertz, Hz, -1, 0, 0, 0, 0, 0)
-UNIT_METRIC_PREFIXES_ALL(Frequency, hertz, Hz)
+NEW_UNIT(Frequency, HERTZ, Hertz, Hz, -1, 0, 0, 0, 0, 0)
+UNIT_METRIC_PREFIXES_ALL(Frequency, HERTZ, hertz, Hz)
 
 // Length, Area, Volume
-NEW_UNIT(Length, meter, m, 0, 1, 0, 0, 0, 0)
-UNIT_METRIC_PREFIXES_ALL(Length, meter, m)
-NEW_UNIT_LITERAL(Length, inch, in, centimeter<F> * 2.54f)
-NEW_UNIT_LITERAL(Length, foot, ft, inch<F> * 12.0f)
-NEW_UNIT_LITERAL(Length, yard, yd, foot<F> * 3.0f)
-NEW_UNIT_LITERAL(Length, mile, mi, foot<F> * 5280.0f)
+NEW_UNIT(Length, METER, Meter, m, 0, 1, 0, 0, 0, 0)
+UNIT_METRIC_PREFIXES_ALL(Length, METER, meter, m)
+NEW_UNIT_LITERAL(Length, INCH, Inch, in, CENTIMETER<F> * 2.54f)
+NEW_UNIT_LITERAL(Length, FOOT, Foot, ft, INCH<F> * 12.0f)
+NEW_UNIT_LITERAL(Length, YARD, Yard, yd, FOOT<F> * 3.0f)
+NEW_UNIT_LITERAL(Length, MILE, Mile, mi, FOOT<F> * 5280.0f)
 
-NEW_UNIT(Area, square_meter, m2, 0, 2, 0, 0, 0, 0)
-NEW_UNIT_LITERAL(Area, square_inch, in2, inch<F>* inch<F>)
-NEW_UNIT_LITERAL(Area, square_foot, ft2, foot<F>* foot<F>)
+NEW_UNIT(Area, SQUARE_METER, SquareMeter, m2, 0, 2, 0, 0, 0, 0)
+NEW_UNIT_LITERAL(Area, SQUARE_INCH, SquareInch, in2, INCH<F>* INCH<F>)
+NEW_UNIT_LITERAL(Area, SQUARE_FOOT, SquareFoot, ft2, FOOT<F>* FOOT<F>)
 
-NEW_UNIT(Volume, cubic_meter, m3, 0, 3, 0, 0, 0, 0)
-NEW_UNIT_LITERAL(Volume, cubic_inch, in3, inch<F>* inch<F>* inch<F>)
-NEW_UNIT_LITERAL(Volume, cubic_foot, ft3, foot<F>* foot<F>* foot<F>)
-NEW_UNIT_LITERAL(Volume, cubic_yard, yd3, yard<F>* yard<F>* yard<F>)
-NEW_UNIT_LITERAL(Volume, liter, L, cubic_meter<F> * 0.001f)
+NEW_UNIT(Volume, CUBIC_METER, CubicMeter, m3, 0, 3, 0, 0, 0, 0)
+NEW_UNIT_LITERAL(Volume, CUBIC_INCH, CubicInch, in3, INCH<F>* INCH<F>* INCH<F>)
+NEW_UNIT_LITERAL(Volume, LITER, Liter, L, CUBIC_METER<F> * 0.001f)
 
 // Mass, Inertia
-NEW_UNIT(Mass, kilogram, kg, 0, 0, 1, 0, 0, 0)
-NEW_UNIT_LITERAL(Mass, gram, g, kilogram<F> * 10E-3f)
-UNIT_METRIC_PREFIXES_SMALL(Mass, gram, g)
-NEW_UNIT_LITERAL(Mass, pound, lb, gram<F> * 453.59237f)
+NEW_UNIT(Mass, KILOGRAM, Kilogram, kg, 0, 0, 1, 0, 0, 0)
+NEW_UNIT_LITERAL(Mass, GRAM, Gram, g, KILOGRAM<F> * 10E-3f)
+UNIT_METRIC_PREFIXES_SMALL(Mass, GRAM, gram, g)
+NEW_UNIT_LITERAL(Mass, POUND, Pound, lb, GRAM<F> * 453.59237f)
 
-NEW_UNIT(Inertia, kilogram_meter_squared, kgm2, 0, 2, 1, 0, 0, 0)
+NEW_UNIT(Inertia, KILOGRAM_METER_SQUARED, KilogramMeterSquared, kgm2, 0, 2, 1, 0, 0, 0)
 
 // Current, Charge, Voltage
-NEW_UNIT(Current, amp, A, 0, 0, 0, 1, 0, 0)
-UNIT_METRIC_PREFIXES_ALL(Current, amp, A)
+NEW_UNIT(Current, AMPERE, Ampere, A, 0, 0, 0, 1, 0, 0)
+UNIT_METRIC_PREFIXES_ALL(Current, AMPERE, amp, A)
 
-NEW_UNIT(Charge, coulomb, C, 1, 0, 0, 1, 0, 0)
-UNIT_METRIC_PREFIXES_ALL(Charge, coulomb, C)
+NEW_UNIT(Charge, COULOMB, Coulomb, C, 1, 0, 0, 1, 0, 0)
+UNIT_METRIC_PREFIXES_ALL(Charge, COULOMB, coulomb, C)
 
-NEW_UNIT(Voltage, volt, V, -3, 2, 1, -1, 0, 0)
-UNIT_METRIC_PREFIXES_ALL(Voltage, volt, V)
+NEW_UNIT(Voltage, VOLT, Volt, V, -3, 2, 1, -1, 0, 0)
+UNIT_METRIC_PREFIXES_ALL(Voltage, VOLT, volt, V)
 
 // Angle
-NEW_UNIT(Angle, radian, rad, 0, 0, 0, 0, 0, 1)
-NEW_UNIT_LITERAL(Angle, degree, deg, radian<F> * 180.0f / M_PI_F)
-NEW_UNIT_LITERAL(Angle, rotation, rot, radian<F>* M_2PI_F)
+NEW_UNIT(Angle, RADIAN, Radian, rad, 0, 0, 0, 0, 0, 1)
+NEW_UNIT_LITERAL(Angle, DEGREE, Degree, deg, RADIAN<F> * 180.0f / M_PI_F)
+NEW_UNIT_LITERAL(Angle, ROTATION, Rotation, rot, RADIAN<F>* M_2PI_F)
+NEW_UNIT_LITERAL(Angle, ARC_MINUTE, ArcMinute, arcmin, DEGREE<F> / 60.0f)
+NEW_UNIT_LITERAL(Angle, ARC_SECOND, ArcSecond, arcsec, DEGREE<F> / 3600.0f)
 
 // Linear Velocity, Acceleration, Jerk
-NEW_UNIT(LinearVelocity, meter_per_second, mps, -1, 1, 0, 0, 0, 0)
-NEW_UNIT_LITERAL(LinearVelocity, foot_per_second, fps, foot<F> / second<F>)
-NEW_UNIT_LITERAL(LinearVelocity, mile_per_hour, mph, mile<F> / hour<F>)
-NEW_UNIT_LITERAL(LinearVelocity, kilometer_per_hour, kmph, kilometer<F> / hour<F>)
+NEW_UNIT(LinearVelocity, METER_PER_SECOND, MetersPerSecond, mps, -1, 1, 0, 0, 0, 0)
+NEW_UNIT_LITERAL(LinearVelocity, FOOT_PER_SECOND, FeetPerSecond, fps, FOOT<F> / SECOND<F>)
+NEW_UNIT_LITERAL(LinearVelocity, MILE_PER_HOUR, MilesPerHour, mph, MILE<F> / HOUR<F>)
+NEW_UNIT_LITERAL(
+    LinearVelocity,
+    KILOMETERS_PER_HOUR,
+    KilometerPerHour,
+    kmph,
+    KILOMETER<F> / HOUR<F>)
 
-NEW_UNIT(LinearAcceleration, meter_per_second_squared, mps2, -2, 1, 0, 0, 0, 0)
+NEW_UNIT(
+    LinearAcceleration,
+    METER_PER_SECOND_SQUARED,
+    MetersPerSecondSquared,
+    mps2,
+    -2,
+    1,
+    0,
+    0,
+    0,
+    0)
 NEW_UNIT_LITERAL(
     LinearAcceleration,
-    foot_per_second_squared,
+    FOOT_PER_SECOND_SQUARED,
+    FeetPerSecondSquared,
     fps2,
-    foot<F> / (second<F> * second<F>))
+    FOOT<F> / (SECOND<F> * SECOND<F>))
 
-NEW_UNIT(LinearJerk, meter_per_second_cubed, mps3, -3, 1, 0, 0, 0, 0)
+NEW_UNIT(LinearJerk, METER_PER_SECOND_CUBED, MetersPerSecondCubed, mps3, -3, 1, 0, 0, 0, 0)
 NEW_UNIT_LITERAL(
     LinearJerk,
-    foot_per_second_cubed,
+    FOOT_PER_SECOND_CUBED,
+    FeetPerSecondCubed,
     fps3,
-    foot<F> / (second<F> * second<F> * second<F>))
+    FOOT<F> / (SECOND<F> * SECOND<F> * SECOND<F>))
 
 // Angular Velocity, Acceleration, Jerk
-NEW_UNIT(AngularVelocity, radian_per_second, rps, -1, 0, 0, 0, 0, 1)
-NEW_UNIT_LITERAL(AngularVelocity, rpm, rpm, rotation<F> / minute<F>)
+NEW_UNIT(AngularVelocity, RADIAN_PER_SECOND, RadsPerSecond, radps, -1, 0, 0, 0, 0, 1)
+NEW_UNIT_LITERAL(AngularVelocity, RPM, Rpm, rpm, ROTATION<F> / MINUTE<F>)
 
-NEW_UNIT(AngularAcceleration, radian_per_second_squared, rps2, -2, 0, 0, 0, 0, 1)
-NEW_UNIT_LITERAL(AngularAcceleration, rpm2, rpm2, rotation<F> / (minute<F> * minute<F>))
+NEW_UNIT(
+    AngularAcceleration,
+    RADIAN_PER_SECOND_SQUARED,
+    RadsPerSecondSquared,
+    radps2,
+    -2,
+    0,
+    0,
+    0,
+    0,
+    1)
+NEW_UNIT_LITERAL(AngularAcceleration, RPM2, RpmSquared, rpm2, ROTATION<F> / (MINUTE<F> * MINUTE<F>))
 
-NEW_UNIT(AngularJerk, radian_per_second_cubed, rps3, -3, 0, 0, 0, 0, 1)
-NEW_UNIT_LITERAL(AngularJerk, rpm3, rpm3, rotation<F> / (minute<F> * minute<F> * minute<F>))
+NEW_UNIT(AngularJerk, RADIAN_PER_SECOND_CUBED, RadsPerSecondCubed, radps3, -3, 0, 0, 0, 0, 1)
+NEW_UNIT_LITERAL(
+    AngularJerk,
+    RPM3,
+    RpmCubed,
+    rpm3,
+    ROTATION<F> / (MINUTE<F> * MINUTE<F> * MINUTE<F>))
 
 // Force, Pressure, Momentum, Impulse, Energy, Power
-NEW_UNIT(Force, newton, N, -2, 1, 1, 0, 0, 0)
-UNIT_METRIC_PREFIXES_ALL(Force, newton, N)
+NEW_UNIT(Force, NEWTON, Newton, N, -2, 1, 1, 0, 0, 0)
+UNIT_METRIC_PREFIXES_ALL(Force, NEWTON, newton, N)
 
-NEW_UNIT(Pressure, pascal, Pa, -2, -1, 1, 0, 0, 0)
-UNIT_METRIC_PREFIXES_ALL(Pressure, pascal, Pa)
+NEW_UNIT(Pressure, PASCAL, Pascal, Pa, -2, -1, 1, 0, 0, 0)
+UNIT_METRIC_PREFIXES_ALL(Pressure, PASCAL, pascal, Pa)
 
-NEW_UNIT(Momentum, newton_second, Ns, -1, 1, 1, 0, 0, 0)
+NEW_UNIT(Momentum, NEWTON_SECOND, NewtonSecond, Ns, -1, 1, 1, 0, 0, 0)
 template <int F = 0>
 using Impulse = Momentum<F>;
 
-NEW_UNIT(Energy, joule, J, -2, 2, 1, 0, 0, 0)
-UNIT_METRIC_PREFIXES_ALL(Energy, joule, J)
+NEW_UNIT(Energy, JOULE, Joule, J, -2, 2, 1, 0, 0, 0)
+UNIT_METRIC_PREFIXES_ALL(Energy, JOULE, joule, J)
 
-NEW_UNIT(Power, watt, W, -3, 2, 1, 0, 0, 0)
-UNIT_METRIC_PREFIXES_ALL(Power, watt, W)
+NEW_UNIT(Power, WATT, Watt, W, -3, 2, 1, 0, 0, 0)
+UNIT_METRIC_PREFIXES_ALL(Power, WATT, watt, W)
 
 // Radius, Curvature
-NEW_UNIT(Radius, meter_per_radian, mprad, 0, 1, 0, 0, 0, -1)
+NEW_UNIT(Radius, METER_PER_RADIAN, MetersPerRadian, mprad, 0, 1, 0, 0, 0, -1)
 
-NEW_UNIT(Curvature, radian_per_meter, radpm, 0, -1, 0, 0, 0, 1)
+NEW_UNIT(Curvature, RADIAN_PER_METER, RadiansPerMeter, radpm, 0, -1, 0, 0, 0, 1)
 
 }  // namespace tap::units
 #endif  // TAPROOT_UNITS_HPP_

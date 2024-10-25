@@ -23,44 +23,41 @@
 namespace tap::units
 {
 // Temperature
-NEW_UNIT(Temperature, kelvin, K, 0, 0, 0, 0, 1, 0)
-NEW_UNIT_LITERAL(Temperature, rankine, R, kelvin<F> / 1.8f)
+NEW_UNIT(Temperature, KELVIN, Kelvin, K, 0, 0, 0, 0, 1, 0)
+NEW_UNIT_LITERAL(Temperature, RANKING, Rankine, R, KELVIN<F> / 1.8f)
 
 namespace constants
 {
 template <int F = 0>
-constexpr Temperature fahrenheit = rankine<F>;
+constexpr Temperature FAHRENHEIT = RANKINE<F>;
 template <int F = 0>
-constexpr Temperature celsius = kelvin<F>;
+constexpr Temperature CELSIUS = KELVIN<F>;
 
-// Specific constants
 template <int F = 0>
-constexpr Temperature absolute_zero = Temperature<F>(0.0f);
+constexpr Temperature WATER_FREEZING_POINT = Temperature<F>(273.15f);
 template <int F = 0>
-constexpr Temperature water_freezing_point = Temperature<F>(273.15f);
-template <int F = 0>
-constexpr Temperature water_boiling_point = Temperature<F>(373.15);
+constexpr Temperature WATER_BOILING_POINT = Temperature<F>(373.15);
 }  // namespace constants
 
 namespace conversions
 {
 template <int F = 0>
-constexpr inline Temperature<F> from_fahrenheit(float value)
+constexpr inline Temperature<F> fromFahrenheit(float value)
 {
     return Temperature<F>((value - 32) * (5.0 / 9.0) + 273.15);
 }
 template <int F = 0>
-constexpr inline float to_fahrenheit(Temperature<F> quantity)
+constexpr inline float toFahrenheit(Temperature<F> quantity)
 {
     return (quantity.valueOf() - 273.15f) * (9.0 / 5.0);
 }
 template <int F = 0>
-constexpr inline Temperature<F> from_celsius(float value)
+constexpr inline Temperature<F> fromCelsius(float value)
 {
     return Temperature(value + 273.15f);
 }
 template <int F = 0>
-constexpr inline float to_celsius(Temperature<F> quantity)
+constexpr inline float toCelsius(Temperature<F> quantity)
 {
     return quantity.internal() - 273.15f;
 }
@@ -69,19 +66,19 @@ namespace literals
 {
 constexpr Temperature<> operator"" _degF(long double value)
 {
-    return conversions::from_fahrenheit(static_cast<float>(value));
+    return conversions::fromFahrenheit(static_cast<float>(value));
 }
 constexpr Temperature<> operator"" _degF(unsigned long long value)
 {
-    return conversions::from_fahrenheit(static_cast<float>(value));
+    return conversions::fromFahrenheit(static_cast<float>(value));
 }
 constexpr Temperature<> operator"" _degC(long double value)
 {
-    return conversions::from_celsius(static_cast<float>(value));
+    return conversions::fromCelsius(static_cast<float>(value));
 }
 constexpr Temperature<> operator"" _degC(unsigned long long value)
 {
-    return conversions::from_celsius(static_cast<float>(value));
+    return conversions::fromCelsius(static_cast<float>(value));
 }
 }  // namespace literals
 }  // namespace tap::units
