@@ -19,8 +19,10 @@
 
 #ifndef TAPROOT_QUANTITY_HPP_
 #define TAPROOT_QUANTITY_HPP_
+
 #include <ratio>
 #include <type_traits>
+
 using std::ratio, std::ratio_add, std::ratio_subtract, std::ratio_multiply, std::ratio_divide,
     std::ratio_equal;
 namespace tap::units
@@ -62,25 +64,33 @@ public:
     /**
      * @brief convenience label. Represents an isomorphic unit (equal dimensions)
      */
+    using Self = Quantity<Time, Length, Mass, Current, Temperature, Angle, Frame>;
+
+    /**
+     * @brief Convenience label. Represents an isomorphic unit (equal dimensions) in an arbitrary
+     * frame.
+     */
     template <int F>
-    using Self = Quantity<Time, Length, Mass, Current, Temperature, Angle, F>;
+    using SelfOtherFrame = Quantity<Time, Length, Mass, Current, Temperature, Angle, F>;
 
     // Constructors
     /**
      * @brief Construct a new Quantity object
      * @param value The new value of the quantity, in its base unit
      */
-    constexpr Quantity(float value) : value(value) {}
+    explicit constexpr Quantity(float value) : value(value) {}
+
     /**
      * @brief Construct a new Quantity object. Default constructor, initializes value to 0
      */
-    constexpr Quantity() : value(0) {}
+    explicit constexpr Quantity() : value(0) {}
+
     /**
      * @brief Construct a new Quantity object
      * @param other The other quantity to copy
      */
     template <int F>
-    constexpr Quantity(const Self<F> other) : value(other.value)
+    constexpr Quantity(const SelfOtherFrame<F> other) : value(other.value)
     {
     }
 
@@ -95,7 +105,7 @@ public:
      * @param other The other unit to convert to
      */
     template <int F>
-    constexpr float convertTo(const Self<F> unit) const
+    constexpr float convertTo(const SelfOtherFrame<F> unit) const
     {
         return value / unit.value;
     }
@@ -106,13 +116,13 @@ public:
      * @brief Adds another quantity to this one
      * @param other The right hand addend
      */
-    constexpr void operator+=(const Self<Frame> other) { value += other.value; }
+    constexpr void operator+=(const SelfOtherFrame<Frame> other) { value += other.value; }
 
     /**
      * @brief Subtracts another quantity from this one
      * @param other The right hand minuend
      */
-    constexpr void operator-=(const Self<Frame> other) { value -= other.value; }
+    constexpr void operator-=(const SelfOtherFrame<Frame> other) { value -= other.value; }
 
     /**
      * @brief Multiplies this quantity by a unitless factor
@@ -127,9 +137,9 @@ public:
     constexpr void operator/=(const float dividend) { value /= dividend; }
 
     template <int F = 0>
-    constexpr Self<F> inOtherFrame(float factor = 1)
+    constexpr SelfOtherFrame<F> inOtherFrame(float factor = 1)
     {
-        return Self<F>(value * factor);
+        return SelfOtherFrame<F>(value * factor);
     }
 };
 
@@ -149,8 +159,8 @@ constexpr void quantityChecker(Quantity<T, L, M, C, O, A, F> q)
 }
 
 /**
- * @brief Concept to use in template arguments (EX: template <isQuantity Q>). Requires Q to inherit
- * from Quantity and have matching dimensions
+ * @brief Concept to use in template arguments (EX: template <isQuantity Q>). Requires instances of
+ * Q to inherit from Quantity and have matching dimensions
  */
 template <typename Q>
 concept isQuantity = requires(Q q)
@@ -178,7 +188,7 @@ concept Isomorphic = isQuantity<Q> && (isQuantity<R> && ...) &&
  * @tparam R Additional quantity type(s) to compare
  */
 template <typename Q, typename... R>
-concept SameFrame = isQuantity<Q> && (isQuantity<R> && ...) && (Q::frame == R::frame && ...);
+concept SameFrame = isQuantity<Q> && (isQuantity<R> && ...) && ((Q::frame == R::frame) && ...);
 
 /**
  * @brief Concept to determine if quantities are isomorphic and in the same frame of reference.
@@ -253,15 +263,27 @@ using Exponentiated = Named<Quantity<
     ratio_multiply<typename Q::angle, R>,
     Q::frame>>;
 
+template <isQuantity Q>
+class Wrapped;
+
 /**
- * @brief Simplifiation of Quantity root. Represents the root of a quantity type, as a named type if
- * it exists.
- * @tparam Q The base quantity type
- * @tparam R The root to take
+ * @brief Internal utility function to check if a type is a Wrapped quantity. Should not be used
+ * directly.
  */
-template <isQuantity Q, typename R>
-using Rooted = Exponentiated < Q,
-      std::ratio_divide<std::ratio<1>, R>;
+template <isQuantity Q>
+void WrappedChecker(Wrapped<Q> w)
+{
+}
+
+/**
+ * @brief Concept to use in template arguments (EX: template <isWrappedQuantity Q>). Requires
+ * instances of Q to inherit from Wrapped and have matching dimensions
+ */
+template <typename Q>
+concept isWrappedQuantity = requires(Q w)
+{
+    WrappedChecker(w);
+};
 
 /**
  * @brief Adds two isomorphic and same-frame quantities.
@@ -270,7 +292,7 @@ using Rooted = Exponentiated < Q,
  * @return The sum of the two quantities, as a named type if it exists.
  */
 template <isQuantity Q, isQuantity R>
-constexpr Named<Q> operator+(Q lhs, R rhs) requires IsomorphicFrame<Q, R>
+constexpr Named<Q> operator+(Q lhs, R rhs) requires(IsomorphicFrame<Q, R> && !isWrappedQuantity<Q>)
 {
     return Named<Q>(lhs.valueOf() + rhs.valueOf());
 }
@@ -282,7 +304,7 @@ constexpr Named<Q> operator+(Q lhs, R rhs) requires IsomorphicFrame<Q, R>
  * @return The difference of the two quantities, as a named type if it exists.
  */
 template <isQuantity Q, isQuantity R>
-constexpr Named<Q> operator-(Q lhs, R rhs) requires IsomorphicFrame<Q, R>
+constexpr Named<Q> operator-(Q lhs, R rhs) requires(IsomorphicFrame<Q, R> && !isWrappedQuantity<Q>)
 {
     return Named<Q>(lhs.valueOf() - rhs.valueOf());
 }
@@ -294,7 +316,7 @@ constexpr Named<Q> operator-(Q lhs, R rhs) requires IsomorphicFrame<Q, R>
  * @return The product of the quantity and the scalar, as a named type if it exists.
  */
 template <isQuantity Q>
-constexpr Named<Q> operator*(Q lhs, float rhs)
+constexpr Named<Q> operator*(Q lhs, float rhs) requires(!isWrappedQuantity<Q>)
 {
     return Named<Q>(lhs.valueOf() * rhs);
 }
@@ -330,7 +352,7 @@ constexpr S operator*(Q lhs, R rhs) requires SameFrame<Q, R>
  * @return The quotient of the quantity and the scalar, as a named type if it exists.
  */
 template <isQuantity Q>
-constexpr Named<Q> operator/(Q lhs, float rhs)
+constexpr Named<Q> operator/(Q lhs, float rhs) requires(!isWrappedQuantity<Q>)
 {
     return Named<Q>(lhs.valueOf() / rhs);
 }

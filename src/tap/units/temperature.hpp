@@ -24,7 +24,7 @@ namespace tap::units
 {
 // Temperature
 NEW_UNIT(Temperature, KELVIN, Kelvin, K, 0, 0, 0, 0, 1, 0)
-NEW_UNIT_LITERAL(Temperature, RANKING, Rankine, R, KELVIN<F> / 1.8f)
+NEW_UNIT_LITERAL(Temperature, RANKINE, Rankine, R, KELVIN<F> / 1.8f)
 
 namespace constants
 {

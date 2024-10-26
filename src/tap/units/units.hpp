@@ -35,8 +35,8 @@ NEW_UNIT_LITERAL(Number, PERCENT, Percent, pct, NUMBER<F> * 0.01f);
 NEW_UNIT(Time, SECOND, Second, s, 1, 0, 0, 0, 0, 0)
 UNIT_METRIC_PREFIXES_SMALL(Time, SECOND, second, s)
 NEW_UNIT_LITERAL(Time, MINUTE, Minute, min, SECOND<F> * 60.0f)
-NEW_UNIT_LITERAL(Time, HOUR, Hour, min, MINUTE<F> * 60.0f)
-NEW_UNIT_LITERAL(Time, DAY, Day, min, HOUR<F> * 24.0f)
+NEW_UNIT_LITERAL(Time, HOUR, Hour, hr, MINUTE<F> * 60.0f)
+NEW_UNIT_LITERAL(Time, DAY, Day, day, HOUR<F> * 24.0f)
 
 NEW_UNIT(Frequency, HERTZ, Hertz, Hz, -1, 0, 0, 0, 0, 0)
 UNIT_METRIC_PREFIXES_ALL(Frequency, HERTZ, hertz, Hz)
@@ -55,7 +55,7 @@ NEW_UNIT_LITERAL(Area, SQUARE_FOOT, SquareFoot, ft2, FOOT<F>* FOOT<F>)
 
 NEW_UNIT(Volume, CUBIC_METER, CubicMeter, m3, 0, 3, 0, 0, 0, 0)
 NEW_UNIT_LITERAL(Volume, CUBIC_INCH, CubicInch, in3, INCH<F>* INCH<F>* INCH<F>)
-NEW_UNIT_LITERAL(Volume, LITER, Liter, L, CUBIC_METER<F> * 0.001f)
+NEW_UNIT_LITERAL(Volume, LITER, Liter, Li, CUBIC_METER<F> * 0.001f)
 
 // Mass, Inertia
 NEW_UNIT(Mass, KILOGRAM, Kilogram, kg, 0, 0, 1, 0, 0, 0)
@@ -69,7 +69,7 @@ NEW_UNIT(Inertia, KILOGRAM_METER_SQUARED, KilogramMeterSquared, kgm2, 0, 2, 1, 0
 NEW_UNIT(Current, AMPERE, Ampere, A, 0, 0, 0, 1, 0, 0)
 UNIT_METRIC_PREFIXES_ALL(Current, AMPERE, amp, A)
 
-NEW_UNIT(Charge, COULOMB, Coulomb, C, 1, 0, 0, 1, 0, 0)
+NEW_UNIT(Charge, COULOMB, Coulomb, Cl, 1, 0, 0, 1, 0, 0)
 UNIT_METRIC_PREFIXES_ALL(Charge, COULOMB, coulomb, C)
 
 NEW_UNIT(Voltage, VOLT, Volt, V, -3, 2, 1, -1, 0, 0)
@@ -145,7 +145,7 @@ NEW_UNIT_LITERAL(
     ROTATION<F> / (MINUTE<F> * MINUTE<F> * MINUTE<F>))
 
 // Force, Pressure, Momentum, Impulse, Energy, Power
-NEW_UNIT(Force, NEWTON, Newton, N, -2, 1, 1, 0, 0, 0)
+NEW_UNIT(Force, NEWTON, Newton, Ne, -2, 1, 1, 0, 0, 0)
 UNIT_METRIC_PREFIXES_ALL(Force, NEWTON, newton, N)
 
 NEW_UNIT(Pressure, PASCAL, Pascal, Pa, -2, -1, 1, 0, 0, 0)

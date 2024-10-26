@@ -1,10 +1,12 @@
 #ifndef TAPROOT_UNIT_MATH_HPP_
 #define TAPROOT_UNIT_MATH_HPP_
 
+#include <algorithm>
 #include <cmath>
 
 #include "quantity.hpp"
 #include "units.hpp"
+
 
 namespace tap::units::math
 {
@@ -17,7 +19,7 @@ namespace tap::units::math
 template <isQuantity Q>
 constexpr Q abs(const Q& lhs)
 {
-    return Q(std::abs(lhs.internal()));
+    return Q(std::abs(lhs.valueOf()));
 }
 
 /**
@@ -56,7 +58,7 @@ constexpr Q min(const Q& lhs, const R& rhs) requires Isomorphic<Q, R>
 template <int R, isQuantity Q, isQuantity S = Exponentiated<Q, ratio<R>>>
 constexpr S pow(const Q& lhs)
 {
-    return S(std::pow(lhs.internal(), R));
+    return S(std::pow(lhs.valueOf(), R));
 }
 
 /**
@@ -90,10 +92,10 @@ constexpr S cube(const Q& lhs)
  * @param lhs the quantity
  * @return constexpr S the R root of the quantity
  */
-template <int R, isQuantity Q, isQuantity S = Rooted<Q, ratio<R>>>
+template <int R, isQuantity Q, isQuantity S = Exponentiated<Q, ratio<1, R>>>
 constexpr S root(const Q& lhs)
 {
-    return S(std::pow(lhs.internal(), 1.0 / R));
+    return S(std::pow(lhs.valueOf(), 1.0 / R));
 }
 
 /**
@@ -102,7 +104,7 @@ constexpr S root(const Q& lhs)
  * @param lhs the quantity
  * @return constexpr S the square root of the quantity
  */
-template <isQuantity Q, isQuantity S = Rooted<Q, ratio<2>>>
+template <isQuantity Q, isQuantity S = Exponentiated<Q, ratio<1, 2>>>
 constexpr S sqrt(const Q& lhs)
 {
     return root<2>(lhs);
@@ -114,7 +116,7 @@ constexpr S sqrt(const Q& lhs)
  * @param lhs the quantity
  * @return constexpr S the cube root of the quantity
  */
-template <isQuantity Q, isQuantity S = Rooted<Q, ratio<3>>>
+template <isQuantity Q, isQuantity S = Exponentiated<Q, ratio<1, 3>>>
 constexpr S cbrt(const Q& lhs)
 {
     return root<3>(lhs);
@@ -130,7 +132,7 @@ constexpr S cbrt(const Q& lhs)
 template <isQuantity Q, isQuantity R>
 constexpr Q hypot(const Q& lhs, const R& rhs) requires Isomorphic<Q, R>
 {
-    return Q(std::hypot(lhs.internal(), rhs.internal()));
+    return Q(std::hypot(lhs.valueOf(), rhs.valueOf()));
 }
 
 /**
@@ -143,7 +145,7 @@ constexpr Q hypot(const Q& lhs, const R& rhs) requires Isomorphic<Q, R>
 template <isQuantity Q, isQuantity R>
 constexpr Q mod(const Q& lhs, const R& rhs) requires Isomorphic<Q, R>
 {
-    return Q(std::fmod(lhs.internal(), rhs.internal()));
+    return Q(std::fmod(lhs.valueOf(), rhs.valueOf()));
 }
 
 /**
@@ -156,7 +158,7 @@ constexpr Q mod(const Q& lhs, const R& rhs) requires Isomorphic<Q, R>
 template <isQuantity Q1, isQuantity Q2>
 constexpr Q1 copysign(const Q1& lhs, const Q2& rhs)
 {
-    return Q1(std::copysign(lhs.internal(), rhs.internal()));
+    return Q1(std::copysign(lhs.valueOf(), rhs.valueOf()));
 }
 
 /**
@@ -168,7 +170,7 @@ constexpr Q1 copysign(const Q1& lhs, const Q2& rhs)
 template <isQuantity Q>
 constexpr int sgn(const Q& lhs)
 {
-    return lhs.internal() < 0 ? -1 : 1;
+    return lhs.valueOf() < 0 ? -1 : 1;
 }
 
 /**
@@ -180,7 +182,7 @@ constexpr int sgn(const Q& lhs)
 template <isQuantity Q>
 constexpr bool signbit(const Q& lhs)
 {
-    return std::signbit(lhs.internal());
+    return std::signbit(lhs.valueOf());
 }
 
 /**
@@ -194,7 +196,7 @@ constexpr bool signbit(const Q& lhs)
 template <isQuantity Q, isQuantity R, isQuantity S>
 constexpr Q clamp(const Q& lhs, const R& lo, const S& hi) requires Isomorphic<Q, R, S>
 {
-    return Q(std::clamp(lhs.internal(), lo.internal(), hi.internal()));
+    return Q(std::clamp(lhs.valueOf(), lo.valueOf(), hi.valueOf()));
 }
 
 /**
@@ -206,7 +208,7 @@ constexpr Q clamp(const Q& lhs, const R& lo, const S& hi) requires Isomorphic<Q,
 template <isQuantity Q, isQuantity R>
 constexpr Q ceil(const Q& lhs, const R& rhs) requires Isomorphic<Q, R>
 {
-    return Q(std::ceil(lhs.internal() / rhs.internal()) * rhs.internal());
+    return Q(std::ceil(lhs.valueOf() / rhs.valueOf()) * rhs.valueOf());
 }
 
 /**
@@ -218,7 +220,7 @@ constexpr Q ceil(const Q& lhs, const R& rhs) requires Isomorphic<Q, R>
 template <isQuantity Q, isQuantity R>
 constexpr Q floor(const Q& lhs, const R& rhs) requires Isomorphic<Q, R>
 {
-    return Q(std::floor(lhs.internal() / rhs.internal()) * rhs.internal());
+    return Q(std::floor(lhs.valueOf() / rhs.valueOf()) * rhs.valueOf());
 }
 
 /**
@@ -229,7 +231,7 @@ constexpr Q floor(const Q& lhs, const R& rhs) requires Isomorphic<Q, R>
 template <isQuantity Q, isQuantity R>
 constexpr Q trunc(const Q& lhs, const R& rhs) requires Isomorphic<Q, R>
 {
-    return Q(std::trunc(lhs.internal() / rhs.internal()) * rhs.internal());
+    return Q(std::trunc(lhs.valueOf() / rhs.valueOf()) * rhs.valueOf());
 }
 
 /**
@@ -240,7 +242,7 @@ constexpr Q trunc(const Q& lhs, const R& rhs) requires Isomorphic<Q, R>
 template <isQuantity Q, isQuantity R>
 constexpr Q round(const Q& lhs, const R& rhs) requires Isomorphic<Q, R>
 {
-    return Q(std::round(lhs.internal() / rhs.internal()) * rhs.internal());
+    return Q(std::round(lhs.valueOf() / rhs.valueOf()) * rhs.valueOf());
 }
 
 /**
@@ -264,7 +266,7 @@ constexpr Q wrap(Q value, R lower, S upper) requires Isomorphic<Q, R, S>
 template <int F = 0, int G>
 constexpr Number<F> sin(const Angle<G>& rhs)
 {
-    return Number<F>(std::sin(rhs.internal()));
+    return Number<F>(std::sin(rhs.valueOf()));
 }
 
 /**
@@ -275,7 +277,7 @@ constexpr Number<F> sin(const Angle<G>& rhs)
 template <int F = 0, int G>
 constexpr Number<F> cos(const Angle<G>& rhs)
 {
-    return Number<F>(std::cos(rhs.internal()));
+    return Number<F>(std::cos(rhs.valueOf()));
 }
 
 /**
@@ -286,7 +288,7 @@ constexpr Number<F> cos(const Angle<G>& rhs)
 template <int F = 0, int G>
 constexpr Number<F> tan(const Angle<G>& rhs)
 {
-    return Number<F>(std::tan(rhs.internal()));
+    return Number<F>(std::tan(rhs.valueOf()));
 }
 
 /**
@@ -297,7 +299,7 @@ constexpr Number<F> tan(const Angle<G>& rhs)
 template <int F = 0, isQuantity Q>
 constexpr Angle<F> asin(const Q& rhs)
 {
-    return Angle<F>(std::asin(rhs.internal()));
+    return Angle<F>(std::asin(rhs.valueOf()));
 }
 
 /**
@@ -308,7 +310,7 @@ constexpr Angle<F> asin(const Q& rhs)
 template <int F = 0, isQuantity Q>
 constexpr Angle<F> acos(const Q& rhs)
 {
-    return Angle<F>(std::acos(rhs.internal()));
+    return Angle<F>(std::acos(rhs.valueOf()));
 }
 
 /**
@@ -319,7 +321,7 @@ constexpr Angle<F> acos(const Q& rhs)
 template <int F = 0, isQuantity Q>
 constexpr Angle<F> atan(const Q& rhs)
 {
-    return Angle<F>(std::atan(rhs.internal()));
+    return Angle<F>(std::atan(rhs.valueOf()));
 }
 
 /**
@@ -331,7 +333,7 @@ constexpr Angle<F> atan(const Q& rhs)
 template <int F = 0, isQuantity Q>
 constexpr Angle<F> atan2(const Q& lhs, const Q& rhs)
 {
-    return Angle<F>(std::atan2(lhs.internal(), rhs.internal()));
+    return Angle<F>(std::atan2(lhs.valueOf(), rhs.valueOf()));
 }
 }  // namespace tap::units::math
 #endif

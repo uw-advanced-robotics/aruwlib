@@ -60,19 +60,19 @@
  * @brief Utility macro to create large metric prefixes (kilo, mega, giga, tera) for a unit.
  */
 #define UNIT_METRIC_PREFIXES_LARGE(_name, _qname, _qfname, _qsuffix)                     \
-    NEW_UNIT_LITERAL(_name, KILO##_qname, Kilo##_qfname, k##_qsuffix, _qname<F> * 10E3f) \
-    NEW_UNIT_LITERAL(_name, MEGA##_qname, Mega##_qfname, M##_qsuffix, _qname<F> * 10E6f) \
-    NEW_UNIT_LITERAL(_name, GIGA##_qname, Giga##_qfname, G##_qsuffix, _qname<F> * 10E9f) \
-    NEW_UNIT_LITERAL(_name, TERA##_qname, Tera##_qfname, T##_qsuffix, _qname<F> * 10E12f)
+    NEW_UNIT_LITERAL(_name, KILO##_qname, Kilo##_qfname, k##_qsuffix, _qname<F> * 1E3f) \
+    NEW_UNIT_LITERAL(_name, MEGA##_qname, Mega##_qfname, M##_qsuffix, _qname<F> * 1E6f) \
+    NEW_UNIT_LITERAL(_name, GIGA##_qname, Giga##_qfname, G##_qsuffix, _qname<F> * 1E9f) \
+    NEW_UNIT_LITERAL(_name, TERA##_qname, Tera##_qfname, T##_qsuffix, _qname<F> * 1E12f)
 
 /**
  * @brief Utility macro to create small metric prefixes (centi, milli, micro, nano) for a unit.
  */
 #define UNIT_METRIC_PREFIXES_SMALL(_name, _qname, _qfname, _qsuffix)                        \
-    NEW_UNIT_LITERAL(_name, CENTI##_qname, Centi##_qfname, c##_qsuffix, _qname<F> * 10E-2f) \
-    NEW_UNIT_LITERAL(_name, MILLI##_qname, Milli##_qfname, m##_qsuffix, _qname<F> * 10E-3f) \
-    NEW_UNIT_LITERAL(_name, MICRO##_qname, Micro##_qfname, u##_qsuffix, _qname<F> * 10E-6f) \
-    NEW_UNIT_LITERAL(_name, NANO##_qname, Nano##_qfname, n##_qsuffix, _qname<F> * 10E-9f)
+    NEW_UNIT_LITERAL(_name, CENTI##_qname, Centi##_qfname, c##_qsuffix, _qname<F> * 1E-2f) \
+    NEW_UNIT_LITERAL(_name, MILLI##_qname, Milli##_qfname, m##_qsuffix, _qname<F> * 1E-3f) \
+    NEW_UNIT_LITERAL(_name, MICRO##_qname, Micro##_qfname, u##_qsuffix, _qname<F> * 1E-6f) \
+    NEW_UNIT_LITERAL(_name, NANO##_qname, Nano##_qfname, n##_qsuffix, _qname<F> * 1E-9f)
 
 /**
  * @brief Utility macro to create metric prefixes (nano through tera) for a unit.
