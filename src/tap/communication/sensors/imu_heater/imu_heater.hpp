@@ -50,10 +50,7 @@ public:
      */
     void runTemperatureController(float temperature);
 
-    inline void setDesiredTemperature(float temperature)
-    {
-        IMU_DESIRED_TEMPERATURE = temperature;
-    }
+    inline void setDesiredTemperature(float temperature) { IMU_DESIRED_TEMPERATURE = temperature; }
 
 private:
     /**
