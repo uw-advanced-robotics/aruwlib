@@ -50,7 +50,7 @@ public:
      */
     void runTemperatureController(float temperature);
 
-    inline void setImuDesiredTemperature(float temperature)
+    inline void setDesiredTemperature(float temperature)
     {
         IMU_DESIRED_TEMPERATURE = temperature;
     }
