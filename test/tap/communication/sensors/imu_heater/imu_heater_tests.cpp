@@ -33,9 +33,8 @@ protected:
 
     void SetUp() override
     {
-        ON_CALL(drivers.pwm, write).WillByDefault([&](float duty, tap::gpio::Pwm::Pin) {
-            imuHeaterOutput = duty;
-        });
+        ON_CALL(drivers.pwm, write)
+            .WillByDefault([&](float duty, tap::gpio::Pwm::Pin) { imuHeaterOutput = duty; });
     }
 
     tap::Drivers drivers;
