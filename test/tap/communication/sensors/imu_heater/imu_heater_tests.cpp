@@ -41,6 +41,8 @@ protected:
     tap::Drivers drivers;
     ImuHeater heater;
     float imuHeaterOutput = 0;
+
+    static constexpr float IMU_DESIRED_TEMPERATURE = 50;
 };
 
 TEST_F(ImuHeaterTest, initialize_sets_pwm_freq)
@@ -59,14 +61,14 @@ TEST_F(ImuHeaterTest, runTemperatureController_negative_temperature_writes_0_dut
 
 TEST_F(ImuHeaterTest, runTemperatureController_temp_gt_IMU_DESIRED_TEMPERATURE_writes_0_duty_cycle)
 {
-    heater.runTemperatureController(ImuHeater::IMU_DESIRED_TEMPERATURE + 10);
+    heater.runTemperatureController(IMU_DESIRED_TEMPERATURE + 10);
 
     EXPECT_NEAR(0, imuHeaterOutput, 1E-3);
 }
 
 TEST_F(ImuHeaterTest, runTemperatureController_temp_lt_IMU_DESIRED_TEMPERATURE_writes_1_duty_cycle)
 {
-    heater.runTemperatureController(std::max(0.0f, ImuHeater::IMU_DESIRED_TEMPERATURE - 10.0f));
+    heater.runTemperatureController(std::max(0.0f, IMU_DESIRED_TEMPERATURE - 10.0f));
 
     EXPECT_NEAR(1, imuHeaterOutput, 1E-3);
 }
@@ -93,4 +95,19 @@ TEST_F(ImuHeaterTest, runTemperatureController_output_always_between_0_and_1)
             EXPECT_THAT(imuHeaterOutput, IsBetween(0, 1));
         }
     }
+}
+
+TEST_F(ImuHeaterTest, runTemperatureController_output_changes_with_temperature_change)
+{
+    int changedTemperature = IMU_DESIRED_TEMPERATURE - 15;
+
+    heater.runTemperatureController(changedTemperature);
+
+    EXPECT_NEAR(1, imuHeaterOutput, 1E-3);
+
+    heater.setDesiredTemperature(changedTemperature);
+
+    heater.runTemperatureController(changedTemperature);
+
+    EXPECT_NEAR(0, imuHeaterOutput, 1E-3);
 }
