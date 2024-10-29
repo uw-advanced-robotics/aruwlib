@@ -46,11 +46,16 @@ public:
     /**
      * Runs a PID controller to regulate the temperature of the IMU.
      *
-     * @param[in] temperature The temperature of the mpu6500, units degrees C.
+     * @param[in] temperature The temperature of the imu, units degrees C.
      */
     void runTemperatureController(float temperature);
 
-    inline void setDesiredTemperature(float temperature) { IMU_DESIRED_TEMPERATURE = temperature; }
+    /**
+     * @brief Set the target temperature for the IMU heater.
+     *
+     * @param temperature Setpoint in degrees C.
+     */
+    inline void setDesiredTemperature(float temperature) { imuDesiredTemperature = temperature; }
 
 private:
     /**
@@ -72,7 +77,7 @@ private:
      * Normal operating temperature is ~40 degrees C, and RM manual says the optimal operating
      * temperature is ~15-20 degrees C above the normal operating temperature of the board.
      */
-    float IMU_DESIRED_TEMPERATURE = 50.0f;
+    float imuDesiredTemperature = 50.0f;
 
     Drivers *drivers;
 
