@@ -99,6 +99,12 @@ public:
 
     const std::vector<Command *> &getAssociatedCommands() const { return mappedCommands; }
 
+    bool isMappingSubsetAndNotNegated(const RemoteMapState &currState)
+    {
+        return mappingSubset(currState) &&
+               !(mapState.getNegKeysUsed() && negKeysSubset(mapState, currState));
+    }
+
 protected:
     /**
      * The RemoteMapState specified when constructing the CommandMapping.
