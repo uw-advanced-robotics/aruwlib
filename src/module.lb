@@ -65,6 +65,7 @@ def build(env):
     env.copy("tap/architecture")
     env.copy("tap/control")
     env.copy("tap/motor")
+    env.copy("tap/units")
 
     env.substitutions = {
         "object_and_mocks": drivers.get_object_and_mock_names(env),

@@ -107,7 +107,7 @@ public:
     template <int F>
     constexpr float convertTo(const SelfOtherFrame<F> unit) const
     {
-        return value / unit.value;
+        return value / unit.valueOf();
     }
 
     // Operators

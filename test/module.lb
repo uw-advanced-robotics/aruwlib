@@ -74,6 +74,7 @@ class TaprootTests(Module):
             env.copy("tap/algorithms")
             env.copy("tap/architecture")
             env.copy("tap/motor")
+            env.copy("tap/units")
             env.copy("tap/communication/serial/dji_serial_tests.cpp")
             env.copy("tap/communication/serial/remote_tests.cpp")
         if env.has_module(":communication:can"):
