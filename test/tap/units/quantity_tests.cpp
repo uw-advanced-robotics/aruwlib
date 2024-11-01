@@ -82,32 +82,6 @@ TEST(Quantity, operator__multiply_divide_equals)
     EXPECT_FLOAT_EQ(0, q1.valueOf());
 }
 
-TEST(Quantity, operator__add_subtract)
-{
-    Quantity<ratio<1>> q1(5);
-    Quantity<ratio<1>> q2(10);
-    Quantity<ratio<1>> q3 = q1 + q2;
-
-    EXPECT_FLOAT_EQ(15, q3.valueOf());
-
-    q3 = q1 - q2;
-    EXPECT_FLOAT_EQ(-5, q3.valueOf());
-}
-
-TEST(Quantity, operator__scalar_multiply_divide) {}
-
-TEST(Quantity, operator__quantity_multiply_divide)
-{
-    Quantity<ratio<1>> q1(5);
-    Quantity<ratio<1>, ratio<1>> q2(10);
-
-    Quantity<ratio<2>, ratio<1>> q3 = q1 * q2;
-    EXPECT_FLOAT_EQ(50, q3.valueOf());
-
-    Quantity<ratio<0>, ratio<-1>> q4 = q1 / q2;
-    EXPECT_FLOAT_EQ(0.5, q4.valueOf());
-}
-
 TEST(Quantity, frame__inOtherFrame)
 {
     Quantity<ratio<1>, ratio<1>> q1(5);
@@ -169,4 +143,66 @@ TEST(Quantity, named) {
 
     constexpr bool b = Isomorphic<Quantity<>, Named<Quantity<>>>;
     EXPECT_TRUE(b);
+}
+
+
+TEST(Quantity, operator__add_subtract)
+{
+    Quantity<ratio<1>> q1(5);
+    Quantity<ratio<1>> q2(10);
+    Quantity<ratio<1>> q3 = q1 + q2;
+
+    EXPECT_FLOAT_EQ(15, q3.valueOf());
+
+    q3 = q1 - q2;
+    EXPECT_FLOAT_EQ(-5, q3.valueOf());
+}
+
+TEST(Quantity, operator__scalar_multiply_divide) {
+    Quantity<ratio<1>> q1(5);
+    Quantity<ratio<1>> q2 = q1 * 3;
+    EXPECT_FLOAT_EQ(15, q2.valueOf());
+
+    q2 = q1 / 5;
+    EXPECT_FLOAT_EQ(1, q2.valueOf());
+}
+
+TEST(Quantity, operator__quantity_multiply_divide)
+{
+    Quantity<ratio<1>> q1(5);
+    Quantity<ratio<1>, ratio<1>> q2(10);
+
+    Quantity<ratio<2>, ratio<1>> q3 = q1 * q2;
+    EXPECT_FLOAT_EQ(50, q3.valueOf());
+
+    Quantity<ratio<0>, ratio<-1>> q4 = q1 / q2;
+    EXPECT_FLOAT_EQ(0.5, q4.valueOf());
+}
+
+TEST(Quantity, operator__comparisons)
+{
+    Quantity<ratio<1>> q1(5);
+    Quantity<ratio<1>> q2(10);
+    EXPECT_TRUE(q1 < q2);
+    EXPECT_TRUE(q2 > q1);
+    EXPECT_TRUE(q1 <= q2);
+    EXPECT_TRUE(q2 >= q1);
+    EXPECT_FALSE(q1 == q2);
+    EXPECT_TRUE(q1 != q2);
+
+    Quantity<ratio<1>> q3(5);
+    EXPECT_FALSE(q1 < q3);
+    EXPECT_FALSE(q3 > q1);
+    EXPECT_TRUE(q1 <= q3);
+    EXPECT_TRUE(q3 >= q1);
+    EXPECT_TRUE(q1 == q3);
+    EXPECT_FALSE(q1 != q3);
+
+    Quantity<ratio<1>> q4(0);
+    EXPECT_TRUE(q4 < q1);
+    EXPECT_TRUE(q4 <= q1);
+    EXPECT_FALSE(q4 > q1);
+    EXPECT_FALSE(q4 >= q1);
+    EXPECT_FALSE(q4 == q1);
+    EXPECT_TRUE(q4 != q1);
 }
