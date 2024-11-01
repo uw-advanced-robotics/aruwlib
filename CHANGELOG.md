@@ -20,6 +20,9 @@
         - There is now a line showing how many tests are running.
         - Each test is individually runnable and stoppable.
         - `x` is shown for failed/incomplete tests, `+` is shown for passed tests.
+- Updated the `mpu6500` and `bmi088` to allow for variable temperature setpoints. This was done as in testing,
+  the type C board was found to operate at a lower tempreature than the type A.
+- Updated `MahonyAHRS` for IMUs to no longer include the 180 degree offset. IMUs will now intitialize at 0 degrees
 
 ### Breaking Changes
 - Removed `Subsystem::isHardwareTestComplete`, `Subsystem::setHardwareTestsIncomplete`, `Subsystem::setHardwareTestsComplete`, `Subsystem::runHardwareTests`, `Subsystem::onHardwareTestStart`, `Subsystem::onHardwareTestComplete`
