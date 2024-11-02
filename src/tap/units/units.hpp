@@ -59,7 +59,7 @@ NEW_UNIT_LITERAL(Volume, LITER, Liter, Li, CUBIC_METER<F> * 0.001f)
 
 // Mass, Inertia
 NEW_UNIT(Mass, KILOGRAM, Kilogram, kg, 0, 0, 1, 0, 0, 0)
-NEW_UNIT_LITERAL(Mass, GRAM, Gram, g, KILOGRAM<F> * 10E-3f)
+NEW_UNIT_LITERAL(Mass, GRAM, Gram, g, KILOGRAM<F> * 1E-3f)
 UNIT_METRIC_PREFIXES_SMALL(Mass, GRAM, gram, g)
 NEW_UNIT_LITERAL(Mass, POUND, Pound, lb, GRAM<F> * 453.59237f)
 

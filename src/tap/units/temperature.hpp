@@ -36,7 +36,7 @@ constexpr Temperature CELSIUS = KELVIN<F>;
 template <int F = 0>
 constexpr Temperature WATER_FREEZING_POINT = Temperature<F>(273.15f);
 template <int F = 0>
-constexpr Temperature WATER_BOILING_POINT = Temperature<F>(373.15);
+constexpr Temperature WATER_BOILING_POINT = Temperature<F>(373.15f);
 }  // namespace constants
 
 namespace conversions
@@ -49,7 +49,7 @@ constexpr inline Temperature<F> fromFahrenheit(float value)
 template <int F = 0>
 constexpr inline float toFahrenheit(Temperature<F> quantity)
 {
-    return (quantity.valueOf() - 273.15f) * (9.0 / 5.0);
+    return (quantity.valueOf() - 273.15f) * (9.0 / 5.0) + 32;
 }
 template <int F = 0>
 constexpr inline Temperature<F> fromCelsius(float value)
@@ -59,7 +59,7 @@ constexpr inline Temperature<F> fromCelsius(float value)
 template <int F = 0>
 constexpr inline float toCelsius(Temperature<F> quantity)
 {
-    return quantity.internal() - 273.15f;
+    return quantity.valueOf() - 273.15f;
 }
 }  // namespace conversions
 namespace literals
