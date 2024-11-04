@@ -52,9 +52,10 @@ public:
           fallbackCommand(fallbackCommand),
           commandGovernorList(commandGovernorList)
     {
-        std::for_each(subRequirements.begin(), subRequirements.end(), [&](auto sub) {
-            addSubsystemRequirement(sub);
-        });
+        std::for_each(
+            subRequirements.begin(),
+            subRequirements.end(),
+            [&](auto sub) { addSubsystemRequirement(sub); });
 
         assert(
             commandWhenGovernorsReady.getRequirementsBitwise() == this->getRequirementsBitwise());
@@ -65,10 +66,7 @@ public:
 
     bool isReady() override
     {
-        currentGovernorReadiness =
-            std::all_of(commandGovernorList.begin(), commandGovernorList.end(), [](auto governor) {
-                return governor->isReady();
-            });
+        currentGovernorReadiness = checkGovernorReadiness();
 
         return (currentGovernorReadiness && commandWhenGovernorsReady.isReady()) ||
                (!currentGovernorReadiness && fallbackCommand.isReady());
@@ -112,8 +110,9 @@ public:
 
     bool isFinished() const override
     {
-        return currentGovernorReadiness ? commandWhenGovernorsReady.isFinished()
-                                        : fallbackCommand.isFinished();
+        return currentGovernorReadiness
+                   ? (commandWhenGovernorsReady.isFinished() || checkGovernorReadiness())
+                   : (fallbackCommand.isFinished() || !checkGovernorReadiness());
     }
 
 private:
@@ -122,6 +121,14 @@ private:
     Command &fallbackCommand;
 
     std::array<CommandGovernorInterface *, NUM_CONDITIONS> commandGovernorList;
+
+    void checkGovernorReadiness()
+    {
+        return std::all_of(
+            commandGovernorList.begin(),
+            commandGovernorList.end(),
+            [](auto governor) { return governor->isReady(); });
+    }
 };
 }  // namespace tap::control::governor
 
