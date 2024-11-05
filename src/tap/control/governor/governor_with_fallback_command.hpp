@@ -121,7 +121,7 @@ private:
 
     std::array<CommandGovernorInterface *, NUM_CONDITIONS> commandGovernorList;
 
-    void checkGovernorReadiness()
+    bool checkGovernorReadiness()
     {
         return std::all_of(
             commandGovernorList.begin(),
