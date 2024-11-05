@@ -20,6 +20,8 @@
 #ifndef TAPROOT_IMU_INTERFACE_HPP_
 #define TAPROOT_IMU_INTERFACE_HPP_
 
+#include "tap/algorithms/MahonyAHRS.h"
+
 namespace tap::communication::sensors::imu
 {
 /**
@@ -103,6 +105,41 @@ public:
      * Returns roll angle in degrees.
      */
     virtual inline float getRoll() = 0;
+
+protected:
+    // Data structure for storing IMU data.
+    struct ImuData
+    {
+        enum Axis
+        {
+            X = 0,
+            Y = 1,
+            Z = 2,
+        };
+
+        float accRaw[3] = {};
+        float gyroRaw[3] = {};
+        float accOffsetRaw[3] = {};
+        float gyroOffsetRaw[3] = {};
+        float accG[3] = {};
+        float gyroDegPerSec[3] = {};
+
+        float pitch;
+        float roll;
+        float yaw;
+
+        float temperature;
+    } data;
+
+    // Current state of the IMU.
+    ImuState state;
+
+    // Target number of samples to take during calibration.
+    int totalCalibrationSamples = 1000;
+    int currentCalibrationSample = 0;
+
+    // Algorithm to compute euler orientation angles.
+    Mahony mahonyAlgorithm;
 };
 }  // namespace tap::communication::sensors::imu
 
