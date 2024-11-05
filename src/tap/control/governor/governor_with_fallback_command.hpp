@@ -110,8 +110,8 @@ public:
     bool isFinished() const override
     {
         return currentGovernorReadiness
-                   ? (commandWhenGovernorsReady.isFinished() || checkGovernorReadiness())
-                   : (fallbackCommand.isFinished() || !checkGovernorReadiness());
+                   ? (commandWhenGovernorsReady.isFinished() || !checkGovernorReadiness())
+                   : (fallbackCommand.isFinished() || checkGovernorReadiness());
     }
 
 private:
