@@ -61,7 +61,10 @@ public:
         assert(fallbackCommand.getRequirementsBitwise() == this->getRequirementsBitwise());
     }
 
-    const char *getName() const override { return "Governor w/fallback"; }
+    const char *getName() const override
+    {
+        return currentGovernorReadiness ? commandWhenGovernorsReady.getName() : fallbackCommand.getName();
+    }
 
     bool isReady() override
     {
@@ -110,7 +113,7 @@ public:
     bool isFinished() const override
     {
         return currentGovernorReadiness
-                   ? (commandWhenGovernorsReady.isFinished() || !checkGovernorReadiness())
+                   ? (commandWhenGovernorsReady.isFinished() || checkAnyGovernorFinished())
                    : (fallbackCommand.isFinished() || checkGovernorReadiness());
     }
 
@@ -127,6 +130,14 @@ private:
             commandGovernorList.begin(),
             commandGovernorList.end(),
             [](auto governor) { return governor->isReady(); });
+    }
+
+    bool checkAnyGovernorFinished() const
+    {
+        return std::any_of(
+            commandGovernorList.begin(),
+            commandGovernorList.end(),
+            [](auto governor) { return governor->isFinished(); });
     }
 };
 }  // namespace tap::control::governor
