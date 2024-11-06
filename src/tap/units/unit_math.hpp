@@ -335,5 +335,19 @@ constexpr Angle<F> atan2(const Q& lhs, const Q& rhs)
 {
     return Angle<F>(std::atan2(lhs.valueOf(), rhs.valueOf()));
 }
+
+/**
+ * @brief Compares two quantities for closeness
+ * @param lhs the first quantity
+ * @param rhs the second quantity
+ * @param epsilon the maximum difference between the two quantities
+ * @return true if the quantities are within epsilon of each other, false otherwise
+ */
+template <isQuantity Q, isQuantity R, isQuantity S>
+constexpr bool compareClose(const Q& lhs, const R& rhs, const S& epsilon) requires Isomorphic<Q, R, S>
+{
+    return abs(lhs - rhs) <= epsilon;
+}
+
 }  // namespace tap::units::math
 #endif

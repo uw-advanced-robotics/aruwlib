@@ -379,3 +379,12 @@ TEST(UnitMath, atan)
     EXPECT_NEAR(M_PI_F / 4, atan2(q6, q7).valueOf(), 1e-5);
 }
 
+TEST(UnitMath, compareClose) {
+    Quantity<> q1(5);
+    Quantity<> q2(5.0001);
+    EXPECT_TRUE(compareClose(q1, q2, Quantity<>(0.001)));
+
+    Quantity<> q3(5);
+    Quantity<> q4(5.002);
+    EXPECT_FALSE(compareClose(q3, q4, Quantity<>(0.001)));
+}
