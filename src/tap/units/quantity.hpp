@@ -370,6 +370,17 @@ constexpr S operator/(Q lhs, R rhs) requires SameFrame<Q, R>
 }
 
 /**
+ * @brief Negates a quantity.
+ * @param q The quantity to negate
+ * @return The negated quantity, as a named type if it exists.
+ */
+template <isQuantity Q>
+constexpr Named<Q> operator-(Q q) requires(!isWrappedQuantity<Q>)
+{
+    return Named<Q>(-q.valueOf());
+}
+
+/**
  * @brief Compares two isomorphic quantities for equality.
  * @param lhs The left hand quantity
  * @param rhs The right hand quantity

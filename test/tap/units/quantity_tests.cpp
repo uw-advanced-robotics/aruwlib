@@ -179,6 +179,13 @@ TEST(Quantity, operator__quantity_multiply_divide)
     EXPECT_FLOAT_EQ(0.5, q4.valueOf());
 }
 
+TEST(Quantity, operator__negate)
+{
+    Quantity<ratio<1>> q1(5);
+    Quantity<ratio<1>> q2 = -q1;
+    EXPECT_FLOAT_EQ(-5, q2.valueOf());
+}
+
 TEST(Quantity, operator__comparisons)
 {
     Quantity<ratio<1>> q1(5);
