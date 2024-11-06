@@ -21,6 +21,7 @@
 #define TAPROOT_UNITS_HPP_
 #include "temperature.hpp"
 #include "unit_macros.hpp"
+#include "modm/math/geometry/vector.hpp"
 
 namespace tap::units
 {
@@ -166,5 +167,13 @@ NEW_UNIT(Radius, METER_PER_RADIAN, MetersPerRadian, mprad, 0, 1, 0, 0, 0, -1)
 
 NEW_UNIT(Curvature, RADIAN_PER_METER, RadiansPerMeter, radpm, 0, -1, 0, 0, 0, 1)
 
+using Vector2Position = modm::Vector<Length<>, 2>;
+using Vector3Position = modm::Vector<Length<>, 3>;
+
+using Vector2Velocity = modm::Vector<LinearVelocity<>, 2>;
+using Vector3Velocity = modm::Vector<LinearVelocity<>, 3>;
+
+using Vector2Acceleration = modm::Vector<LinearAcceleration<>, 2>;
+using Vector3Acceleration = modm::Vector<LinearAcceleration<>, 3>;
 }  // namespace tap::units
 #endif  // TAPROOT_UNITS_HPP_
