@@ -76,7 +76,7 @@ public:
      */
     constexpr float valueOfUnwrapped() const
     {
-        return (this->value + this->revolutions * (this->upper - this->lower)).valueOf();
+        return Internal::value + (this->upper - this->lower).valueOf() * this->revolutions;
     }
 
     /**
@@ -84,6 +84,12 @@ public:
      * @return The unwrapped value of the quantity
      */
     constexpr Internal getUnwrapped() const { return Internal(valueOfUnwrapped()); }
+
+    /**
+     * @brief Returns the number of revolutions the quantity has undergone
+     * @return The number of revolutions
+     */
+    constexpr int getRevolutions() const { return revolutions; }
 
     /**
      * @brief Create a new Wrapped object with the same bounds as the current object
@@ -105,12 +111,13 @@ public:
     }
 
     /**
-     * @brief Determine if a value is within the bounds of the Wrapped object
+     * @brief Determine if a value is within the bounds of the Wrapped object, Specifically, it
+     * checks the bounds [lower, upper)
      * @param value the value to check
      */
     inline bool withinRange(const Q &value) const
     {
-        return (value > this->lower && value < this->upper);
+        return (value >= this->lower && value < this->upper);
     }
 
     /**
@@ -118,8 +125,7 @@ public:
      * @param other The other Wrapped Quantity
      */
     template <isQuantity R>
-    void assertBoundsEqual(const R &other) const
-        requires Isomorphic<Q, R> &&std::is_base_of_v<Wrapped, R>
+    void assertBoundsEqual(const R &other) const requires Isomorphic<Q, R> &&isWrappedQuantity<R>
     {
         modm_assert(
             tap::algorithms::compareFloatClose(
@@ -223,17 +229,6 @@ public:
         lower += shiftMagnitude;
         wrapValue();
     }
-
-    /**
-     * @brief Determines if this Wrapped quantity is within the specified bounds.
-     * @param lowerBound The lower bound to check against.
-     * @param upperBound The upper bound to check against.
-     */
-    bool withinRange(const Similar &lowerBound, const Similar &upperBound) const
-    {
-        return (*this) > math::min(lowerBound, upperBound) &&
-               (*this) < math::max(upperBound, upperBound);
-    }
 };
 
 /**
@@ -247,7 +242,10 @@ template <isWrappedQuantity Q, isQuantity R>
 constexpr Q operator+(const Q &lhs, const R &rhs) requires IsomorphicFrame<Q, R>
 {
     if constexpr (std::is_base_of_v<Wrapped<typename R::Self>, R>) lhs.assertBoundsEqual(rhs);
-    return Q(R(lhs.valueOf() + rhs.valueOf()), lhs.getLowerBound(), lhs.getUpperBound());
+    return Q(
+        typename R::Self(lhs.valueOf() + rhs.valueOf()),
+        lhs.getLowerBound(),
+        lhs.getUpperBound());
 }
 
 /**
@@ -262,8 +260,8 @@ template <isWrappedQuantity Q, isQuantity R>
 constexpr Q operator-(const Q &lhs, const R &rhs) requires IsomorphicFrame<Q, R>
 {
     if constexpr (std::is_base_of_v<Wrapped<typename R::Self>, R>) lhs.assertBoundsEqual(rhs);
-    return Wrapped<Q>(
-        Q::Self(lhs.valueOf() - rhs.valueOf()),
+    return Q(
+        typename R::Self(typename R::Self(lhs.valueOf() - rhs.valueOf())),
         lhs.getLowerBound(),
         lhs.getUpperBound());
 }
@@ -278,7 +276,7 @@ constexpr Q operator-(const Q &lhs, const R &rhs) requires IsomorphicFrame<Q, R>
 template <isWrappedQuantity Q>
 constexpr Q operator*(const Q &lhs, float rhs)
 {
-    return Q(lhs.valueOf() * rhs, lhs.getLowerBound(), lhs.getUpperBound);
+    return Q(typename Q::Self(lhs.valueOf() * rhs), lhs.getLowerBound(), lhs.getUpperBound());
 }
 
 /**
@@ -291,7 +289,7 @@ constexpr Q operator*(const Q &lhs, float rhs)
 template <isWrappedQuantity Q>
 constexpr Q operator/(const Q &lhs, float rhs)
 {
-    return Q(lhs.valueOf() / rhs, lhs.getLowerBound(), lhs.getUpperBound);
+    return Q(typename Q::Self(lhs.valueOf() / rhs), lhs.getLowerBound(), lhs.getUpperBound());
 }
 
 }  // namespace tap::units
