@@ -31,13 +31,14 @@
 #include "modm/math/geometry/vector3.hpp"
 
 #include "cmsis_mat.hpp"
+#include "tap/units/units.hpp"
 
 namespace tap
 {
 namespace algorithms
 {
 /// Acceleration due to gravity, in m/s^2.
-static constexpr float ACCELERATION_GRAVITY = 9.80665f;
+static constexpr units::LinearAcceleration<> ACCELERATION_GRAVITY = units::LinearAcceleration(9.80665);
 
 /**
  * Use this instead of the == operator when asserting equality for floats.
