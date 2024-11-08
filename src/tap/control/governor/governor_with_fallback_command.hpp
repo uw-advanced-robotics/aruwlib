@@ -47,10 +47,12 @@ public:
         std::vector<Subsystem *> subRequirements,
         Command &commandWhenGovernorsReady,
         Command &fallbackCommand,
-        const std::array<CommandGovernorInterface *, NUM_CONDITIONS> &commandGovernorList)
+        const std::array<CommandGovernorInterface *, NUM_CONDITIONS> &commandGovernorList,
+        const bool stopFallbackCommandIfGovernorsReady = false)
         : commandWhenGovernorsReady(commandWhenGovernorsReady),
           fallbackCommand(fallbackCommand),
-          commandGovernorList(commandGovernorList)
+          commandGovernorList(commandGovernorList),
+          stopFallbackCommandIfGovernorsReady(stopFallbackCommandIfGovernorsReady)
     {
         std::for_each(subRequirements.begin(), subRequirements.end(), [&](auto sub) {
             addSubsystemRequirement(sub);
@@ -63,21 +65,21 @@ public:
 
     const char *getName() const override
     {
-        return currentGovernorReadiness ? commandWhenGovernorsReady.getName()
+        return defaultCommandSelected ? commandWhenGovernorsReady.getName()
                                         : fallbackCommand.getName();
     }
 
     bool isReady() override
     {
-        currentGovernorReadiness = checkGovernorReadiness();
+        defaultCommandSelected = checkGovernorReadiness();
 
-        return (currentGovernorReadiness && commandWhenGovernorsReady.isReady()) ||
-               (!currentGovernorReadiness && fallbackCommand.isReady());
+        return (defaultCommandSelected && commandWhenGovernorsReady.isReady()) ||
+               (!defaultCommandSelected && fallbackCommand.isReady());
     }
 
     void initialize() override
     {
-        if (currentGovernorReadiness)
+        if (defaultCommandSelected)
         {
             commandWhenGovernorsReady.initialize();
         }
@@ -89,7 +91,7 @@ public:
 
     void execute() override
     {
-        if (currentGovernorReadiness)
+        if (defaultCommandSelected)
         {
             commandWhenGovernorsReady.execute();
         }
@@ -101,7 +103,7 @@ public:
 
     void end(bool interrupted) override
     {
-        if (currentGovernorReadiness)
+        if (defaultCommandSelected)
         {
             commandWhenGovernorsReady.end(interrupted);
         }
@@ -113,17 +115,18 @@ public:
 
     bool isFinished() const override
     {
-        return currentGovernorReadiness
+        return defaultCommandSelected
                    ? (commandWhenGovernorsReady.isFinished() || checkAnyGovernorFinished())
-                   : (fallbackCommand.isFinished() || checkGovernorReadiness());
+                   : (fallbackCommand.isFinished() || (stopFallbackCommandIfGovernorsReady && checkGovernorReadiness()));
     }
 
 private:
-    bool currentGovernorReadiness = false;
+    bool defaultCommandSelected = false;
     Command &commandWhenGovernorsReady;
     Command &fallbackCommand;
 
     std::array<CommandGovernorInterface *, NUM_CONDITIONS> commandGovernorList;
+    const bool stopFallbackCommandIfGovernorsReady;
 
     bool checkGovernorReadiness() const
     {

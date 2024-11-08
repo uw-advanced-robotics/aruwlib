@@ -59,7 +59,7 @@ protected:
         }
 
         cmd = std::shared_ptr<GovernorWithFallbackCommand<S>>(
-            new GovernorWithFallbackCommand<S>({&sub}, cmdToDefault, cmdToFallback, governorPtrs));
+            new GovernorWithFallbackCommand<S>({&sub}, cmdToDefault, cmdToFallback, governorPtrs, true));
     }
 
     Drivers drivers;
