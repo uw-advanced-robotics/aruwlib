@@ -216,7 +216,7 @@ public:
      * @return: The signed minimum distance.
      */
     template <isQuantity R>
-    Internal minDifference(const R &other) requires (Isomorphic<Q, R> && !isWrappedQuantity<R>)
+    Internal minDifference(const R &other) requires(Isomorphic<Q, R> && !isWrappedQuantity<R>)
     {
         Wrapped<typename R::Self> s(other, this->lower, this->upper);
         Internal interval = this->upper - this->lower;

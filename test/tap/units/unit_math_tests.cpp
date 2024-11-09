@@ -173,7 +173,8 @@ TEST(UnitMath, signbit)
     EXPECT_FALSE(signbit(q3));
 }
 
-TEST(UnitMath, clamp) {
+TEST(UnitMath, clamp)
+{
     Quantity<> q1(5);
     Quantity<> q2(0);
     Quantity<> q3(10);
@@ -190,7 +191,8 @@ TEST(UnitMath, clamp) {
     EXPECT_FLOAT_EQ(10, clamp(q7, q8, q9).valueOf());
 }
 
-TEST(UnitMath, ceil) {
+TEST(UnitMath, ceil)
+{
     Quantity<> q1(5);
     Quantity<> q2(3);
     EXPECT_FLOAT_EQ(6, ceil(q1, q2).valueOf());
@@ -208,7 +210,8 @@ TEST(UnitMath, ceil) {
     EXPECT_FLOAT_EQ(9, ceil(q7, q8).valueOf());
 }
 
-TEST(UnitMath, floor) {
+TEST(UnitMath, floor)
+{
     Quantity<> q1(5);
     Quantity<> q2(3);
     EXPECT_FLOAT_EQ(3, floor(q1, q2).valueOf());
@@ -226,7 +229,8 @@ TEST(UnitMath, floor) {
     EXPECT_FLOAT_EQ(6, floor(q7, q8).valueOf());
 }
 
-TEST(UnitMath, trunc) {
+TEST(UnitMath, trunc)
+{
     Quantity<> q1(5);
     Quantity<> q2(3);
     EXPECT_FLOAT_EQ(3, trunc(q1, q2).valueOf());
@@ -244,7 +248,8 @@ TEST(UnitMath, trunc) {
     EXPECT_FLOAT_EQ(6, trunc(q7, q8).valueOf());
 }
 
-TEST(UnitMath, round) {
+TEST(UnitMath, round)
+{
     Quantity<> q1(5);
     Quantity<> q2(3);
     EXPECT_FLOAT_EQ(6, round(q1, q2).valueOf());
@@ -262,7 +267,8 @@ TEST(UnitMath, round) {
     EXPECT_FLOAT_EQ(9, round(q7, q8).valueOf());
 }
 
-TEST(UnitMath, wrap) {
+TEST(UnitMath, wrap)
+{
     Quantity<> q1(5);
     Quantity<> q2(3);
     Quantity<> q3(7);
@@ -379,7 +385,8 @@ TEST(UnitMath, atan)
     EXPECT_NEAR(M_PI_F / 4, atan2(q6, q7).valueOf(), 1e-5);
 }
 
-TEST(UnitMath, compareClose) {
+TEST(UnitMath, compareClose)
+{
     Quantity<> q1(5);
     Quantity<> q2(5.0001);
     EXPECT_TRUE(compareClose(q1, q2, Quantity<>(0.001)));

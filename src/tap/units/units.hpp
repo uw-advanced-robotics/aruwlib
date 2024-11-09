@@ -19,9 +19,10 @@
 
 #ifndef TAPROOT_UNITS_HPP_
 #define TAPROOT_UNITS_HPP_
+#include "modm/math/geometry/vector.hpp"
+
 #include "temperature.hpp"
 #include "unit_macros.hpp"
-#include "modm/math/geometry/vector.hpp"
 
 namespace tap::units
 {

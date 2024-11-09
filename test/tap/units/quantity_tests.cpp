@@ -40,7 +40,8 @@ TEST(Quantity, constructor__copy)
     EXPECT_FLOAT_EQ(5, q2.valueOf());
 }
 
-TEST(Quantity, covertTo) {
+TEST(Quantity, covertTo)
+{
     Quantity<ratio<1>, ratio<1>> q1(5);
     Quantity<ratio<1>, ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, 1> q2(10);
     EXPECT_FLOAT_EQ(0.5, q1.convertTo(q2));
@@ -93,23 +94,30 @@ TEST(Quantity, frame__inOtherFrame)
     EXPECT_FLOAT_EQ(10, q3.valueOf());
 }
 
-TEST(Quantity, concept__isQuantity) {
+TEST(Quantity, concept__isQuantity)
+{
     constexpr bool a = isQuantity<Quantity<>>;
     EXPECT_TRUE(a);
-    constexpr bool b = isQuantity<Quantity<ratio<1>, ratio<-1>, ratio<5,3>, ratio<0>, ratio<0>, ratio<1>, 0x7fffffff>&>;
+    constexpr bool b = isQuantity<
+        Quantity<ratio<1>, ratio<-1>, ratio<5, 3>, ratio<0>, ratio<0>, ratio<1>, 0x7fffffff>&>;
     EXPECT_TRUE(b);
     constexpr bool c = isQuantity<int>;
-    EXPECT_FALSE(c); 
+    EXPECT_FALSE(c);
 }
 
-TEST(Quantity, concept__Isomorphic) {
+TEST(Quantity, concept__Isomorphic)
+{
     constexpr bool a = Isomorphic<Quantity<>, Quantity<>>;
     EXPECT_TRUE(a);
 
-    constexpr bool b = Isomorphic<Quantity<ratio<1>, ratio<-1>, ratio<1,2>, ratio<0>, ratio<0>, ratio<1>>, Quantity<ratio<1>, ratio<-1>, ratio<1,2>, ratio<0>, ratio<0>, ratio<1>>>;
+    constexpr bool b = Isomorphic<
+        Quantity<ratio<1>, ratio<-1>, ratio<1, 2>, ratio<0>, ratio<0>, ratio<1>>,
+        Quantity<ratio<1>, ratio<-1>, ratio<1, 2>, ratio<0>, ratio<0>, ratio<1>>>;
     EXPECT_TRUE(b);
 
-    constexpr bool c = Isomorphic<Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, 0>, Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, 1>>;
+    constexpr bool c = Isomorphic<
+        Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, 0>,
+        Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, 1>>;
     EXPECT_TRUE(c);
 
     constexpr bool d = Isomorphic<Quantity<ratio<1>, ratio<1>>, Quantity<>>;
@@ -117,34 +125,40 @@ TEST(Quantity, concept__Isomorphic) {
 
     constexpr bool e = Isomorphic<Quantity<ratio<1>, ratio<1>>, int>;
     EXPECT_FALSE(e);
-
 }
 
-TEST(Quantity, concept__SameFrame_IsomorphicFrame) {
+TEST(Quantity, concept__SameFrame_IsomorphicFrame)
+{
     constexpr bool a = SameFrame<Quantity<>, Quantity<>>;
     EXPECT_TRUE(a);
 
-    constexpr bool b = SameFrame<Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, 0>, Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, 1>>;
+    constexpr bool b = SameFrame<
+        Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, 0>,
+        Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, 1>>;
     EXPECT_FALSE(b);
 
     constexpr bool c = IsomorphicFrame<Quantity<>, Quantity<>>;
     EXPECT_TRUE(c);
 
-    constexpr bool d = IsomorphicFrame<Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, 0>, Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, 1>>;
+    constexpr bool d = IsomorphicFrame<
+        Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, 0>,
+        Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, 1>>;
     EXPECT_FALSE(d);
 
-    constexpr bool e = IsomorphicFrame<Quantity<>, Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, 0>>;
+    constexpr bool e = IsomorphicFrame<
+        Quantity<>,
+        Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, 0>>;
     EXPECT_FALSE(e);
 }
 
-TEST(Quantity, named) {
+TEST(Quantity, named)
+{
     constexpr bool a = isQuantity<Named<Quantity<>>>;
     EXPECT_TRUE(a);
 
     constexpr bool b = Isomorphic<Quantity<>, Named<Quantity<>>>;
     EXPECT_TRUE(b);
 }
-
 
 TEST(Quantity, operator__add_subtract)
 {
@@ -158,7 +172,8 @@ TEST(Quantity, operator__add_subtract)
     EXPECT_FLOAT_EQ(-5, q3.valueOf());
 }
 
-TEST(Quantity, operator__scalar_multiply_divide) {
+TEST(Quantity, operator__scalar_multiply_divide)
+{
     Quantity<ratio<1>> q1(5);
     Quantity<ratio<1>> q2 = q1 * 3;
     EXPECT_FLOAT_EQ(15, q2.valueOf());

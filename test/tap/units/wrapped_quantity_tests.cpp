@@ -25,7 +25,6 @@ using namespace tap::units;
 using namespace tap::units::conversions;
 using namespace tap::units::literals;
 
-
 TEST(WrappedQuantity, Basic_functionality)
 {
     Wrapped<Number<>> testInstance(5_n, 0_n, 10_n);
@@ -153,7 +152,8 @@ TEST(WrappedQuantity, operator__multiply_divide_equals)
     EXPECT_FLOAT_EQ(2.5, q1.valueOf());
 }
 
-TEST(WrappedQuantity, operator__add_subtract) {
+TEST(WrappedQuantity, operator__add_subtract)
+{
     Wrapped<Length<>> q1(5_m, 0_m, 10_m);
     Wrapped<Length<>> q2(6_m, 0_m, 10_m);
     auto q3 = q1 + q2;
@@ -167,7 +167,8 @@ TEST(WrappedQuantity, operator__add_subtract) {
     EXPECT_FLOAT_EQ(10, q3.getUpperBound().valueOf());
 }
 
-TEST(WrappedQuantity, operator__scalar_multiply_divide) {
+TEST(WrappedQuantity, operator__scalar_multiply_divide)
+{
     Wrapped<Length<>> q1(5_m, 0_m, 10_m);
     auto q2 = q1 * 2;
     EXPECT_FLOAT_EQ(0, q2.valueOf());
@@ -179,4 +180,3 @@ TEST(WrappedQuantity, operator__scalar_multiply_divide) {
     EXPECT_FLOAT_EQ(0, q2.getLowerBound().valueOf());
     EXPECT_FLOAT_EQ(10, q2.getUpperBound().valueOf());
 }
-

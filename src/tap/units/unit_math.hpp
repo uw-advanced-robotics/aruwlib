@@ -7,7 +7,6 @@
 #include "quantity.hpp"
 #include "units.hpp"
 
-
 namespace tap::units::math
 {
 /**
@@ -344,7 +343,10 @@ constexpr Angle<F> atan2(const Q& lhs, const Q& rhs)
  * @return true if the quantities are within epsilon of each other, false otherwise
  */
 template <isQuantity Q, isQuantity R, isQuantity S>
-constexpr bool compareClose(const Q& lhs, const R& rhs, const S& epsilon) requires Isomorphic<Q, R, S>
+constexpr bool compareClose(
+    const Q& lhs,
+    const R& rhs,
+    const S& epsilon) requires Isomorphic<Q, R, S>
 {
     return abs(lhs - rhs) <= epsilon;
 }
