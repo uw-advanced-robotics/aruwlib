@@ -66,7 +66,7 @@ public:
     const char *getName() const override
     {
         return governedCommandSelected ? commandWhenGovernorsReady.getName()
-                                      : fallbackCommand.getName();
+                                       : fallbackCommand.getName();
     }
 
     bool isReady() override
