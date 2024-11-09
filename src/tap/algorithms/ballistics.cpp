@@ -36,9 +36,9 @@ bool computeTravelTime(
         units::math::square(bulletVelocity);
     units::Exponentiated<units::LinearVelocity<>, ratio<4>> sqrtTerm =
         units::math::square(bulletVelocitySquared) -
-        ACCELERATION_GRAVITY * (ACCELERATION_GRAVITY * units::math::square(horizontalDist) +
-         2 * targetPosition.z *
-          bulletVelocitySquared);  // todo: make sure this is correct
+        ACCELERATION_GRAVITY *
+            (ACCELERATION_GRAVITY * units::math::square(horizontalDist) +
+             2 * targetPosition.z * bulletVelocitySquared);  // todo: make sure this is correct
 
     if (units::math::sgn(sqrtTerm) < 0)
     {
