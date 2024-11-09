@@ -43,7 +43,7 @@ protected:
 
     void SetUp() override
     {
-        ON_CALL(cmdToDefault, getName).WillByDefault(Return("default"));
+        ON_CALL(cmdToDefault, getName).WillByDefault(Return("governed"));
         ON_CALL(cmdToDefault, getRequirementsBitwise)
             .WillByDefault(Return(1UL << sub.getGlobalIdentifier()));
 
@@ -106,7 +106,7 @@ TYPED_TEST(GovernorWithFallbackCommandTest, getName_ret_cmdToFallback_name)
     EXPECT_STREQ(TestFixture::cmdToFallback.getName(), TestFixture::cmd->getName());
 }
 
-TYPED_TEST(GovernorWithFallbackCommandTest, isReady_default_false_cmd_not_ready)
+TYPED_TEST(GovernorWithFallbackCommandTest, isReady_governed_false_cmd_not_ready)
 {
     for (auto &gov : TestFixture::governors)
     {
@@ -144,7 +144,7 @@ TYPED_TEST(GovernorWithFallbackCommandTest, getName_when_single_gov_not_ready)
     EXPECT_STREQ(TestFixture::cmdToFallback.getName(), TestFixture::cmd->getName());
 }
 
-TYPED_TEST(GovernorWithFallbackCommandTest, isReady_default_true_when_gov_and_cmd_ready)
+TYPED_TEST(GovernorWithFallbackCommandTest, isReady_governed_true_when_gov_and_cmd_ready)
 {
     for (auto &gov : TestFixture::governors)
     {
@@ -168,7 +168,7 @@ TYPED_TEST(GovernorWithFallbackCommandTest, isReady_fallback_true_when_gov_and_c
     EXPECT_TRUE(TestFixture::cmd->isReady());
 }
 
-TYPED_TEST(GovernorWithFallbackCommandTest, isFinished_default_true_when_cmd_finished)
+TYPED_TEST(GovernorWithFallbackCommandTest, isFinished_governed_true_when_cmd_finished)
 {
     for (auto &gov : TestFixture::governors)
     {
@@ -195,7 +195,7 @@ TYPED_TEST(GovernorWithFallbackCommandTest, isFinished_fallback_true_when_cmd_fi
     EXPECT_TRUE(TestFixture::cmd->isFinished());
 }
 
-TYPED_TEST(GovernorWithFallbackCommandTest, isFinished_default_true_when_govs_finished)
+TYPED_TEST(GovernorWithFallbackCommandTest, isFinished_governed_true_when_govs_finished)
 {
     for (auto &gov : TestFixture::governors)
     {
@@ -227,7 +227,7 @@ TYPED_TEST(GovernorWithFallbackCommandTest, isFinished_fallback_true_when_govs_f
     EXPECT_TRUE(TestFixture::cmd->isFinished());
 }
 
-TYPED_TEST(GovernorWithFallbackCommandTest, isFinished_default_false_when_govs_not_finished)
+TYPED_TEST(GovernorWithFallbackCommandTest, isFinished_governed_false_when_govs_not_finished)
 {
     for (auto &gov : TestFixture::governors)
     {
