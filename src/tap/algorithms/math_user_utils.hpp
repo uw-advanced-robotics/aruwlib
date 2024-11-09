@@ -25,20 +25,22 @@
 #include <cmath>
 #include <cstring>
 
+#include "tap/units/units.hpp"
+
 #include "modm/architecture/interface/assert.hpp"
 #include "modm/math/geometry/angle.hpp"
 #include "modm/math/geometry/quaternion.hpp"
 #include "modm/math/geometry/vector3.hpp"
 
 #include "cmsis_mat.hpp"
-#include "tap/units/units.hpp"
 
 namespace tap
 {
 namespace algorithms
 {
 /// Acceleration due to gravity, in m/s^2.
-static constexpr units::LinearAcceleration<> ACCELERATION_GRAVITY = units::LinearAcceleration(9.80665);
+static constexpr units::LinearAcceleration<> ACCELERATION_GRAVITY =
+    units::LinearAcceleration(9.80665);
 
 /**
  * Use this instead of the == operator when asserting equality for floats.
