@@ -115,10 +115,14 @@ public:
 
     bool isFinished() const override
     {
-        return governedCommandSelected
-                   ? (commandWhenGovernorsReady.isFinished() || checkAnyGovernorFinished())
-                   : (fallbackCommand.isFinished() ||
-                      (stopFallbackCommandIfGovernorsReady && checkGovernorReadiness()));
+        const stopGovernedCommand =
+            commandWhenGovernorsReady.isFinished() || checkAnyGovernorFinished();
+
+        const stopFallbackCommand =
+            fallbackCommand.isFinished() ||
+            (stopFallbackCommandIfGovernorsReady && checkGovernorReadiness());
+
+        return governedCommandSelected ? stopGovernedCommand : stopFallbackCommand;
     }
 
 private:
