@@ -25,76 +25,119 @@ using namespace tap::units;
 using namespace tap::units::conversions;
 using namespace tap::units::literals;
 
-TEST(WrappedQuantity, constructors__bounds_revolutions)
+
+TEST(WrappedQuantity, Basic_functionality)
 {
-    Wrapped<Number<>> q1(5_n, 0_n, 10_n);
-    EXPECT_FLOAT_EQ(5, q1.valueOf());
-    EXPECT_FLOAT_EQ(0, q1.getLowerBound().valueOf());
-    EXPECT_FLOAT_EQ(10, q1.getUpperBound().valueOf());
-    EXPECT_EQ(0, q1.getRevolutions());
-
-    Wrapped<Length<>> q2(11_m, 0_m, 10_m);
-    EXPECT_FLOAT_EQ(1, q2.valueOf());
-    EXPECT_EQ(1, q2.getRevolutions());
-
-    Wrapped<Length<>> q3(11_m, 0_m, 5_m);
-    EXPECT_FLOAT_EQ(1, q3.valueOf());
-    EXPECT_EQ(2, q3.getRevolutions());
+    Wrapped<Number<>> testInstance(5_n, 0_n, 10_n);
+    EXPECT_EQ(5, testInstance.valueOf());
+    EXPECT_EQ(5, testInstance.valueOfUnwrapped());
 }
 
-TEST(WrappedQuantity, unwrap)
+TEST(WrappedQuantity, Wrapping_behavior)
 {
-    Wrapped<Number<>> q1(5_n, 0_n, 10_n);
-    EXPECT_FLOAT_EQ(5, q1.valueOf());
-    EXPECT_FLOAT_EQ(5, q1.getUnwrapped().valueOf());
+    Wrapped<Number<>> testInstance(-4_n, 0_n, 10_n);
+    EXPECT_EQ(6, testInstance.valueOf());
+    EXPECT_EQ(-4, testInstance.valueOfUnwrapped());
 
-    Wrapped<Length<>> q2(11_m, 0_m, 10_m);
-    EXPECT_FLOAT_EQ(1, q2.valueOf());
-    EXPECT_FLOAT_EQ(11, q2.getUnwrapped().valueOf());
+    testInstance.set(16_n);
+    EXPECT_EQ(6, testInstance.valueOf());
+    EXPECT_EQ(6, testInstance.valueOfUnwrapped());
+
+    testInstance.set(28_n);
+    EXPECT_EQ(8, testInstance.valueOf());
+    EXPECT_EQ(28, testInstance.valueOfUnwrapped());
 }
 
-TEST(WrappedQuantity, withSameBounds)
+TEST(WrappedQuantity, Difference)
 {
-    Wrapped<Length<>> q1(5_m, 0_m, 10_m);
-    auto q2 = q1.withSameBounds(6_m);
-    EXPECT_FLOAT_EQ(6, q2.valueOf());
-    EXPECT_FLOAT_EQ(0, q2.getLowerBound().valueOf());
-    EXPECT_FLOAT_EQ(10, q2.getUpperBound().valueOf());
+    Wrapped<Number<>> testInstance(2_n, 0_n, 10_n);
+    EXPECT_EQ(2_n, testInstance.minDifference(4_n));
+    EXPECT_EQ(-1_n, testInstance.minDifference(11_n));
 
-    auto q3 = q1.withSameBounds(10_m, 0.5, 2);
-    EXPECT_FLOAT_EQ(10, q3.valueOf());
-    EXPECT_FLOAT_EQ(0, q3.getLowerBound().valueOf());
-    EXPECT_FLOAT_EQ(20, q3.getUpperBound().valueOf());
+    testInstance.set(9_n);
+    EXPECT_EQ(2_n, testInstance.minDifference(11_n));
 
-    auto q4 = q1.withSameBounds(12_m, 0.5, 0.5);
-    EXPECT_FLOAT_EQ(2, q4.valueOf());
-    EXPECT_FLOAT_EQ(0, q4.getLowerBound().valueOf());
-    EXPECT_FLOAT_EQ(5, q4.getUpperBound().valueOf());
-    EXPECT_EQ(2, q4.getRevolutions());
+    testInstance.set(10_n);
+    EXPECT_EQ(1_n, testInstance.minDifference(1_n));
+    testInstance.set(1_n);
+    EXPECT_EQ(-1_n, testInstance.minDifference(10_n));
 }
 
-TEST(WrappedQuantity, withinRange)
+TEST(WrappedQuantity, Rotation_bounds)
 {
-    Wrapped<Length<>> q1(5_m, 0_m, 10_m);
-    EXPECT_TRUE(q1.withinRange(5_m));
-    EXPECT_TRUE(q1.withinRange(0_m));
-    EXPECT_FALSE(q1.withinRange(10_m));
-    EXPECT_FALSE(q1.withinRange(11_m));
-    EXPECT_FALSE(q1.withinRange(fromMeter(INFINITY)));
+    Wrapped<Angle<>> testInstance(150_deg, -180_deg, 180_deg);
+
+    EXPECT_NEAR(40, toDegree(testInstance.minDifference(190_deg)), 1E-3);
+    EXPECT_NEAR(40, toDegree(testInstance.minDifference(-170_deg)), 1E-3);
+
+    EXPECT_NEAR(40, toDegree(testInstance.minDifference(190_deg)), 1E-3);
+    EXPECT_NEAR(40, toDegree(testInstance.minDifference(-170_deg)), 1E-3);
+
+    testInstance.set(180_deg);
+
+    EXPECT_NEAR(-180, toDegree(testInstance), 1E-3);
+    EXPECT_NEAR(0, toDegree(testInstance.minDifference(-180_deg)), 1E-3);
+
+    Wrapped<Angle<>> testInstance2(40_deg, -180_deg, 180_deg);
+    EXPECT_NEAR(-140, toDegree(testInstance2.minDifference(-100_deg)), 1E-3);
 }
 
-TEST(WrappedQuantity, operator__add_subtract_equals)
+TEST(WrappedQuantity, Shifting_up)
 {
-    Wrapped<Length<>> q1(5_m, 0_m, 10_m);
-    q1 += 5_m;
-    EXPECT_FLOAT_EQ(0, q1.valueOf());
-    EXPECT_FLOAT_EQ(0, q1.getLowerBound().valueOf());
-    EXPECT_FLOAT_EQ(10, q1.getUpperBound().valueOf());
+    Wrapped<Number<>> testInstance(150_n, -180_n, 180_n);
 
-    q1 -= 6_m;
-    EXPECT_FLOAT_EQ(4, q1.valueOf());
-    EXPECT_FLOAT_EQ(0, q1.getLowerBound().valueOf());
-    EXPECT_FLOAT_EQ(10, q1.getUpperBound().valueOf());
+    testInstance += 40_n;
+    EXPECT_EQ(-170, testInstance.valueOf());
+    EXPECT_EQ(190, testInstance.valueOfUnwrapped());
+
+    testInstance += 40_n;
+    EXPECT_EQ(-130, testInstance.valueOf());
+    EXPECT_EQ(230, testInstance.valueOfUnwrapped());
+
+    testInstance += 360_n;
+    EXPECT_EQ(-130, testInstance.valueOf());
+    EXPECT_EQ(590, testInstance.valueOfUnwrapped());
+
+    testInstance += 0_n;
+    EXPECT_EQ(-130, testInstance.valueOf());
+    EXPECT_EQ(590, testInstance.valueOfUnwrapped());
+}
+
+TEST(WrappedQuantity, shifting_down)
+{
+    Wrapped<Number<>> testInstance(-150_n, -180_n, 180_n);
+
+    testInstance -= 40_n;
+    EXPECT_EQ(170, testInstance.valueOf());
+    EXPECT_EQ(-190, testInstance.valueOfUnwrapped());
+
+    testInstance -= 40_n;
+    EXPECT_EQ(130, testInstance.valueOf());
+    EXPECT_EQ(-230, testInstance.valueOfUnwrapped());
+
+    testInstance -= 360_n;
+    EXPECT_EQ(130, testInstance.valueOf());
+    EXPECT_EQ(-590, testInstance.valueOfUnwrapped());
+
+    testInstance -= 0_n;
+    EXPECT_EQ(130, testInstance.valueOf());
+    EXPECT_EQ(-590, testInstance.valueOfUnwrapped());
+}
+
+TEST(WrappedQuantity, shiftBounds_positive)
+{
+    Wrapped<Number<>> testInstance(0_n, -100_n, 100_n);
+    EXPECT_EQ(0, testInstance.valueOf());
+    testInstance.shiftBounds(200_n);
+    EXPECT_EQ(200, testInstance.valueOf());
+}
+
+TEST(WrappedQuantity, shiftBounds_negative)
+{
+    Wrapped<Number<>> testInstance(10_n, -100_n, 100_n);
+    EXPECT_EQ(10, testInstance.valueOf());
+    testInstance.shiftBounds(-200_n);
+    EXPECT_EQ(-190, testInstance.valueOf());
 }
 
 TEST(WrappedQuantity, operator__multiply_divide_equals)
@@ -108,27 +151,6 @@ TEST(WrappedQuantity, operator__multiply_divide_equals)
     q1 += 5_m;
     q1 /= 2;
     EXPECT_FLOAT_EQ(2.5, q1.valueOf());
-}
-
-TEST(WrappedQuantity, minDifference) {
-    Wrapped<Length<>> q1(5_m, 0_m, 10_m);
-    Wrapped<Length<>> q2(6_m, 0_m, 10_m);
-    EXPECT_FLOAT_EQ(1, q1.minDifference(q2).valueOf());
-    EXPECT_FLOAT_EQ(-1, q2.minDifference(q1).valueOf());
-}
-
-TEST(WrappedQuantity, shiftBounds)
-{
-    Wrapped<Length<>> q1(5_m, 0_m, 10_m);
-    q1.shiftBounds(5_m);
-    EXPECT_FLOAT_EQ(5, q1.valueOf());
-    EXPECT_FLOAT_EQ(5, q1.getLowerBound().valueOf());
-    EXPECT_FLOAT_EQ(15, q1.getUpperBound().valueOf());
-
-    q1.shiftBounds(fromMeter(-10));
-    EXPECT_FLOAT_EQ(-5, q1.valueOf());
-    EXPECT_FLOAT_EQ(-5, q1.getLowerBound().valueOf());
-    EXPECT_FLOAT_EQ(5, q1.getUpperBound().valueOf());
 }
 
 TEST(WrappedQuantity, operator__add_subtract) {

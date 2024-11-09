@@ -92,6 +92,16 @@ public:
     constexpr int getRevolutions() const { return revolutions; }
 
     /**
+     * @brief Sets the value of the quantity
+     * @param value the new value, which will be wrapped
+     */
+    void set(Similar value)
+    {
+        Internal::value = value.valueOf();
+        wrapValue();
+    }
+
+    /**
      * @brief Create a new Wrapped object with the same bounds as the current object
      * @param value the value of the new object
      * @param lowerBoundScale a scale factor for the lower bound (defaults to 1 to not scale)
@@ -115,7 +125,7 @@ public:
      * checks the bounds [lower, upper)
      * @param value the value to check
      */
-    inline bool withinRange(const Q &value) const
+    inline bool withinRange(const Similar &value) const
     {
         return (value >= this->lower && value < this->upper);
     }
@@ -124,8 +134,8 @@ public:
      * @brief Asserts that wrapped Isomorphic Quantity has the same bounds as this one
      * @param other The other Wrapped Quantity
      */
-    template <isQuantity R>
-    void assertBoundsEqual(const R &other) const requires Isomorphic<Q, R> &&isWrappedQuantity<R>
+    template <isWrappedQuantity R>
+    void assertBoundsEqual(const R &other) const requires Isomorphic<Q, R>
     {
         modm_assert(
             tap::algorithms::compareFloatClose(
@@ -163,7 +173,7 @@ public:
     template <isQuantity R>
     constexpr void operator+=(const R &other) requires IsomorphicFrame<Q, R>
     {
-        if constexpr (std::is_base_of_v<Wrapped, R>)
+        if constexpr (isWrappedQuantity<R>)
         {
             this->assertBoundsEqual(other);
         }
@@ -179,7 +189,7 @@ public:
     template <isQuantity R>
     constexpr void operator-=(const R &other) requires IsomorphicFrame<Q, R>
     {
-        if constexpr (std::is_base_of_v<Wrapped, R>)
+        if constexpr (isWrappedQuantity<R>)
         {
             this->assertBoundsEqual(other);
         }
@@ -198,6 +208,27 @@ public:
     }
 
     /**
+     * Finds the minimum difference against another value, which will be wrapped with the same
+     * bounds as this quantity. Can be thought of as the minimum distance between two points on a
+     * circle's perimeter.
+     *
+     * @param[in] other: The isomorphic quantity to compute the minDifference with.
+     * @return: The signed minimum distance.
+     */
+    template <isQuantity R>
+    Internal minDifference(const R &other) requires (Isomorphic<Q, R> && !isWrappedQuantity<R>)
+    {
+        Wrapped<typename R::Self> s(other, this->lower, this->upper);
+        Internal interval = this->upper - this->lower;
+        Internal difference_between = Internal(s.valueOf() - Internal::valueOf());
+        Internal difference_around =
+            difference_between +
+            ((difference_between.valueOf() < 0) ? interval : Internal(0) - interval);
+        return (math::abs(difference_between) < math::abs(difference_around)) ? difference_between
+                                                                              : difference_around;
+    }
+
+    /**
      * Finds the minimum difference against another wrapped value. Can be thought of as the minimum
      * distance between two points on a circle's perimeter.
      *
@@ -205,8 +236,8 @@ public:
      * @return: The signed minimum distance.
      * @throws: An assertion error if the two values have different lower and upper bounds.
      */
-    template <isQuantity R>
-    Internal minDifference(const R &other) requires Isomorphic<Q, R> &&std::is_base_of_v<Wrapped, R>
+    template <isWrappedQuantity R>
+    Internal minDifference(const R &other) requires Isomorphic<Q, R>
     {
         assertBoundsEqual(other);
         Internal interval = this->upper - this->lower;
@@ -241,7 +272,7 @@ public:
 template <isWrappedQuantity Q, isQuantity R>
 constexpr Q operator+(const Q &lhs, const R &rhs) requires IsomorphicFrame<Q, R>
 {
-    if constexpr (std::is_base_of_v<Wrapped<typename R::Self>, R>) lhs.assertBoundsEqual(rhs);
+    if constexpr (isWrappedQuantity<R>) lhs.assertBoundsEqual(rhs);
     return Q(
         typename R::Self(lhs.valueOf() + rhs.valueOf()),
         lhs.getLowerBound(),
@@ -259,7 +290,7 @@ constexpr Q operator+(const Q &lhs, const R &rhs) requires IsomorphicFrame<Q, R>
 template <isWrappedQuantity Q, isQuantity R>
 constexpr Q operator-(const Q &lhs, const R &rhs) requires IsomorphicFrame<Q, R>
 {
-    if constexpr (std::is_base_of_v<Wrapped<typename R::Self>, R>) lhs.assertBoundsEqual(rhs);
+    if constexpr (isWrappedQuantity<R>) lhs.assertBoundsEqual(rhs);
     return Q(
         typename R::Self(typename R::Self(lhs.valueOf() - rhs.valueOf())),
         lhs.getLowerBound(),
