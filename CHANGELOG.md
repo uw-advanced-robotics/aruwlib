@@ -23,6 +23,7 @@
 - Updated the `mpu6500` and `bmi088` to allow for variable temperature setpoints. This was done as in testing,
   the type C board was found to operate at a lower tempreature than the type A.
 - Updated `MahonyAHRS` for IMUs to no longer include the 180 degree offset. IMUs will now intitialize at 0 degrees
+- Updated `GovernorWithFallbackCommand` such that if the governed command is selected, the command stops if any governor is finished. Also stops the fallback command if all governors become ready.
 
 ### Breaking Changes
 - Removed `Subsystem::isHardwareTestComplete`, `Subsystem::setHardwareTestsIncomplete`, `Subsystem::setHardwareTestsComplete`, `Subsystem::runHardwareTests`, `Subsystem::onHardwareTestStart`, `Subsystem::onHardwareTestComplete`
