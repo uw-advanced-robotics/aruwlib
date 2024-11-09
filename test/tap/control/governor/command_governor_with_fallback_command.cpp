@@ -58,8 +58,12 @@ protected:
             governorPtrs[i] = &governors[i];
         }
 
-        cmd = std::shared_ptr<GovernorWithFallbackCommand<S>>(
-            new GovernorWithFallbackCommand<S>({&sub}, cmdToDefault, cmdToFallback, governorPtrs, true));
+        cmd = std::shared_ptr<GovernorWithFallbackCommand<S>>(new GovernorWithFallbackCommand<S>(
+            {&sub},
+            cmdToDefault,
+            cmdToFallback,
+            governorPtrs,
+            true));
     }
 
     Drivers drivers;

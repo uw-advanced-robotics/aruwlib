@@ -66,7 +66,7 @@ public:
     const char *getName() const override
     {
         return defaultCommandSelected ? commandWhenGovernorsReady.getName()
-                                        : fallbackCommand.getName();
+                                      : fallbackCommand.getName();
     }
 
     bool isReady() override
@@ -117,7 +117,8 @@ public:
     {
         return defaultCommandSelected
                    ? (commandWhenGovernorsReady.isFinished() || checkAnyGovernorFinished())
-                   : (fallbackCommand.isFinished() || (stopFallbackCommandIfGovernorsReady && checkGovernorReadiness()));
+                   : (fallbackCommand.isFinished() ||
+                      (stopFallbackCommandIfGovernorsReady && checkGovernorReadiness()));
     }
 
 private:
