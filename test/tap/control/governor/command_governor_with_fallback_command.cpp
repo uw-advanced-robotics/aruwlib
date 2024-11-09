@@ -43,8 +43,8 @@ protected:
 
     void SetUp() override
     {
-        ON_CALL(cmdToDefault, getName).WillByDefault(Return("governed"));
-        ON_CALL(cmdToDefault, getRequirementsBitwise)
+        ON_CALL(cmdToGovern, getName).WillByDefault(Return("governed"));
+        ON_CALL(cmdToGovern, getRequirementsBitwise)
             .WillByDefault(Return(1UL << sub.getGlobalIdentifier()));
 
         ON_CALL(cmdToFallback, getName).WillByDefault(Return("fallback"));
@@ -60,14 +60,14 @@ protected:
 
         cmd = std::shared_ptr<GovernorWithFallbackCommand<S>>(new GovernorWithFallbackCommand<S>(
             {&sub},
-            cmdToDefault,
+            cmdToGovern,
             cmdToFallback,
             governorPtrs,
             true));
     }
 
     Drivers drivers;
-    NiceMock<CommandMock> cmdToDefault;
+    NiceMock<CommandMock> cmdToGovern;
     NiceMock<CommandMock> cmdToFallback;
 
     NiceMock<SubsystemMock> sub;
@@ -84,7 +84,7 @@ using TestTypes = Types<
 
 TYPED_TEST_SUITE(GovernorWithFallbackCommandTest, TestTypes);
 
-TYPED_TEST(GovernorWithFallbackCommandTest, getName_ret_cmdToDefault_name)
+TYPED_TEST(GovernorWithFallbackCommandTest, getName_ret_cmdToGovern_name)
 {
     for (auto &gov : TestFixture::governors)
     {
@@ -92,7 +92,7 @@ TYPED_TEST(GovernorWithFallbackCommandTest, getName_ret_cmdToDefault_name)
     }
 
     TestFixture::cmd->isReady();
-    EXPECT_STREQ(TestFixture::cmdToDefault.getName(), TestFixture::cmd->getName());
+    EXPECT_STREQ(TestFixture::cmdToGovern.getName(), TestFixture::cmd->getName());
 }
 
 TYPED_TEST(GovernorWithFallbackCommandTest, getName_ret_cmdToFallback_name)
@@ -113,7 +113,7 @@ TYPED_TEST(GovernorWithFallbackCommandTest, isReady_governed_false_cmd_not_ready
         ON_CALL(gov, isReady).WillByDefault(Return(true));
     }
 
-    ON_CALL(TestFixture::cmdToDefault, isReady).WillByDefault(Return(false));
+    ON_CALL(TestFixture::cmdToGovern, isReady).WillByDefault(Return(false));
 
     EXPECT_FALSE(TestFixture::cmd->isReady());
 }
@@ -151,7 +151,7 @@ TYPED_TEST(GovernorWithFallbackCommandTest, isReady_governed_true_when_gov_and_c
         ON_CALL(gov, isReady).WillByDefault(Return(true));
     }
 
-    ON_CALL(TestFixture::cmdToDefault, isReady).WillByDefault(Return(true));
+    ON_CALL(TestFixture::cmdToGovern, isReady).WillByDefault(Return(true));
 
     EXPECT_TRUE(TestFixture::cmd->isReady());
 }
@@ -177,7 +177,7 @@ TYPED_TEST(GovernorWithFallbackCommandTest, isFinished_governed_true_when_cmd_fi
     }
 
     TestFixture::cmd->isReady();
-    ON_CALL(TestFixture::cmdToDefault, isFinished).WillByDefault(Return(true));
+    ON_CALL(TestFixture::cmdToGovern, isFinished).WillByDefault(Return(true));
 
     EXPECT_TRUE(TestFixture::cmd->isFinished());
 }
@@ -204,7 +204,7 @@ TYPED_TEST(GovernorWithFallbackCommandTest, isFinished_governed_true_when_govs_f
     }
 
     TestFixture::cmd->isReady();
-    ON_CALL(TestFixture::cmdToDefault, isFinished).WillByDefault(Return(false));
+    ON_CALL(TestFixture::cmdToGovern, isFinished).WillByDefault(Return(false));
 
     EXPECT_TRUE(TestFixture::cmd->isFinished());
 }
@@ -236,7 +236,7 @@ TYPED_TEST(GovernorWithFallbackCommandTest, isFinished_governed_false_when_govs_
     }
 
     TestFixture::cmd->isReady();
-    ON_CALL(TestFixture::cmdToDefault, isFinished).WillByDefault(Return(false));
+    ON_CALL(TestFixture::cmdToGovern, isFinished).WillByDefault(Return(false));
 
     EXPECT_FALSE(TestFixture::cmd->isFinished());
 }
@@ -254,13 +254,13 @@ TYPED_TEST(GovernorWithFallbackCommandTest, isFinished_fallback_false_when_govs_
     EXPECT_FALSE(TestFixture::cmd->isFinished());
 }
 
-TYPED_TEST(GovernorWithFallbackCommandTest, initialize_execute_end_runs_cmdToDefault)
+TYPED_TEST(GovernorWithFallbackCommandTest, initialize_execute_end_runs_cmdToGovern)
 {
     InSequence seq;
-    EXPECT_CALL(TestFixture::cmdToDefault, initialize);
-    EXPECT_CALL(TestFixture::cmdToDefault, execute);
-    EXPECT_CALL(TestFixture::cmdToDefault, end(false));
-    EXPECT_CALL(TestFixture::cmdToDefault, end(true));
+    EXPECT_CALL(TestFixture::cmdToGovern, initialize);
+    EXPECT_CALL(TestFixture::cmdToGovern, execute);
+    EXPECT_CALL(TestFixture::cmdToGovern, end(false));
+    EXPECT_CALL(TestFixture::cmdToGovern, end(true));
 
     for (auto &gov : TestFixture::governors)
     {
@@ -277,10 +277,10 @@ TYPED_TEST(GovernorWithFallbackCommandTest, initialize_execute_end_runs_cmdToDef
 TYPED_TEST(GovernorWithFallbackCommandTest, initialize_execute_end_runs_cmdToFallback)
 {
     InSequence seq;
-    EXPECT_CALL(TestFixture::cmdToDefault, initialize);
-    EXPECT_CALL(TestFixture::cmdToDefault, execute);
-    EXPECT_CALL(TestFixture::cmdToDefault, end(false));
-    EXPECT_CALL(TestFixture::cmdToDefault, end(true));
+    EXPECT_CALL(TestFixture::cmdToGovern, initialize);
+    EXPECT_CALL(TestFixture::cmdToGovern, execute);
+    EXPECT_CALL(TestFixture::cmdToGovern, end(false));
+    EXPECT_CALL(TestFixture::cmdToGovern, end(true));
 
     for (auto &gov : TestFixture::governors)
     {
