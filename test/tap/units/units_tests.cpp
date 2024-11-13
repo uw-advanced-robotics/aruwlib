@@ -39,13 +39,10 @@ TEST(Units, temperature)
 {
     Temperature<> t1(0);
     EXPECT_FLOAT_EQ(0, t1.valueOf());
-    EXPECT_NEAR(-273.15, toCelsius(t1), 1e-5);
+    EXPECT_NEAR(273.15, toKelvin(t1), 1e-5);
+    EXPECT_NEAR(32, toDegreesFahrenheit(t1), 1e-5);
 
-    Temperature<> t2 = 0_degC;
-    EXPECT_NEAR(273.15, t2.valueOf(), 1e-5);
-    EXPECT_NEAR(32, toFahrenheit(t2), 1e-5);
-
-    Temperature<> t3 = fromCelsius(-40);
-    EXPECT_NEAR(233.15, t3.valueOf(), 1e-5);
-    EXPECT_NEAR(-40, toFahrenheit(t3), 1e-5);
+    Temperature<> t2 = fromDegreesCelsius(-40);
+    EXPECT_NEAR(233.15, toKelvin(t2), 1e-5);
+    EXPECT_NEAR(-40, toDegreesFahrenheit(t2), 1e-5);
 }

@@ -19,16 +19,13 @@
 
 #ifndef TAPROOT_UNITS_HPP_
 #define TAPROOT_UNITS_HPP_
+#include "modm/math/geometry/angle.hpp"
 #include "modm/math/geometry/vector.hpp"
 
 #include "temperature.hpp"
 #include "unit_macros.hpp"
-
 namespace tap::units
 {
-#define M_PI_F 3.14159265358979323846f
-#define M_2PI_F 6.28318530717958647692f
-
 // Number
 NEW_UNIT(Number, NUMBER, Number, n, 0, 0, 0, 0, 0, 0)
 NEW_UNIT_LITERAL(Number, PERCENT, Percent, pct, NUMBER<F> * 0.01f);
@@ -79,8 +76,8 @@ UNIT_METRIC_PREFIXES_ALL(Voltage, VOLT, volt, V)
 
 // Angle
 NEW_UNIT(Angle, RADIAN, Radian, rad, 0, 0, 0, 0, 0, 1)
-NEW_UNIT_LITERAL(Angle, DEGREE, Degree, deg, RADIAN<F> * 180.0f / M_PI_F)
-NEW_UNIT_LITERAL(Angle, ROTATION, Rotation, rot, RADIAN<F>* M_2PI_F)
+NEW_UNIT_LITERAL(Angle, DEGREE, Degree, deg, RADIAN<F> * 180.0f / M_PI)
+NEW_UNIT_LITERAL(Angle, ROTATION, Rotation, rot, RADIAN<F>* M_TWOPI)
 NEW_UNIT_LITERAL(Angle, ARC_MINUTE, ArcMinute, arcmin, DEGREE<F> / 60.0f)
 NEW_UNIT_LITERAL(Angle, ARC_SECOND, ArcSecond, arcsec, DEGREE<F> / 3600.0f)
 

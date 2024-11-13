@@ -295,13 +295,13 @@ TEST(UnitMath, sin)
     Angle<> a1(0);
     EXPECT_NEAR(0, sin(a1).valueOf(), 1e-5);
 
-    Angle<> a2(M_PI_F / 2);
+    Angle<> a2(M_PI / 2);
     EXPECT_NEAR(1, sin(a2).valueOf(), 1e-5);
 
-    Angle<> a3(M_PI_F);
+    Angle<> a3(M_PI);
     EXPECT_NEAR(0, sin(a3).valueOf(), 1e-5);
 
-    Angle<> a4(3 * M_PI_F / 2);
+    Angle<> a4(3 * M_PI / 2);
     EXPECT_NEAR(-1, sin(a4).valueOf(), 1e-5);
 }
 
@@ -310,13 +310,13 @@ TEST(UnitMath, cos)
     Angle<> a1(0);
     EXPECT_NEAR(1, cos(a1).valueOf(), 1e-5);
 
-    Angle<> a2(M_PI_F / 2);
+    Angle<> a2(M_PI / 2);
     EXPECT_NEAR(0, cos(a2).valueOf(), 1e-5);
 
-    Angle<> a3(M_PI_F);
+    Angle<> a3(M_PI);
     EXPECT_NEAR(-1, cos(a3).valueOf(), 1e-5);
 
-    Angle<> a4(3 * M_PI_F / 2);
+    Angle<> a4(3 * M_PI / 2);
     EXPECT_NEAR(0, cos(a4).valueOf(), 1e-5);
 }
 
@@ -325,13 +325,13 @@ TEST(UnitMath, tan)
     Angle<> a1(0);
     EXPECT_NEAR(0, tan(a1).valueOf(), 1e-5);
 
-    Angle<> a2(M_PI_F / 4);
+    Angle<> a2(M_PI / 4);
     EXPECT_NEAR(1, tan(a2).valueOf(), 1e-5);
 
-    Angle<> a3(M_PI_F / 2);
+    Angle<> a3(M_PI / 2);
     EXPECT_TRUE(abs(tan(a3)).valueOf() > 1'000.0f);
 
-    Angle<> a4(3 * M_PI_F / 4);
+    Angle<> a4(3 * M_PI / 4);
     EXPECT_NEAR(-1, tan(a4).valueOf(), 1e-5);
 }
 
@@ -341,28 +341,28 @@ TEST(UnitMath, asin)
     EXPECT_NEAR(0, asin(q1).valueOf(), 1e-5);
 
     Quantity<> q2(1);
-    EXPECT_NEAR(M_PI_F / 2, asin(q2).valueOf(), 1e-5);
+    EXPECT_NEAR(M_PI / 2, asin(q2).valueOf(), 1e-5);
 
     Quantity<> q3(-1);
-    EXPECT_NEAR(-M_PI_F / 2, asin(q3).valueOf(), 1e-5);
+    EXPECT_NEAR(-M_PI / 2, asin(q3).valueOf(), 1e-5);
 
     Quantity<> q4(0.5);
-    EXPECT_NEAR(M_PI_F / 6, asin(q4).valueOf(), 1e-5);
+    EXPECT_NEAR(M_PI / 6, asin(q4).valueOf(), 1e-5);
 }
 
 TEST(UnitMath, acos)
 {
     Quantity<> q1(0);
-    EXPECT_NEAR(M_PI_F / 2, acos(q1).valueOf(), 1e-5);
+    EXPECT_NEAR(M_PI / 2, acos(q1).valueOf(), 1e-5);
 
     Quantity<> q2(1);
     EXPECT_NEAR(0, acos(q2).valueOf(), 1e-5);
 
     Quantity<> q3(-1);
-    EXPECT_NEAR(M_PI_F, acos(q3).valueOf(), 1e-5);
+    EXPECT_NEAR(M_PI, acos(q3).valueOf(), 1e-5);
 
     Quantity<> q4(0.5);
-    EXPECT_NEAR(M_PI_F / 3, acos(q4).valueOf(), 1e-5);
+    EXPECT_NEAR(M_PI / 3, acos(q4).valueOf(), 1e-5);
 }
 
 TEST(UnitMath, atan)
@@ -371,10 +371,10 @@ TEST(UnitMath, atan)
     EXPECT_NEAR(0, atan(q1).valueOf(), 1e-5);
 
     Quantity<> q2(1);
-    EXPECT_NEAR(M_PI_F / 4, atan(q2).valueOf(), 1e-5);
+    EXPECT_NEAR(M_PI / 4, atan(q2).valueOf(), 1e-5);
 
     Quantity<> q3(-1);
-    EXPECT_NEAR(-M_PI_F / 4, atan(q3).valueOf(), 1e-5);
+    EXPECT_NEAR(-M_PI / 4, atan(q3).valueOf(), 1e-5);
 
     Quantity<> q4(0);
     Quantity<> q5(1);
@@ -382,7 +382,7 @@ TEST(UnitMath, atan)
 
     Quantity<> q6(1);
     Quantity<> q7(1);
-    EXPECT_NEAR(M_PI_F / 4, atan2(q6, q7).valueOf(), 1e-5);
+    EXPECT_NEAR(M_PI / 4, atan2(q6, q7).valueOf(), 1e-5);
 }
 
 TEST(UnitMath, compareClose)
