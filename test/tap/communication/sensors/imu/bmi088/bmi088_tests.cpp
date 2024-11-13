@@ -134,7 +134,8 @@ TEST(Bmi088, requestRecalibration__calibration_adds_offset_to_acc_gyro_data)
     {
         int16_t x = 12;
         int16_t y = 15;
-        int16_t z = 20 + tap::algorithms::ACCELERATION_GRAVITY.valueOf() / Bmi088::ACC_G_PER_ACC_COUNT;
+        int16_t z =
+            20 + tap::algorithms::ACCELERATION_GRAVITY.valueOf() / Bmi088::ACC_G_PER_ACC_COUNT;
     } modm_packed accData;
 
     struct
