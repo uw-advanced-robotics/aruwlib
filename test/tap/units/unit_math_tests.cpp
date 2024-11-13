@@ -149,16 +149,16 @@ TEST(UnitMath, copysign)
     EXPECT_FLOAT_EQ(-5, copysign(q7, q8).valueOf());
 }
 
-TEST(UnitMath, sgn)
+TEST(UnitMath, sign)
 {
     Quantity<> q1(5);
-    EXPECT_FLOAT_EQ(1, sgn(q1));
+    EXPECT_FLOAT_EQ(1, sign(q1));
 
     Quantity<> q2(-5);
-    EXPECT_FLOAT_EQ(-1, sgn(q2));
+    EXPECT_FLOAT_EQ(-1, sign(q2));
 
     Quantity<> q3(0);
-    EXPECT_FLOAT_EQ(1, sgn(q3));
+    EXPECT_FLOAT_EQ(1, sign(q3));
 }
 
 TEST(UnitMath, signbit)

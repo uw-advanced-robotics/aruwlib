@@ -40,7 +40,7 @@ bool computeTravelTime(
             (ACCELERATION_GRAVITY * units::math::square(horizontalDist) +
              2 * targetPosition.z * bulletVelocitySquared);  // todo: make sure this is correct
 
-    if (units::math::sgn(sqrtTerm) < 0)
+    if (units::math::sign(sqrtTerm) < 0)
     {
         return false;
     }
@@ -63,7 +63,7 @@ bool computeTravelTime(
 
         // If there isn't a real-valued root, there is no time where we can reach the target with
         // the given assumptions
-        if (units::math::sgn(sqrtTerm) < 0)
+        if (units::math::sign(sqrtTerm) < 0)
         {
             return false;
         }
