@@ -134,7 +134,7 @@ TEST(Bmi088, requestRecalibration__calibration_adds_offset_to_acc_gyro_data)
     {
         int16_t x = 12;
         int16_t y = 15;
-        int16_t z = 20 + tap::algorithms::ACCELERATION_GRAVITY / Bmi088::ACC_G_PER_ACC_COUNT;
+        int16_t z = 20 + tap::algorithms::ACCELERATION_GRAVITY.valueOf() / Bmi088::ACC_G_PER_ACC_COUNT;
     } modm_packed accData;
 
     struct
@@ -154,7 +154,7 @@ TEST(Bmi088, requestRecalibration__calibration_adds_offset_to_acc_gyro_data)
 
     accData.x = 0;
     accData.y = 0;
-    accData.z = tap::algorithms::ACCELERATION_GRAVITY / Bmi088::ACC_G_PER_ACC_COUNT;
+    accData.z = tap::algorithms::ACCELERATION_GRAVITY.valueOf() / Bmi088::ACC_G_PER_ACC_COUNT;
     gyroData.x = 0;
     gyroData.y = 0;
     gyroData.z = 0;
@@ -168,7 +168,7 @@ TEST(Bmi088, requestRecalibration__calibration_adds_offset_to_acc_gyro_data)
     EXPECT_NEAR(-12 * Bmi088::ACC_G_PER_ACC_COUNT, bmi088.getAx(), ALPHA);
     EXPECT_NEAR(-15 * Bmi088::ACC_G_PER_ACC_COUNT, bmi088.getAy(), ALPHA);
     EXPECT_NEAR(
-        (-20 + tap::algorithms::ACCELERATION_GRAVITY / Bmi088::ACC_G_PER_ACC_COUNT) *
+        (-20 + tap::algorithms::ACCELERATION_GRAVITY.valueOf() / Bmi088::ACC_G_PER_ACC_COUNT) *
             Bmi088::ACC_G_PER_ACC_COUNT,
         bmi088.getAz(),
         ALPHA);
