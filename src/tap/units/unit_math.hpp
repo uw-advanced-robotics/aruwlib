@@ -186,7 +186,7 @@ constexpr Q1 copysign(const Q1& lhs, const Q2& rhs)
  * @return constexpr int the sign of the quantity
  */
 template <isQuantity Q>
-constexpr int sgn(const Q& lhs)
+constexpr int sign(const Q& lhs)
 {
     return lhs.valueOf() < 0 ? -1 : 1;
 }
