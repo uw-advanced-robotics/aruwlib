@@ -63,9 +63,10 @@ public:
      * @param upper the upper bound
      */
     explicit constexpr Wrapped(Q value, Similar lower, Similar upper)
-        : lower(math::min(lower, upper)),
-          upper(math::max(lower, upper)),
-          Internal(value)
+        : Internal(value),
+          lower(math::min(lower, upper)),
+          upper(math::max(lower, upper))
+
     {
         wrapValue();
     }

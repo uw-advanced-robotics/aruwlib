@@ -36,9 +36,8 @@ bool computeTravelTime(
         units::math::square(bulletVelocity);
     units::Exponentiated<units::LinearVelocity<>, ratio<4>> sqrtTerm =
         units::math::square(bulletVelocitySquared) -
-        ACCELERATION_GRAVITY *
-            (ACCELERATION_GRAVITY * units::math::square(horizontalDist) +
-             2 * targetPosition.z * bulletVelocitySquared);  // todo: make sure this is correct
+        ACCELERATION_GRAVITY * (ACCELERATION_GRAVITY * units::math::square(horizontalDist) +
+                                2 * targetPosition.z * bulletVelocitySquared);
 
     if (units::math::sign(sqrtTerm) < 0)
     {
@@ -53,10 +52,7 @@ bool computeTravelTime(
     // For vertical aiming, y_f = v_0*t - 0.5*g*t^2 -> t = (v_0 - sqrt((v_0)^2 - 2*g*y_f))/g
     // We use the negative root since the collision will happen on the first instance that the
     // trajectory reaches y_f
-    if (units::math::compareClose(
-            *turretPitch,
-            units::Angle<>(0),
-            units::Angle<>(1E-2)))  // todo create Quantity replacement for compareFloatClose
+    if (units::math::compareClose(*turretPitch, units::Angle<>(0), units::Angle<>(1E-2)))
     {
         tap::units::Exponentiated<tap::units::LinearVelocity<>, ratio<2>> sqrtTerm =
             units::math::square(bulletVelocity) - 2 * ACCELERATION_GRAVITY * targetPosition.z;
