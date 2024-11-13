@@ -142,7 +142,7 @@ void DjiMotorTxHandler::encodeAndSendCanData()
         {
             messageSuccess &= drivers->can.sendMessage(can::CanBus::CAN_BUS2, can2MessageHigh);
         }
-        if (can2ValidMotorMessageHigh)
+        if (can2ValidMotorMessage6020Current)
         {
             messageSuccess &=
                 drivers->can.sendMessage(can::CanBus::CAN_BUS2, can2Message6020Current);
