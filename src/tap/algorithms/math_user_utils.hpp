@@ -25,8 +25,6 @@
 #include <cmath>
 #include <cstring>
 
-#include "tap/units/units.hpp"
-
 #include "modm/architecture/interface/assert.hpp"
 #include "modm/math/geometry/angle.hpp"
 #include "modm/math/geometry/quaternion.hpp"
