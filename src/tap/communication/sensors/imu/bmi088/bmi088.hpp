@@ -76,9 +76,8 @@ public:
      * Refer to page 27 of the bmi088 datasheet for explination of this equation.
      * Used to convert raw accel values to units m/s^2. Ratio has units (m/s^2) / acc counts.
      */
-    static constexpr float ACC_G_PER_ACC_COUNT = modm::pow(2, ACC_RANGE.value + 1) * 1.5f *
-                                                 tap::algorithms::ACCELERATION_GRAVITY.valueOf() /
-                                                 32768.0f;
+    static constexpr float ACC_G_PER_ACC_COUNT =
+        modm::pow(2, ACC_RANGE.value + 1) * 1.5f * tap::algorithms::ACCELERATION_GRAVITY / 32768.0f;
 
     /**
      * The number of samples we take in order to determine the mpu offsets.

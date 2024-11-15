@@ -202,8 +202,7 @@ void Bmi088::computeOffsets()
     data.accOffsetRaw[ImuData::X] += data.accRaw[ImuData::X];
     data.accOffsetRaw[ImuData::Y] += data.accRaw[ImuData::Y];
     data.accOffsetRaw[ImuData::Z] +=
-        data.accRaw[ImuData::Z] -
-        (tap::algorithms::ACCELERATION_GRAVITY.valueOf() / ACC_G_PER_ACC_COUNT);
+        data.accRaw[ImuData::Z] - (tap::algorithms::ACCELERATION_GRAVITY / ACC_G_PER_ACC_COUNT);
 
     if (calibrationSample >= BMI088_OFFSET_SAMPLES)
     {
