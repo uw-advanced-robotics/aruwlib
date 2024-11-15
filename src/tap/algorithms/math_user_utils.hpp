@@ -39,8 +39,7 @@ namespace tap
 namespace algorithms
 {
 /// Acceleration due to gravity, in m/s^2.
-static constexpr units::LinearAcceleration<> ACCELERATION_GRAVITY =
-    units::LinearAcceleration(9.80665);
+static constexpr float ACCELERATION_GRAVITY = 9.80665f;
 
 /**
  * Use this instead of the == operator when asserting equality for floats.

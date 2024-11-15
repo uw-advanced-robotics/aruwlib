@@ -22,9 +22,6 @@
 
 #include <cmath>
 
-#include "tap/units/unit_math.hpp"
-#include "tap/units/units.hpp"
-
 #include "modm/math/geometry/vector.hpp"
 
 namespace tap::algorithms::ballistics
@@ -38,7 +35,7 @@ namespace tap::algorithms::ballistics
 
 struct AbstractKinematicState
 {
-    virtual units::Vector3Position projectForward(units::Time<> dt) const = 0;
+    virtual modm::Vector3f projectForward(float dt) const = 0;
 
     /**
      * @param[in] dt: The amount of time to project forward.
@@ -48,32 +45,27 @@ struct AbstractKinematicState
      *
      * @return The future position of an object using a quadratic (constant acceleration) model.
      */
-    template <int F>
-    inline static units::Length<F> quadraticKinematicProjection(
-        units::Time<F> dt,
-        units::Length<F> s,
-        units::LinearVelocity<F> v,
-        units::LinearAcceleration<F> a)
+    inline static float quadraticKinematicProjection(float dt, float s, float v, float a)
     {
-        return s + v * dt + 0.5 * a * units::math::square(dt);
+        return s + v * dt + 0.5f * a * powf(dt, 2.0f);
     }
 };
 
 struct SecondOrderKinematicState : public AbstractKinematicState
 {
     inline SecondOrderKinematicState(
-        units::Vector3Position position,
-        units::Vector3Velocity velocity,
-        units::Vector3Acceleration acceleration)
+        modm::Vector3f position,
+        modm::Vector3f velocity,
+        modm::Vector3f acceleration)
         : position(position),
           velocity(velocity),
           acceleration(acceleration)
     {
     }
 
-    units::Vector3Position position;          // m
-    units::Vector3Velocity velocity;          // m/s
-    units::Vector3Acceleration acceleration;  // m/s^2
+    modm::Vector3f position;      // m
+    modm::Vector3f velocity;      // m/s
+    modm::Vector3f acceleration;  // m/s^2
 
     /**
      * @param[in] dt: The amount of time to project the state forward.
@@ -81,9 +73,9 @@ struct SecondOrderKinematicState : public AbstractKinematicState
      * @return The future 3D position of this object using a quadratic (constant acceleration)
      * model.
      */
-    inline units::Vector3Position projectForward(units::Time<> dt) const override
+    inline modm::Vector3f projectForward(float dt) const override
     {
-        return units::Vector3Position(
+        return modm::Vector3f(
             quadraticKinematicProjection(dt, position.x, velocity.x, acceleration.x),
             quadraticKinematicProjection(dt, position.y, velocity.y, acceleration.y),
             quadraticKinematicProjection(dt, position.z, velocity.z, acceleration.z));
@@ -108,11 +100,11 @@ struct SecondOrderKinematicState : public AbstractKinematicState
  * @return Whether or not a valid travel time was found.
  */
 bool computeTravelTime(
-    const units::Vector3Position &targetPosition,
-    units::LinearVelocity<> bulletVelocity,
-    units::Time<> *travelTime,
-    units::Angle<> *turretPitch,
-    const units::Length<> pitchAxisOffset = units::Length(0));
+    const modm::Vector3f &targetPosition,
+    float bulletVelocity,
+    float *travelTime,
+    float *turretPitch,
+    const float pitchAxisOffset = 0);
 
 /**
  * @param[in] targetInitialState: The initial 3D kinematic state of a target. Frame requirements:
@@ -138,12 +130,12 @@ bool computeTravelTime(
  */
 bool findTargetProjectileIntersection(
     const AbstractKinematicState &targetInitialState,
-    units::LinearVelocity<> bulletVelocity,
+    float bulletVelocity,
     uint8_t numIterations,
-    units::Angle<> *turretPitch,
-    units::Angle<> *turretYaw,
-    units::Time<> *projectedTravelTime,
-    const units::Length<> pitchAxisOffset = units::Length(0));
+    float *turretPitch,
+    float *turretYaw,
+    float *projectedTravelTime,
+    const float pitchAxisOffset = 0);
 
 }  // namespace tap::algorithms::ballistics
 

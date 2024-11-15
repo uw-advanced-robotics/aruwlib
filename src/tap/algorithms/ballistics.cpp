@@ -24,71 +24,64 @@
 namespace tap::algorithms::ballistics
 {
 bool computeTravelTime(
-    const units::Vector3Position &targetPosition,
-    units::LinearVelocity<> bulletVelocity,
-    units::Time<> *travelTime,
-    units::Angle<> *turretPitch,
-    const units::Length<> pitchAxisOffset)
+    const modm::Vector3f &targetPosition,
+    float bulletVelocity,
+    float *travelTime,
+    float *turretPitch,
+    const float pitchAxisOffset)
 {
-    units::Length horizontalDist =
-        units::math::hypot(targetPosition.x, targetPosition.y) + pitchAxisOffset;
-    units::Exponentiated<units::LinearVelocity<>, ratio<2>> bulletVelocitySquared =
-        units::math::square(bulletVelocity);
-    units::Exponentiated<units::LinearVelocity<>, ratio<4>> sqrtTerm =
-        units::math::square(bulletVelocitySquared) -
-        ACCELERATION_GRAVITY * (ACCELERATION_GRAVITY * units::math::square(horizontalDist) +
-                                2 * targetPosition.z * bulletVelocitySquared);
+    float horizontalDist = hypot(targetPosition.x, targetPosition.y) + pitchAxisOffset;
+    float bulletVelocitySquared = powf(bulletVelocity, 2);
+    float sqrtTerm = powf(bulletVelocitySquared, 2) -
+                     ACCELERATION_GRAVITY * (ACCELERATION_GRAVITY * powf(horizontalDist, 2) +
+                                             2 * targetPosition.z * bulletVelocitySquared);
 
-    if (units::math::sign(sqrtTerm) < 0)
+    if (sqrtTerm < 0)
     {
         return false;
     }
 
     // Equation obtained from the wikipedia page on projectile motion
-    *turretPitch = -units::math::atan2(
-        bulletVelocitySquared - units::math::sqrt(sqrtTerm),
-        (ACCELERATION_GRAVITY * horizontalDist));
+    *turretPitch =
+        -atan2(bulletVelocitySquared - sqrt(sqrtTerm), (ACCELERATION_GRAVITY * horizontalDist));
 
     // For vertical aiming, y_f = v_0*t - 0.5*g*t^2 -> t = (v_0 - sqrt((v_0)^2 - 2*g*y_f))/g
     // We use the negative root since the collision will happen on the first instance that the
     // trajectory reaches y_f
-    if (units::math::compareClose(*turretPitch, units::Angle<>(0), units::Angle<>(1E-2)))
+    if (compareFloatClose(*turretPitch, 0, 1E-2))
     {
-        tap::units::Exponentiated<tap::units::LinearVelocity<>, ratio<2>> sqrtTerm =
-            units::math::square(bulletVelocity) - 2 * ACCELERATION_GRAVITY * targetPosition.z;
+        float sqrtTerm = powf(bulletVelocity, 2.0f) - 2 * ACCELERATION_GRAVITY * targetPosition.z;
 
         // If there isn't a real-valued root, there is no time where we can reach the target with
         // the given assumptions
-        if (units::math::sign(sqrtTerm) < 0)
+        if (sqrtTerm < 0)
         {
             return false;
         }
 
-        *travelTime = (bulletVelocity - units::math::sqrt(sqrtTerm)) / ACCELERATION_GRAVITY;
+        *travelTime = (bulletVelocity - sqrt(sqrtTerm)) / ACCELERATION_GRAVITY;
         return true;
     }
 
     // Equation obtained from the wikipedia page on projectile motion
-    *travelTime = horizontalDist / (bulletVelocity * units::math::cos(*turretPitch));
+    *travelTime = horizontalDist / (bulletVelocity * cos(*turretPitch));
 
-    return !isnan(turretPitch->valueOf()) && !isnan(travelTime->valueOf());
+    return !isnan(*turretPitch) && !isnan(*travelTime);
 }
 
 bool findTargetProjectileIntersection(
     const AbstractKinematicState &targetInitialState,
-    units::LinearVelocity<> bulletVelocity,
+    float bulletVelocity,
     uint8_t numIterations,
-    units::Angle<> *turretPitch,
-    units::Angle<> *turretYaw,
-    units::Time<> *projectedTravelTime,
-    const units::Length<> pitchAxisOffset)
+    float *turretPitch,
+    float *turretYaw,
+    float *projectedTravelTime,
+    const float pitchAxisOffset)
 {
-    units::Vector3Position projectedTargetPosition =
-        targetInitialState.projectForward(units::Time<>(0));
+    modm::Vector3f projectedTargetPosition = targetInitialState.projectForward(0);
 
-    if (projectedTargetPosition.x == units::Length(0) &&
-        projectedTargetPosition.y == units::Length(0) &&
-        projectedTargetPosition.z == units::Length(0))
+    if (projectedTargetPosition.x == 0 && projectedTargetPosition.y == 0 &&
+        projectedTargetPosition.z == 0)
     {
         return false;
     }
@@ -107,9 +100,9 @@ bool findTargetProjectileIntersection(
         projectedTargetPosition = targetInitialState.projectForward(*projectedTravelTime);
     }
 
-    *turretYaw = units::math::atan2(projectedTargetPosition.y, projectedTargetPosition.x);
+    *turretYaw = atan2f(projectedTargetPosition.y, projectedTargetPosition.x);
 
-    return !isnan(turretPitch->valueOf()) && !isnan(turretYaw->valueOf());
+    return !isnan(*turretPitch) && !isnan(*turretYaw);
 }
 
 }  // namespace tap::algorithms::ballistics
