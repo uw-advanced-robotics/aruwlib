@@ -1,10 +1,45 @@
 # Taproot Changelog
 
+## October 2024
+
+- Added `SequentialCommand`
+    - Allows running multiple commands in order.
+- Added `Concurrent[Race]Command`
+    - Allows running multiple commands at the same time.
+    - The race variant ends when any command has finished, while the normal variant waits for all to finish.
+- Refactored the hardware testing feature.
+    - Hardware tests are now done through commands set with `Subsystem::setTestCommand`
+    - Hardware tests now only run when the robot is out of safe disconnect mode.
+    - All tests are runnable with `CommandScheduler::runAllHardwareTests`, while individual tests can be run with `CommandScheduler::runHardwareTest(const Subsystem*)`
+    - Similarly, `CommandScheduler::stopAllHardwareTests` and `CommandScheduler::stopHardwareTest(const Subsystem*)` exist.
+    - `CommandScheduler::isRunningTest(const Subsystem*)` returns true if the subsystem is running a hardware test.
+    - `CommandScheduler::hasPassedTest(const Subsystem*)` returns true if the subsystem has passed a hardware test.
+    - `CommandScheduler::countRunningHardwareTests()` returns the number of hardware tests currently running.
+    - Hardware Test Menu:
+        - The tests now must be manually run and don't start when the menu is open.
+        - There is now a line showing how many tests are running.
+        - Each test is individually runnable and stoppable.
+        - `x` is shown for failed/incomplete tests, `+` is shown for passed tests.
+- Updated the `mpu6500` and `bmi088` to allow for variable temperature setpoints. This was done as in testing,
+  the type C board was found to operate at a lower tempreature than the type A.
+- Updated `MahonyAHRS` for IMUs to no longer include the 180 degree offset. IMUs will now intitialize at 0 degrees
+- Updated `GovernorWithFallbackCommand` such that if the governed command is selected, the command stops if any governor is finished. Also stops the fallback command if all governors become ready.
+
+### Breaking Changes
+- Removed `Subsystem::isHardwareTestComplete`, `Subsystem::setHardwareTestsIncomplete`, `Subsystem::setHardwareTestsComplete`, `Subsystem::runHardwareTests`, `Subsystem::onHardwareTestStart`, `Subsystem::onHardwareTestComplete`
+- Removed `CommandScheduler::startHardwareTests`, `CommandScheduler::stopHardwareTests`
+
 ## September 2024
+
+- Added some more utility functions to `WrappedFloat`
+  - `withinRange`, `rangeOverlap` can be used to deal with wrapped ranges
+  - `withSameBounds` and `Angle::fromDegrees` can be used to construct `WrappedFloat`s
+  - Fixed a bug with how `revolutions` was calculated
 
 ### Breaking Changes
 - Bmi088 now has seperate `periodicIMUUpdate` and `read` methods. `periodicIMUUpdate` should 
 be called at a fixed rate of mahony, and `read` should be called at a rate such that `periodicIMUUpdate` <= `read` <= sampling rate.
+- The `Angle` class within `WrappedFloat` now has bounds of 0 to 2pi as opposed to -pi to pi. This affects values gotten from `getWrappedValue()`.
 
 ## July 2024
 

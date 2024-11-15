@@ -33,6 +33,11 @@ Vector Position::operator-(const Position& other) const
     return Vector(this->coordinates_ - other.coordinates());
 }
 
+Position Position::operator+(const Vector& vector) const
+{
+    return Position(this->coordinates_ + vector.coordinates());
+}
+
 Position Position::operator+(const Position& vector) const
 {
     return Position(this->coordinates_ + vector.coordinates_);

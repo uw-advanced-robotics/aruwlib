@@ -47,10 +47,12 @@ public:
         std::vector<Subsystem *> subRequirements,
         Command &commandWhenGovernorsReady,
         Command &fallbackCommand,
-        const std::array<CommandGovernorInterface *, NUM_CONDITIONS> &commandGovernorList)
+        const std::array<CommandGovernorInterface *, NUM_CONDITIONS> &commandGovernorList,
+        const bool stopFallbackCommandIfGovernorsReady = false)
         : commandWhenGovernorsReady(commandWhenGovernorsReady),
           fallbackCommand(fallbackCommand),
-          commandGovernorList(commandGovernorList)
+          commandGovernorList(commandGovernorList),
+          stopFallbackCommandIfGovernorsReady(stopFallbackCommandIfGovernorsReady)
     {
         std::for_each(subRequirements.begin(), subRequirements.end(), [&](auto sub) {
             addSubsystemRequirement(sub);
@@ -61,22 +63,23 @@ public:
         assert(fallbackCommand.getRequirementsBitwise() == this->getRequirementsBitwise());
     }
 
-    const char *getName() const override { return "Governor w/fallback"; }
+    const char *getName() const override
+    {
+        return governedCommandSelected ? commandWhenGovernorsReady.getName()
+                                       : fallbackCommand.getName();
+    }
 
     bool isReady() override
     {
-        currentGovernorReadiness =
-            std::all_of(commandGovernorList.begin(), commandGovernorList.end(), [](auto governor) {
-                return governor->isReady();
-            });
+        governedCommandSelected = checkGovernorReadiness();
 
-        return (currentGovernorReadiness && commandWhenGovernorsReady.isReady()) ||
-               (!currentGovernorReadiness && fallbackCommand.isReady());
+        return (governedCommandSelected && commandWhenGovernorsReady.isReady()) ||
+               (!governedCommandSelected && fallbackCommand.isReady());
     }
 
     void initialize() override
     {
-        if (currentGovernorReadiness)
+        if (governedCommandSelected)
         {
             commandWhenGovernorsReady.initialize();
         }
@@ -88,7 +91,7 @@ public:
 
     void execute() override
     {
-        if (currentGovernorReadiness)
+        if (governedCommandSelected)
         {
             commandWhenGovernorsReady.execute();
         }
@@ -100,7 +103,7 @@ public:
 
     void end(bool interrupted) override
     {
-        if (currentGovernorReadiness)
+        if (governedCommandSelected)
         {
             commandWhenGovernorsReady.end(interrupted);
         }
@@ -112,16 +115,37 @@ public:
 
     bool isFinished() const override
     {
-        return currentGovernorReadiness ? commandWhenGovernorsReady.isFinished()
-                                        : fallbackCommand.isFinished();
+        if (governedCommandSelected)
+        {
+            return commandWhenGovernorsReady.isFinished() || checkAnyGovernorFinished();
+        }
+        return fallbackCommand.isFinished() ||
+               (stopFallbackCommandIfGovernorsReady && checkGovernorReadiness());
     }
 
 private:
-    bool currentGovernorReadiness = false;
+    bool governedCommandSelected = false;
     Command &commandWhenGovernorsReady;
     Command &fallbackCommand;
 
     std::array<CommandGovernorInterface *, NUM_CONDITIONS> commandGovernorList;
+    const bool stopFallbackCommandIfGovernorsReady;
+
+    bool checkGovernorReadiness() const
+    {
+        return std::all_of(
+            commandGovernorList.begin(),
+            commandGovernorList.end(),
+            [](auto governor) { return governor->isReady(); });
+    }
+
+    bool checkAnyGovernorFinished() const
+    {
+        return std::any_of(
+            commandGovernorList.begin(),
+            commandGovernorList.end(),
+            [](auto governor) { return governor->isFinished(); });
+    }
 };
 }  // namespace tap::control::governor
 
