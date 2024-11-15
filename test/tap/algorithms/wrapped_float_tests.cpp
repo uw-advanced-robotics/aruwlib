@@ -33,12 +33,15 @@ TEST(WrappedFloat, Wrapping_behavior)
 {
     WrappedFloat testInstance(-4, 0, 10);
     EXPECT_EQ(6, testInstance.getWrappedValue());
+    EXPECT_EQ(-4, testInstance.getUnwrappedValue());
 
     testInstance.setWrappedValue(16);
     EXPECT_EQ(6, testInstance.getWrappedValue());
+    EXPECT_EQ(6, testInstance.getUnwrappedValue());
 
     testInstance.setWrappedValue(28);
     EXPECT_EQ(8, testInstance.getWrappedValue());
+    EXPECT_EQ(28, testInstance.getUnwrappedValue());
 }
 
 TEST(WrappedFloat, Difference)
@@ -81,15 +84,19 @@ TEST(WrappedFloat, Shifting_up)
 
     testInstance += 40;
     EXPECT_EQ(-170, testInstance.getWrappedValue());
+    EXPECT_EQ(190, testInstance.getUnwrappedValue());
 
     testInstance += 40;
     EXPECT_EQ(-130, testInstance.getWrappedValue());
+    EXPECT_EQ(230, testInstance.getUnwrappedValue());
 
     testInstance += 360;
     EXPECT_EQ(-130, testInstance.getWrappedValue());
+    EXPECT_EQ(590, testInstance.getUnwrappedValue());
 
     testInstance += 0;
     EXPECT_EQ(-130, testInstance.getWrappedValue());
+    EXPECT_EQ(590, testInstance.getUnwrappedValue());
 }
 
 TEST(WrappedFloat, shifting_down)
@@ -98,23 +105,20 @@ TEST(WrappedFloat, shifting_down)
 
     testInstance -= 40;
     EXPECT_EQ(170, testInstance.getWrappedValue());
+    EXPECT_EQ(-190, testInstance.getUnwrappedValue());
 
     testInstance -= 40;
     EXPECT_EQ(130, testInstance.getWrappedValue());
+    EXPECT_EQ(-230, testInstance.getUnwrappedValue());
 
     testInstance -= 360;
     EXPECT_EQ(130, testInstance.getWrappedValue());
+    EXPECT_EQ(-590, testInstance.getUnwrappedValue());
 
     testInstance -= 0;
     EXPECT_EQ(130, testInstance.getWrappedValue());
+    EXPECT_EQ(-590, testInstance.getUnwrappedValue());
 }
-
-// TEST(WrappedFloat, bad_bounds)
-// {
-//     WrappedFloat testInstance(150, 180, -180);
-//     EXPECT_EQ(-180, testInstance.getLowerBound());
-//     EXPECT_EQ(180, testInstance.getUpperBound());
-// }
 
 TEST(WrappedFloat, shiftBounds_positive)
 {
@@ -131,20 +135,6 @@ TEST(WrappedFloat, shiftBounds_negative)
     testInstance.shiftBounds(-200);
     EXPECT_EQ(-190, testInstance.getWrappedValue());
 }
-
-// TEST(WrappedFloat, setLowerBound_value_outside_new_bounds)
-// {
-//     WrappedFloat testInstance(10, -100, 100);
-//     testInstance.setLowerBound(50);
-//     EXPECT_EQ(60, testInstance.getWrappedValue());
-// }
-
-// TEST(WrappedFloat, setUpperBound_value_outside_new_bounds)
-// {
-//     WrappedFloat testInstance(10, -100, 100);
-//     testInstance.setLowerBound(50);
-//     EXPECT_EQ(60, testInstance.getWrappedValue());
-// }
 
 TEST(WrappedFloat, limitVal_min_lt_max)
 {
@@ -178,4 +168,86 @@ TEST(WrappedFloat, limitVal_min_gt_max)
     testInstance.setWrappedValue(20);
     EXPECT_EQ(20, WrappedFloat::limitValue(testInstance, 10, -10, &status));
     EXPECT_EQ(0, status);
+}
+
+TEST(WrappedFloat, rangeOverlap)
+{
+    // non intersecting ranges
+    EXPECT_EQ(
+        0.0f,
+        WrappedFloat::rangeOverlap(
+            WrappedFloat(0, 0, 100),
+            WrappedFloat(49, 0, 100),
+            WrappedFloat(50, 0, 100),
+            WrappedFloat(90, 0, 100)));
+
+    // basic intersection
+    EXPECT_EQ(
+        20.0f,
+        WrappedFloat::rangeOverlap(
+            WrappedFloat(0, 0, 100),
+            WrappedFloat(60, 0, 100),
+            WrappedFloat(40, 0, 100),
+            WrappedFloat(90, 0, 100)));
+
+    EXPECT_EQ(
+        20.0f,
+        WrappedFloat::rangeOverlap(
+            WrappedFloat(40, 0, 100),
+            WrappedFloat(90, 0, 100),
+            WrappedFloat(0, 0, 100),
+            WrappedFloat(60, 0, 100)));
+
+    // one range contained entirely in the other
+    EXPECT_EQ(
+        30.0f,
+        WrappedFloat::rangeOverlap(
+            WrappedFloat(0, 0, 100),
+            WrappedFloat(90, 0, 100),
+            WrappedFloat(30, 0, 100),
+            WrappedFloat(60, 0, 100)));
+
+    EXPECT_EQ(
+        30.0f,
+        WrappedFloat::rangeOverlap(
+            WrappedFloat(30, 0, 100),
+            WrappedFloat(60, 0, 100),
+            WrappedFloat(0, 0, 100),
+            WrappedFloat(90, 0, 100)));
+
+    // two intersections
+    EXPECT_EQ(
+        20.0f,
+        WrappedFloat::rangeOverlap(
+            WrappedFloat(30, 0, 100),
+            WrappedFloat(60, 0, 100),
+            WrappedFloat(50, 0, 100),
+            WrappedFloat(40, 0, 100)));
+
+    // one adjacent boundary, no intersection
+    EXPECT_EQ(
+        0.0f,
+        WrappedFloat::rangeOverlap(
+            WrappedFloat(30, 0, 100),
+            WrappedFloat(60, 0, 100),
+            WrappedFloat(60, 0, 100),
+            WrappedFloat(90, 0, 100)));
+
+    // one adjacent boundary, one intersection
+    EXPECT_EQ(
+        20.0f,
+        WrappedFloat::rangeOverlap(
+            WrappedFloat(30, 0, 100),
+            WrappedFloat(80, 0, 100),
+            WrappedFloat(60, 0, 100),
+            WrappedFloat(30, 0, 100)));
+
+    // duplicate range
+    EXPECT_EQ(
+        30.0f,
+        WrappedFloat::rangeOverlap(
+            WrappedFloat(30, 0, 100),
+            WrappedFloat(60, 0, 100),
+            WrappedFloat(30, 0, 100),
+            WrappedFloat(60, 0, 100)));
 }
