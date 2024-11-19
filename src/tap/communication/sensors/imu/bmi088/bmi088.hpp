@@ -157,6 +157,14 @@ public:
         imuHeater.setDesiredTemperature(temperatureC);
     }
 
+    // Override the calibrated accelerometer offsets
+    inline void applyAccelerometerOffset(float x, float y, float z)
+    {
+        data.accOffsetRaw[ImuData::X] = x;
+        data.accOffsetRaw[ImuData::Y] = y;
+        data.accOffsetRaw[ImuData::Z] = z;
+    }
+
 private:
     static constexpr uint16_t RAW_TEMPERATURE_TO_APPLY_OFFSET = 1023;
     /// Offset parsed temperature reading by this amount if > RAW_TEMPERATURE_TO_APPLY_OFFSET.

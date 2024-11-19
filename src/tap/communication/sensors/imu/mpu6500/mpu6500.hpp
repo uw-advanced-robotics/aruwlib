@@ -280,6 +280,14 @@ public:
         imuHeater.setDesiredTemperature(temperatureC);
     }
 
+    // Override the calibrated accelerometer offsets
+    inline void applyAccelerometerOffset(float x, float y, float z)
+    {
+        raw.accelOffset.x = x;
+        raw.accelOffset.y = y;
+        raw.accelOffset.z = z;
+    }
+
 private:
     static constexpr float ACCELERATION_GRAVITY = 9.80665f;
 
