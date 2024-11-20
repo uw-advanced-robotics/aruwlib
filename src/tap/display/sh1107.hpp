@@ -71,7 +71,7 @@ public:
     /**
      * Rotate display content
      */
-    void setInvert(unsigned int rotateDegrees);
+    void setRotate(unsigned int rotateDegrees);
 
 protected:
 #ifndef PLATFORM_HOSTED

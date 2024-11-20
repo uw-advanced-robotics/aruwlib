@@ -77,6 +77,8 @@ before_script:
         -i src/tap/algorithms/MahonyAHRS.h
             src/tap/display/sh1106_impl.hpp
             src/tap/display/sh1106_mock_impl.hpp
+            src/tap/display/sh1107_impl.hpp
+            src/tap/display/sh1107_mock_impl.hpp
   variables:
     GIT_SUBMODULE_STRATEGY: normal
   only: *verification_only

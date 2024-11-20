@@ -112,11 +112,11 @@ template <
     unsigned int Height,
     bool Flipped,
     unsigned int RotateDegrees>
-void tap::display::Sh1107<SPI, A0, Reset, Width, Height, Flipped, RotateDegrees>::setRotate(bool invert)
+void tap::display::Sh1107<SPI, A0, Reset, Width, Height, Flipped, RotateDegrees>::setRotate(unsigned int rotate)
 {
     a0.reset();
 
-    if (invert)
+    if (rotate > 1)
     {
         spi.transferBlocking(SH1107_REVERSE);
     }
