@@ -281,7 +281,7 @@ constexpr Q wrap(Q value, R lower, S upper) requires Isomorphic<Q, R, S>
  * @param rhs the angle
  * @return constexpr Number the sine of the angle
  */
-template <int F = 0, int G>
+template <typename F = DefaultFrame, typename G = DefaultFrame>
 constexpr Number<F> sin(const Angle<G>& rhs)
 {
     return Number<F>(std::sin(rhs.valueOf()));
@@ -292,7 +292,7 @@ constexpr Number<F> sin(const Angle<G>& rhs)
  * @param rhs the angle
  * @return constexpr Number the cosine of the angle
  */
-template <int F = 0, int G>
+template <typename F = DefaultFrame, typename G = DefaultFrame>
 constexpr Number<F> cos(const Angle<G>& rhs)
 {
     return Number<F>(std::cos(rhs.valueOf()));
@@ -303,7 +303,7 @@ constexpr Number<F> cos(const Angle<G>& rhs)
  * @param rhs the angle
  * @return constexpr Number the tangent of the angle
  */
-template <int F = 0, int G>
+template <typename F = DefaultFrame, typename G = DefaultFrame>
 constexpr Number<F> tan(const Angle<G>& rhs)
 {
     return Number<F>(std::tan(rhs.valueOf()));
@@ -314,7 +314,7 @@ constexpr Number<F> tan(const Angle<G>& rhs)
  * @param rhs the ratio
  * @return the angle
  */
-template <int F = 0, isQuantity Q>
+template <typename F = DefaultFrame, isQuantity Q>
 constexpr Angle<F> asin(const Q& rhs)
 {
     return Angle<F>(std::asin(rhs.valueOf()));
@@ -325,7 +325,7 @@ constexpr Angle<F> asin(const Q& rhs)
  * @param rhs the ratio
  * @return the angle
  */
-template <int F = 0, isQuantity Q>
+template <typename F = DefaultFrame, isQuantity Q>
 constexpr Angle<F> acos(const Q& rhs)
 {
     return Angle<F>(std::acos(rhs.valueOf()));
@@ -336,7 +336,7 @@ constexpr Angle<F> acos(const Q& rhs)
  * @param rhs the ratio
  * @return the angle
  */
-template <int F = 0, isQuantity Q>
+template <typename F = DefaultFrame, isQuantity Q>
 constexpr Angle<F> atan(const Q& rhs)
 {
     return Angle<F>(std::atan(rhs.valueOf()));
@@ -348,7 +348,7 @@ constexpr Angle<F> atan(const Q& rhs)
  * @param rhs the x coordinate
  * @return the angle
  */
-template <int F = 0, isQuantity Q>
+template <typename F = DefaultFrame, isQuantity Q>
 constexpr Angle<F> atan2(const Q& lhs, const Q& rhs)
 {
     return Angle<F>(std::atan2(lhs.valueOf(), rhs.valueOf()));

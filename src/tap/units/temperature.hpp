@@ -27,34 +27,34 @@ NEW_UNIT(Temperature, DEGREE_CELSIUS, DegreesCelsius, degC, 0, 0, 0, 0, 1, 0)
 
 namespace constants
 {
-template <int F = 0>
+template <typename F = DefaultFrame>
 constexpr Temperature DEGREE_FAHRENHEIT = DEGREE_CELSIUS<F> / 1.8f;
-template <int F = 0>
+template <typename F = DefaultFrame>
 constexpr Temperature KELVIN = DEGREE_CELSIUS<F>;
-template <int F = 0>
+template <typename F = DefaultFrame>
 constexpr Temperature WATER_FREEZING_POINT = Temperature<F>(0.0f);
-template <int F = 0>
+template <typename F = DefaultFrame>
 constexpr Temperature WATER_BOILING_POINT = Temperature<F>(100.0f);
 }  // namespace constants
 
 namespace conversions
 {
-template <int F = 0>
+template <typename F = DefaultFrame>
 constexpr inline Temperature<F> fromDegreesFahrenheit(float value)
 {
     return Temperature((value - 32.0f) * (5.0f / 9.0f));
 }
-template <int F = 0>
+template <typename F = DefaultFrame>
 constexpr inline Temperature<F> fromKelvin(float value)
 {
     return Temperature(value - 273.15f);
 }
-template <int F = 0>
+template <typename F = DefaultFrame>
 constexpr inline float toDegreesFahrenheit(Temperature<F> quantity)
 {
     return (quantity.valueOf() * 1.8f) + 32.0f;
 }
-template <int F = 0>
+template <typename F = DefaultFrame>
 constexpr inline float toKelvin(Temperature<F> quantity)
 {
     return quantity.valueOf() + 273.15f;

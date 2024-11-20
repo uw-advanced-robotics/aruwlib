@@ -25,6 +25,22 @@
 
 using std::ratio, std::ratio_add, std::ratio_subtract, std::ratio_multiply, std::ratio_divide,
     std::ratio_equal;
+
+template <typename F1, typename F2>
+struct FrameConvert
+{
+    using factor = ratio<0, 1>;
+};
+struct DefaultFrame
+{
+};
+
+template <>
+struct FrameConvert<DefaultFrame, DefaultFrame>
+{
+    using factor = ratio<1, 1>;
+};
+
 namespace tap::units
 {
 /**
@@ -37,11 +53,15 @@ template <
     typename Current = ratio<0>,
     typename Temperature = ratio<0>,
     typename Angle = ratio<0>,
-    int Frame = 0>
+    typename Frame = DefaultFrame>
 class Quantity
 {
 protected:
     float value;
+
+    static_assert(
+        std::ratio_not_equal_v<typename FrameConvert<DefaultFrame, Frame>::factor, ratio<0, 1>>,
+        "Default frame conversion not defined");
 
 public:
     // Convenience labels representing the dimensions, for use in template metaprogramming
@@ -59,19 +79,12 @@ public:
     /// The angle dimension of the quantity, with a base unit of radians
     typedef Angle angle;
     /// The frame of reference of the quantity
-    static constexpr int frame = Frame;
+    typedef Frame frame;
 
     /**
      * @brief convenience label. Represents an isomorphic unit (equal dimensions)
      */
     using Self = Quantity<Time, Length, Mass, Current, Temperature, Angle, Frame>;
-
-    /**
-     * @brief Convenience label. Represents an isomorphic unit (equal dimensions) in an arbitrary
-     * frame.
-     */
-    template <int F>
-    using SelfOtherFrame = Quantity<Time, Length, Mass, Current, Temperature, Angle, F>;
 
     // Constructors
     /**
@@ -89,10 +102,7 @@ public:
      * @brief Construct a new Quantity object
      * @param other The other quantity to copy
      */
-    template <int F>
-    constexpr Quantity(const SelfOtherFrame<F> other) : value(other.value)
-    {
-    }
+    constexpr Quantity(const Self& other) : value(other.value) {}
 
     /**
      * @brief Returns the value of the quantity in its base unit
@@ -104,11 +114,7 @@ public:
      * @brief Returns the value of the quantity converted to another unit
      * @param other The other unit to convert to
      */
-    template <int F>
-    constexpr float convertTo(const SelfOtherFrame<F> unit) const
-    {
-        return value / unit.valueOf();
-    }
+    constexpr float convertTo(const Self unit) const { return value / unit.valueOf(); }
 
     // Operators
 
@@ -116,13 +122,13 @@ public:
      * @brief Adds another quantity to this one
      * @param other The right hand addend
      */
-    constexpr void operator+=(const SelfOtherFrame<Frame> other) { value += other.value; }
+    constexpr void operator+=(const Self other) { value += other.value; }
 
     /**
      * @brief Subtracts another quantity from this one
      * @param other The right hand minuend
      */
-    constexpr void operator-=(const SelfOtherFrame<Frame> other) { value -= other.value; }
+    constexpr void operator-=(const Self other) { value -= other.value; }
 
     /**
      * @brief Multiplies this quantity by a unitless factor
@@ -136,10 +142,14 @@ public:
      */
     constexpr void operator/=(const float dividend) { value /= dividend; }
 
-    template <int F = 0>
-    constexpr SelfOtherFrame<F> inOtherFrame(float factor = 1)
+    template <typename F>
+    constexpr Quantity<Time, Length, Mass, Current, Temperature, Angle, F>
+    convertFrame() requires std::
+        ratio_not_equal_v<typename FrameConvert<DefaultFrame, F>::factor, ratio<0, 1>>
     {
-        return SelfOtherFrame<F>(value * factor);
+        return Quantity<Time, Length, Mass, Current, Temperature, Angle, F>(
+            value * ((float)FrameConvert<Frame, F>::factor::num /
+                     (float)FrameConvert<Frame, F>::factor::den));
     }
 };
 
@@ -153,7 +163,7 @@ template <
     typename C = ratio<0>,
     typename O = ratio<0>,
     typename A = ratio<0>,
-    int F = 0>
+    typename F = DefaultFrame>
 constexpr void quantityChecker(Quantity<T, L, M, C, O, A, F> q)
 {
 }
@@ -188,7 +198,8 @@ concept Isomorphic = isQuantity<Q> && (isQuantity<R> && ...) &&
  * @tparam R Additional quantity type(s) to compare
  */
 template <typename Q, typename... R>
-concept SameFrame = isQuantity<Q> && (isQuantity<R> && ...) && ((Q::frame == R::frame) && ...);
+concept SameFrame = isQuantity<Q> && (isQuantity<R> && ...) &&
+                    ((std::is_same_v<typename Q::frame, typename R::frame>)&&...);
 
 /**
  * @brief Concept to determine if quantities are isomorphic and in the same frame of reference.
@@ -222,14 +233,14 @@ using Named = typename lookupName<Q>::Named;
  * @tparam R The second multiplicand type
  */
 template <isQuantity Q, isQuantity R>
-requires(Q::frame == R::frame) using Multiplied = Named<Quantity<
+requires SameFrame<Q, R> using Multiplied = Named<Quantity<
     ratio_add<typename Q::time, typename R::time>,
     ratio_add<typename Q::length, typename R::length>,
     ratio_add<typename Q::mass, typename R::mass>,
     ratio_add<typename Q::current, typename R::current>,
     ratio_add<typename Q::temperature, typename R::temperature>,
     ratio_add<typename Q::angle, typename R::angle>,
-    Q::frame>>;
+    typename Q::frame>>;
 
 /**
  * @brief Simplifiation of Quantity division. Represents two quantity types in the same frame
@@ -238,14 +249,14 @@ requires(Q::frame == R::frame) using Multiplied = Named<Quantity<
  * @tparam R The divisor type
  */
 template <isQuantity Q, isQuantity R>
-requires(Q::frame == R::frame) using Divided = Named<Quantity<
+requires SameFrame<Q, R> using Divided = Named<Quantity<
     ratio_subtract<typename Q::time, typename R::time>,
     ratio_subtract<typename Q::length, typename R::length>,
     ratio_subtract<typename Q::mass, typename R::mass>,
     ratio_subtract<typename Q::current, typename R::current>,
     ratio_subtract<typename Q::temperature, typename R::temperature>,
     ratio_subtract<typename Q::angle, typename R::angle>,
-    Q::frame>>;
+    typename Q::frame>>;
 
 /**
  * @brief Simplifiation of Quantity exponentiation. Represents a quantity type raised to a power, as
@@ -261,7 +272,7 @@ using Exponentiated = Named<Quantity<
     ratio_multiply<typename Q::current, R>,
     ratio_multiply<typename Q::temperature, R>,
     ratio_multiply<typename Q::angle, R>,
-    Q::frame>>;
+    typename Q::frame>>;
 
 template <isQuantity Q>
 class Wrapped;

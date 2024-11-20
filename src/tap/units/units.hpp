@@ -151,7 +151,7 @@ NEW_UNIT(Pressure, PASCAL, Pascal, Pa, -2, -1, 1, 0, 0, 0)
 UNIT_METRIC_PREFIXES_ALL(Pressure, PASCAL, pascal, Pa)
 
 NEW_UNIT(Momentum, NEWTON_SECOND, NewtonSecond, Ns, -1, 1, 1, 0, 0, 0)
-template <int F = 0>
+template <typename F = DefaultFrame>
 using Impulse = Momentum<F>;
 
 NEW_UNIT(Energy, JOULE, Joule, J, -2, 2, 1, 0, 0, 0)

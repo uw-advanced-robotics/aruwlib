@@ -28,17 +28,17 @@
 #define NEW_UNIT_LITERAL(_name, _qname, _qfname, _qsuffix, _value)        \
     namespace constants                                                   \
     {                                                                     \
-    template <int F = 0>                                                  \
+    template <typename F = DefaultFrame>                                  \
     constexpr _name<F> _qname = _value;                                   \
     }                                                                     \
     namespace conversions                                                 \
     {                                                                     \
-    template <int F = 0>                                                  \
+    template <typename F = DefaultFrame>                                  \
     constexpr inline _name<F> from##_qfname(float value)                  \
     {                                                                     \
         return constants::_qname<F> * value;                              \
     }                                                                     \
-    template <int F = 0>                                                  \
+    template <typename F = DefaultFrame>                                  \
     constexpr inline float to##_qfname(_name<F> quantity)                 \
     {                                                                     \
         return quantity.valueOf() / constants::_qname<F>.valueOf();       \
@@ -95,7 +95,7 @@
     _current,                                 \
     _temperature,                             \
     _angle)                                   \
-    template <int Frame = 0>                  \
+    template <typename Frame = DefaultFrame>  \
     class _name : public Quantity<            \
                       ratio<_time>,           \
                       ratio<_length>,         \
@@ -136,7 +136,7 @@
         {                                     \
         }                                     \
     };                                        \
-    template <int F>                          \
+    template <typename F>                     \
     struct lookupName<Quantity<               \
         ratio<_time>,                         \
         ratio<_length>,                       \
@@ -149,4 +149,23 @@
         using Named = _name<F>;               \
     };                                        \
     NEW_UNIT_LITERAL(_name, _qname, _qfname, _qsuffix, _name<F>(1.0f))
+
+#define NEW_FRAME_CONVERSION(_f1, _f2, _num, _denom) \
+    template <>                                      \
+    struct FrameConvert<_f1, _f2>                    \
+    {                                                \
+        using factor = ratio<_num, _denom>;          \
+    };                                               \
+    template <>                                      \
+    struct FrameConvert<_f2, _f1>                    \
+    {                                                \
+        using factor = ratio<_denom, _num>;          \
+    };
+
+#define NEW_FRAME(_name) \
+    struct _name         \
+    {                    \
+    };                   \
+    NEW_FRAME_CONVERSION(DefaultFrame, _name, 1, 1)
+
 #endif

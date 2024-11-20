@@ -20,8 +20,13 @@
 #include <gtest/gtest.h>
 
 #include "tap/units/quantity.hpp"
+#include "tap/units/unit_macros.hpp"
 
 using namespace tap::units;
+
+NEW_FRAME(TestFrame)
+NEW_FRAME(TestFrame2)
+NEW_FRAME_CONVERSION(TestFrame, TestFrame2, 2, 1)
 
 TEST(Quantity, constructors__default_value)
 {
@@ -43,7 +48,7 @@ TEST(Quantity, constructor__copy)
 TEST(Quantity, covertTo)
 {
     Quantity<ratio<1>, ratio<1>> q1(5);
-    Quantity<ratio<1>, ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, 1> q2(10);
+    Quantity<ratio<1>, ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>> q2(10);
     EXPECT_FLOAT_EQ(0.5, q1.convertTo(q2));
 }
 
@@ -83,29 +88,29 @@ TEST(Quantity, operator__multiply_divide_equals)
     EXPECT_FLOAT_EQ(0, q1.valueOf());
 }
 
-TEST(Quantity, frame__inOtherFrame)
+TEST(Quantity, convertFrame)
 {
     Quantity<ratio<1>, ratio<1>> q1(5);
-    Quantity<ratio<1>, ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, 1> q2 =
-        q1.inOtherFrame<1>();
+    Quantity<ratio<1>, ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, TestFrame> q2 =
+        q1.convertFrame<TestFrame>();
     EXPECT_FLOAT_EQ(5, q2.valueOf());
-    Quantity<ratio<1>, ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, 1> q3 =
-        q1.inOtherFrame<1>(2);
+    Quantity<ratio<1>, ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, TestFrame2> q3 =
+        q2.convertFrame<TestFrame2>();
     EXPECT_FLOAT_EQ(10, q3.valueOf());
 }
 
-TEST(Quantity, concept__isQuantity)
+TEST(Quantity, isQuantity)
 {
     constexpr bool a = isQuantity<Quantity<>>;
     EXPECT_TRUE(a);
     constexpr bool b = isQuantity<
-        Quantity<ratio<1>, ratio<-1>, ratio<5, 3>, ratio<0>, ratio<0>, ratio<1>, 0x7fffffff>&>;
+        Quantity<ratio<1>, ratio<-1>, ratio<5, 3>, ratio<0>, ratio<0>, ratio<1>, TestFrame2>&>;
     EXPECT_TRUE(b);
     constexpr bool c = isQuantity<int>;
     EXPECT_FALSE(c);
 }
 
-TEST(Quantity, concept__Isomorphic)
+TEST(Quantity, Isomorphic)
 {
     constexpr bool a = Isomorphic<Quantity<>, Quantity<>>;
     EXPECT_TRUE(a);
@@ -116,8 +121,8 @@ TEST(Quantity, concept__Isomorphic)
     EXPECT_TRUE(b);
 
     constexpr bool c = Isomorphic<
-        Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, 0>,
-        Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, 1>>;
+        Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, DefaultFrame>,
+        Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, TestFrame>>;
     EXPECT_TRUE(c);
 
     constexpr bool d = Isomorphic<Quantity<ratio<1>, ratio<1>>, Quantity<>>;
@@ -127,27 +132,27 @@ TEST(Quantity, concept__Isomorphic)
     EXPECT_FALSE(e);
 }
 
-TEST(Quantity, concept__SameFrame_IsomorphicFrame)
+TEST(Quantity, SameFrame_IsomorphicFrame)
 {
     constexpr bool a = SameFrame<Quantity<>, Quantity<>>;
     EXPECT_TRUE(a);
 
     constexpr bool b = SameFrame<
-        Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, 0>,
-        Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, 1>>;
+        Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, DefaultFrame>,
+        Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, TestFrame>>;
     EXPECT_FALSE(b);
 
     constexpr bool c = IsomorphicFrame<Quantity<>, Quantity<>>;
     EXPECT_TRUE(c);
 
     constexpr bool d = IsomorphicFrame<
-        Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, 0>,
-        Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, 1>>;
+        Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, DefaultFrame>,
+        Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, TestFrame2>>;
     EXPECT_FALSE(d);
 
     constexpr bool e = IsomorphicFrame<
         Quantity<>,
-        Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, 0>>;
+        Quantity<ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, ratio<0>, TestFrame>>;
     EXPECT_FALSE(e);
 }
 
@@ -190,6 +195,7 @@ TEST(Quantity, operator__quantity_multiply_divide)
     Quantity<ratio<2>, ratio<1>> q3 = q1 * q2;
     EXPECT_FLOAT_EQ(50, q3.valueOf());
 
+    Divided<Quantity<ratio<1>>, Quantity<ratio<1>, ratio<1>>> a(0.0f);
     Quantity<ratio<0>, ratio<-1>> q4 = q1 / q2;
     EXPECT_FLOAT_EQ(0.5, q4.valueOf());
 }

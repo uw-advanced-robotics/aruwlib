@@ -26,6 +26,9 @@
 
 namespace tap::units
 {
+template <typename Q>
+concept isQuantityOrIntegral = isQuantity<Q> || std::is_integral_v<Q>;
+
 /**
  * @brief A quantity that is wrapped between a range of values
  */
