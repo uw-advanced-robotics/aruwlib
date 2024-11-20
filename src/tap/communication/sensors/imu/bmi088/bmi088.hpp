@@ -152,6 +152,11 @@ public:
 
     inline void setGyroOutputRate(Gyro::GyroBandwidth outputRate) { gyroOutputRate = outputRate; }
 
+    inline void setTargetTemperature(float temperatureC)
+    {
+        imuHeater.setDesiredTemperature(temperatureC);
+    }
+
 private:
     static constexpr uint16_t RAW_TEMPERATURE_TO_APPLY_OFFSET = 1023;
     /// Offset parsed temperature reading by this amount if > RAW_TEMPERATURE_TO_APPLY_OFFSET.
