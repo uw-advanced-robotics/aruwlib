@@ -41,7 +41,8 @@ public:
         bool isInverted,
         const char* name,
         uint16_t encWrapped = ENC_RESOLUTION / 2,
-        int64_t encRevolutions = 0);
+        int64_t encRevolutions = 0,
+        bool currentControl = false);
     virtual ~DjiMotorMock();
 
     MOCK_METHOD(void, initialize, (), (override));
