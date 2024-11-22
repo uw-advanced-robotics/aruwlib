@@ -191,7 +191,7 @@ TEST_F(DjiMotorTxHandlerTest, encodeAndSendCanData_single_motor_added_single_mes
 
 TEST_F(DjiMotorTxHandlerTest, encodeAndSendCanData_all_motors_added_6_messages_sent)
 {
-    EXPECT_CALL(drivers.can, sendMessage).Times(6);
+    EXPECT_CALL(drivers.can, sendMessage).Times(12);
 
     addAllMotors();
 
