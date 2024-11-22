@@ -37,7 +37,8 @@ DjiMotorMock::DjiMotorMock(
           isInverted,
           name,
           encWrapped,
-          encRevolutions)
+          encRevolutions,
+          currentControl)
 {
 }
 DjiMotorMock::~DjiMotorMock() {}
