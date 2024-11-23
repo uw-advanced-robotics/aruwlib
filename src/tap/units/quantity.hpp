@@ -217,7 +217,7 @@ struct lookupName
 };
 
 /**
- * @brief Helper type to look up the named class representation of a type. 
+ * @brief Helper type to look up the named class representation of a type.
  */
 template <typename Q>
 using Named = typename lookupName<Q>::Named;
