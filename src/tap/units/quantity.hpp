@@ -113,6 +113,11 @@ public:
     // Operators
 
     /**
+     * @brief Assign a new value to this quantity
+     * @param other The new value
+     */
+    constexpr void operator=(const Self other) { value = other.value; }
+    /**
      * @brief Adds another quantity to this one
      * @param other The right hand addend
      */
