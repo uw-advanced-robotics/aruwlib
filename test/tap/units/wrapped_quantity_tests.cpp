@@ -27,6 +27,11 @@ using namespace tap::units::literals;
 
 TEST(WrappedQuantity, Basic_functionality)
 {
+    static_assert(
+        isWrappedQuantity<Wrapped<Number<>>>,
+        "Wrapped<Number<>> is not a Wrapped Quantity");
+    static_assert(isQuantity<Wrapped<Number<>>>, "Wrapped<Number<>> is not a Quantity");
+    static_assert(isQuantity<Wrapped<int>>, "Wrapped<int> is not a Quantity");
     Wrapped<Number<>> testInstance(5_n, 0_n, 10_n);
     EXPECT_EQ(5, testInstance.valueOf());
     EXPECT_EQ(5, testInstance.valueOfUnwrapped());
@@ -35,6 +40,7 @@ TEST(WrappedQuantity, Basic_functionality)
 TEST(WrappedQuantity, Wrapping_behavior)
 {
     Wrapped<Number<>> testInstance(-4_n, 0_n, 10_n);
+
     EXPECT_EQ(6, testInstance.valueOf());
     EXPECT_EQ(-4, testInstance.valueOfUnwrapped());
 
@@ -45,6 +51,18 @@ TEST(WrappedQuantity, Wrapping_behavior)
     testInstance.set(28_n);
     EXPECT_EQ(8, testInstance.valueOf());
     EXPECT_EQ(28, testInstance.valueOfUnwrapped());
+
+    Wrapped<int> testInstance2(-4, 0, 10);
+    EXPECT_EQ(6, testInstance2.valueOf());
+    EXPECT_EQ(-4, testInstance2.valueOfUnwrapped());
+
+    testInstance2.set(16);
+    EXPECT_EQ(6, testInstance2.valueOf());
+    EXPECT_EQ(6, testInstance2.valueOfUnwrapped());
+
+    testInstance2.set(28);
+    EXPECT_EQ(8, testInstance2.valueOf());
+    EXPECT_EQ(28, testInstance2.valueOfUnwrapped());
 }
 
 TEST(WrappedQuantity, Difference)
@@ -60,6 +78,10 @@ TEST(WrappedQuantity, Difference)
     EXPECT_EQ(1_n, testInstance.minDifference(1_n));
     testInstance.set(1_n);
     EXPECT_EQ(-1_n, testInstance.minDifference(10_n));
+
+    Wrapped<float> testInstance2(2, 0, 10);
+    EXPECT_EQ(2, testInstance2.minDifference(4));
+    EXPECT_EQ(-1, testInstance2.minDifference(11));
 }
 
 TEST(WrappedQuantity, Rotation_bounds)
@@ -100,6 +122,10 @@ TEST(WrappedQuantity, Shifting_up)
     testInstance += 0_n;
     EXPECT_EQ(-130, testInstance.valueOf());
     EXPECT_EQ(590, testInstance.valueOfUnwrapped());
+
+    Wrapped<char> testInstance2(100, 20, 120);
+    testInstance2 += (char)20;
+    EXPECT_EQ(20, testInstance2.valueOf());
 }
 
 TEST(WrappedQuantity, shifting_down)
@@ -121,6 +147,10 @@ TEST(WrappedQuantity, shifting_down)
     testInstance -= 0_n;
     EXPECT_EQ(130, testInstance.valueOf());
     EXPECT_EQ(-590, testInstance.valueOfUnwrapped());
+
+    Wrapped<char> testInstance2(20, 20, 120);
+    testInstance2 -= (char)20;
+    EXPECT_EQ(100, testInstance2.valueOf());
 }
 
 TEST(WrappedQuantity, shiftBounds_positive)
@@ -133,9 +163,9 @@ TEST(WrappedQuantity, shiftBounds_positive)
 
 TEST(WrappedQuantity, shiftBounds_negative)
 {
-    Wrapped<Number<>> testInstance(10_n, -100_n, 100_n);
+    Wrapped<float> testInstance(10, -100, 100);
     EXPECT_EQ(10, testInstance.valueOf());
-    testInstance.shiftBounds(-200_n);
+    testInstance.shiftBounds(-200);
     EXPECT_EQ(-190, testInstance.valueOf());
 }
 
@@ -165,6 +195,12 @@ TEST(WrappedQuantity, operator__add_subtract)
     EXPECT_FLOAT_EQ(9, q3.valueOf());
     EXPECT_FLOAT_EQ(0, q3.getLowerBound().valueOf());
     EXPECT_FLOAT_EQ(10, q3.getUpperBound().valueOf());
+    Wrapped<int> q4(5, 0, 10);
+    Wrapped<int> q5 = q4 + 3;
+    EXPECT_EQ(8, q5.valueOf());
+
+    q5 = q4 - 3;
+    EXPECT_EQ(2, q5.valueOf());
 }
 
 TEST(WrappedQuantity, operator__scalar_multiply_divide)
@@ -179,4 +215,9 @@ TEST(WrappedQuantity, operator__scalar_multiply_divide)
     EXPECT_FLOAT_EQ(2.5, q2.valueOf());
     EXPECT_FLOAT_EQ(0, q2.getLowerBound().valueOf());
     EXPECT_FLOAT_EQ(10, q2.getUpperBound().valueOf());
+
+    Wrapped<int> q3(102, 0, 10);
+    auto q4 = q3 * 2;
+    EXPECT_EQ(4, q4.valueOf());
+    EXPECT_EQ(204, q4.valueOfUnwrapped());
 }

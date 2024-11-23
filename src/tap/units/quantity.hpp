@@ -110,12 +110,6 @@ public:
      */
     constexpr float valueOf() const { return value; }
 
-    /**
-     * @brief Returns the value of the quantity converted to another unit
-     * @param other The other unit to convert to
-     */
-    constexpr float convertTo(const Self unit) const { return value / unit.valueOf(); }
-
     // Operators
 
     /**
@@ -178,6 +172,9 @@ concept isQuantity = requires(Q q)
     quantityChecker(q);
 };
 
+template <typename Q>
+concept isQuantityOrArithmetic = isQuantity<Q> || std::is_arithmetic_v<Q>;
+
 /**
  * @brief Concept to use when determining dimensional equivalence.
  * @tparam Q The first quantity type to compare
@@ -210,20 +207,19 @@ template <typename Q, typename... R>
 concept IsomorphicFrame = Isomorphic<Q, R...>&& SameFrame<Q, R...>;
 
 /**
- * @brief Utility struct to look up the named class representation of a quantity type. Should not be
- * used directly.
+ * @brief Utility struct to look up the named class representation of a type. Should not be
+ * used directly besides to define new named types.
  */
-template <isQuantity Q>
+template <typename Q>
 struct lookupName
 {
     using Named = Q;
 };
 
 /**
- * @brief Helper type to look up the named class representation of a quantity type. Should rarely
- * need to be used directly.
+ * @brief Helper type to look up the named class representation of a type. 
  */
-template <isQuantity Q>
+template <typename Q>
 using Named = typename lookupName<Q>::Named;
 
 /**
@@ -274,15 +270,15 @@ using Exponentiated = Named<Quantity<
     ratio_multiply<typename Q::angle, R>,
     typename Q::frame>>;
 
-template <isQuantity Q>
+template <isQuantityOrArithmetic Q, typename Frame>
 class Wrapped;
 
 /**
  * @brief Internal utility function to check if a type is a Wrapped quantity. Should not be used
  * directly.
  */
-template <isQuantity Q>
-void WrappedChecker(Wrapped<Q> w)
+template <isQuantityOrArithmetic Q, typename F>
+void WrappedChecker(Wrapped<Q, F> w)
 {
 }
 

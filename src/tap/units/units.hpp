@@ -27,7 +27,7 @@
 namespace tap::units
 {
 // Number
-NEW_UNIT(Number, NUMBER, Number, n, 0, 0, 0, 0, 0, 0)
+NEW_UNIT(Number, NUMBER, __NULLABILITY_PRAGMA_PUSH, n, 0, 0, 0, 0, 0, 0)
 NEW_UNIT_LITERAL(Number, PERCENT, Percent, pct, NUMBER<F> * 0.01f);
 
 // Time, Frequency

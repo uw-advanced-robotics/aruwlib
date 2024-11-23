@@ -45,13 +45,6 @@ TEST(Quantity, constructor__copy)
     EXPECT_FLOAT_EQ(5, q2.valueOf());
 }
 
-TEST(Quantity, covertTo)
-{
-    Quantity<ratio<1>, ratio<1>> q1(5);
-    Quantity<ratio<1>, ratio<1>, ratio<0>, ratio<0>, ratio<0>, ratio<0>> q2(10);
-    EXPECT_FLOAT_EQ(0.5, q1.convertTo(q2));
-}
-
 TEST(Quantity, operator__add_subtract_equals)
 {
     Quantity<> q1(5);

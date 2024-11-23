@@ -26,49 +26,88 @@
 
 namespace tap::units
 {
-template <typename Q>
-concept isQuantityOrIntegral = isQuantity<Q> || std::is_integral_v<Q>;
+template <isQuantityOrArithmetic Q, typename F>
+using IQInternal = std::conditional_t<std::is_arithmetic_v<Q>, Number<F>, Q>;
+
+template <isQuantityOrArithmetic Q>
+struct valueOf
+{
+    static constexpr float value(const Q &q) { return q; }
+};
+
+template <isQuantity Q>
+struct valueOf<Q>
+{
+    static constexpr float value(const Q &q) { return q.valueOf(); }
+};
 
 /**
  * @brief A quantity that is wrapped between a range of values
  */
-template <isQuantity Q>
-class Wrapped : public Named<Q>
+template <isQuantityOrArithmetic Q, typename Frame = DefaultFrame>
+class Wrapped : public IQInternal<Q, Frame>
 {
 protected:
-    using Internal = Named<Q>;
-    using Similar = Q::Self;
     int revolutions{0};
-    Similar lower, upper;
+    Q lower, upper;
 
     /**
      * @brief Wraps the value of the quantity to be within the bounds. Internal function.
      */
     void wrapValue()
     {
-        while (Internal::value >= this->upper.valueOf())
+        Named<Q> val(IQInternal<Q, Frame>::value);
+        while (val >= this->upper)
         {
             this->revolutions++;
-            this->value -= (this->upper - this->lower).valueOf();
+            val -= (this->upper - this->lower);
         }
-        while (Internal::value < this->lower.valueOf())
+        while (val < this->lower)
         {
             this->revolutions--;
-            this->value += (this->upper - this->lower).valueOf();
+            val += (this->upper - this->lower);
         }
+        Internal::value = IQInternal<Q, Frame>(val).valueOf();
+    }
+
+    template <isQuantityOrArithmetic T>
+    constexpr static T min(T a, T b)
+    {
+        return a < b ? a : b;
+    }
+
+    template <isQuantityOrArithmetic T>
+    constexpr static T max(T a, T b)
+    {
+        return a > b ? a : b;
+    }
+
+    template <isQuantityOrArithmetic T>
+    constexpr static T abs(const T &val)
+    {
+        return val < T(0) ? -val : val;
+    }
+
+    constexpr static bool compareClose(Q val1, Q val2, Q epsilon)
+    {
+        Q diff = val1 - val2;
+        return (diff < Q(0) ? (Q(0) - diff) : diff) <= epsilon;
     }
 
 public:
+    typedef IQInternal<Q, Frame> Internal;
+    typedef Named<Q> Similar;
+
     /**
      * @brief Construct a new Wrapped object, with an initial value and bounds
      * @param value the initial value (will be wrapped)
      * @param lower the lower bound
      * @param upper the upper bound
      */
-    explicit constexpr Wrapped(Q value, Similar lower, Similar upper)
+    explicit constexpr Wrapped(Similar value, Similar lower, Similar upper)
         : Internal(value),
-          lower(math::min(lower, upper)),
-          upper(math::max(lower, upper))
+          lower(min(lower, upper)),
+          upper(max(lower, upper))
 
     {
         wrapValue();
@@ -80,14 +119,14 @@ public:
      */
     constexpr float valueOfUnwrapped() const
     {
-        return Internal::value + (this->upper - this->lower).valueOf() * this->revolutions;
+        return Internal::value + Internal(upper - lower).valueOf() * this->revolutions;
     }
 
     /**
      * @brief Unwraps the quantity and returns it
      * @return The unwrapped value of the quantity
      */
-    constexpr Internal getUnwrapped() const { return Internal(valueOfUnwrapped()); }
+    constexpr Similar getUnwrapped() const { return Similar(valueOfUnwrapped()); }
 
     /**
      * @brief Returns the number of revolutions the quantity has undergone
@@ -101,7 +140,7 @@ public:
      */
     void set(Similar value)
     {
-        Internal::value = value.valueOf();
+        Internal::value = Internal(value).valueOf();
         wrapValue();
     }
 
@@ -110,18 +149,16 @@ public:
      * @param value the value of the new object
      * @param lowerBoundScale a scale factor for the lower bound (defaults to 1 to not scale)
      * @param upperBoundScale a scale factor for the upper bound (defaults to 1 to not scale)
-     * @return Wrapped<Internal> the new Wrapped object
+     * @return Wrapped<Internal> the new Wrapped objectclea
      */
-    template <isQuantity R>
-    inline Wrapped<Named<typename R::Self>> withSameBounds(
-        const R nvalue,
+    template <isQuantityOrArithmetic R>
+    inline Wrapped<Named<R>> withSameBounds(
+        const R &nvalue,
         float lowerBoundScale = 1,
-        float upperBoundScale = 1) const requires Isomorphic<Q, R>
+        float upperBoundScale = 1) const
+        requires(IsomorphicFrame<Internal, IQInternal<R, Frame>> || std::is_convertible_v<Q, R>)
     {
-        return Wrapped<Named<typename R::Self>>(
-            nvalue,
-            Named<typename R::Self>(lower.valueOf() * lowerBoundScale),
-            Named<typename R::Self>(upper.valueOf() * upperBoundScale));
+        return Wrapped<Named<R>>(nvalue, R(lower * lowerBoundScale), R(upper * upperBoundScale));
     }
 
     /**
@@ -139,21 +176,15 @@ public:
      * @param other The other Wrapped Quantity
      */
     template <isWrappedQuantity R>
-    void assertBoundsEqual(const R &other) const requires Isomorphic<Q, R>
+    void assertBoundsEqual(const R &other) const requires Isomorphic<Internal, R>
     {
         modm_assert(
-            tap::algorithms::compareFloatClose(
-                this->lower.valueOf(),
-                other.getLowerBound().valueOf(),
-                1E-8f),
-            "WrappedQuantity::assertBoundsEqual",
+            Wrapped::compareClose(this->lower, other.getLowerBound(), Similar(1E-8f)),
+            "Wrapped::assertBoundsEqual",
             "Lower bounds do not match");
         modm_assert(
-            tap::algorithms::compareFloatClose(
-                this->upper.valueOf(),
-                other.getUpperBound().valueOf(),
-                1E-8f),
-            "WrappedQuantity::assertBoundsEqual",
+            Wrapped::compareClose(this->upper, other.getUpperBound(), Similar(1E-8f)),
+            "Wrapped::assertBoundsEqual",
             "Upper bounds do not match");
     }
 
@@ -174,14 +205,15 @@ public:
      * @param other The right hand addend
      * @throws: An assertion error if the other quantity is wrapped, and it has different bounds.
      */
-    template <isQuantity R>
-    constexpr void operator+=(const R &other) requires IsomorphicFrame<Q, R>
+    template <isQuantityOrArithmetic R>
+    constexpr void operator+=(const R &other) requires(
+        IsomorphicFrame<Internal, R> || std::is_convertible_v<Q, R>)
     {
         if constexpr (isWrappedQuantity<R>)
         {
             this->assertBoundsEqual(other);
         }
-        Internal::operator+=(other);
+        Internal::operator+=(Internal(other));
         wrapValue();
     }
 
@@ -190,14 +222,15 @@ public:
      * @param other The right hand minuend
      * @throws:  An assertion error if the other quantity is wrapped, and it has different bounds.
      */
-    template <isQuantity R>
-    constexpr void operator-=(const R &other) requires IsomorphicFrame<Q, R>
+    template <isQuantityOrArithmetic R>
+    constexpr void operator-=(const R &other) requires(
+        IsomorphicFrame<Internal, R> || std::is_convertible_v<Q, R>)
     {
         if constexpr (isWrappedQuantity<R>)
         {
             this->assertBoundsEqual(other);
         }
-        Internal::operator-=(other);
+        Internal::operator-=(Internal(other));
         wrapValue();
     }
 
@@ -212,45 +245,30 @@ public:
     }
 
     /**
-     * Finds the minimum difference against another value, which will be wrapped with the same
-     * bounds as this quantity. Can be thought of as the minimum distance between two points on a
-     * circle's perimeter.
+     * Finds the minimum difference against another value, which will (or must if it is already) be
+     * wrapped with the same bounds as this quantity. Can be thought of as the minimum distance
+     * between two points on a circle's perimeter.
      *
      * @param[in] other: The isomorphic quantity to compute the minDifference with.
      * @return: The signed minimum distance.
      */
-    template <isQuantity R>
-    Internal minDifference(const R &other) requires(Isomorphic<Q, R> && !isWrappedQuantity<R>)
+    template <isQuantityOrArithmetic R>
+    Similar minDifference(const R &other) requires(
+        IsomorphicFrame<Internal, IQInternal<R, Frame>> || std::is_convertible_v<Q, R>)
     {
-        Wrapped<typename R::Self> s(other, this->lower, this->upper);
-        Internal interval = this->upper - this->lower;
+        if constexpr (isWrappedQuantity<Q>)
+        {
+            assertBoundsEqual(other);
+        }
+        Wrapped<R> s = withSameBounds(other);
+        Similar interval = this->upper - this->lower;
         Internal difference_between = Internal(s.valueOf() - Internal::valueOf());
-        Internal difference_around =
-            difference_between +
-            ((difference_between.valueOf() < 0) ? interval : Internal(0) - interval);
-        return (math::abs(difference_between) < math::abs(difference_around)) ? difference_between
-                                                                              : difference_around;
-    }
-
-    /**
-     * Finds the minimum difference against another wrapped value. Can be thought of as the minimum
-     * distance between two points on a circle's perimeter.
-     *
-     * @param[in] other: The wrapped isomorphic quantity to compute the minDifference with.
-     * @return: The signed minimum distance.
-     * @throws: An assertion error if the two values have different lower and upper bounds.
-     */
-    template <isWrappedQuantity R>
-    Internal minDifference(const R &other) requires Isomorphic<Q, R>
-    {
-        assertBoundsEqual(other);
-        Internal interval = this->upper - this->lower;
-        Internal difference_between = Internal(other.valueOf() - Internal::valueOf());
-        Internal difference_around =
-            difference_between +
-            ((difference_between.valueOf() < 0) ? interval : Internal(0) - interval);
-        return (math::abs(difference_between) < math::abs(difference_around)) ? difference_between
-                                                                              : difference_around;
+        Internal difference_around = difference_between + ((difference_between.valueOf() < 0)
+                                                               ? Internal(interval)
+                                                               : Internal(0) - Internal(interval));
+        return (abs(difference_between) < abs(difference_around))
+                   ? Similar(difference_between.valueOf())
+                   : Similar(difference_around.valueOf());
     }
 
     /**
@@ -273,32 +291,28 @@ public:
  * @throws: An assertion error if the right hand quantity is wrapped, and it has different bounds.
  * @return The sum of the two quantities, wrapped using the same bounds as the left hand operand.
  */
-template <isWrappedQuantity Q, isQuantity R>
-constexpr Q operator+(const Q &lhs, const R &rhs) requires IsomorphicFrame<Q, R>
+template <isWrappedQuantity Q, isQuantityOrArithmetic R>
+constexpr Q operator+(const Q &lhs, const R &rhs) requires(
+    IsomorphicFrame<typename Q::Internal, R> || std::is_convertible_v<typename Q::Similar, R>)
 {
     if constexpr (isWrappedQuantity<R>) lhs.assertBoundsEqual(rhs);
-    return Q(
-        typename R::Self(lhs.valueOf() + rhs.valueOf()),
-        lhs.getLowerBound(),
-        lhs.getUpperBound());
+    return lhs.withSameBounds(typename Q::Similar(lhs.valueOf() + valueOf<R>::value(rhs)));
 }
 
 /**
- * @brief Subtracts a quantity from  a wrapped quantity
+ * @brief Subtracts a quantity from a wrapped quantity
  * @param lhs The left hand minuend
  * @param other The right hand minuend
  * @throws: An assertion error if the right hand quantity is wrapped, and it has different bounds.
  * @return The difference of the two quantities, wrapped using the same bounds as the left hand
  * operand.
  */
-template <isWrappedQuantity Q, isQuantity R>
-constexpr Q operator-(const Q &lhs, const R &rhs) requires IsomorphicFrame<Q, R>
+template <isWrappedQuantity Q, isQuantityOrArithmetic R>
+constexpr Q operator-(const Q &lhs, const R &rhs) requires(
+    IsomorphicFrame<typename Q::Internal, R> || std::is_convertible_v<typename Q::Similar, R>)
 {
     if constexpr (isWrappedQuantity<R>) lhs.assertBoundsEqual(rhs);
-    return Q(
-        typename R::Self(typename R::Self(lhs.valueOf() - rhs.valueOf())),
-        lhs.getLowerBound(),
-        lhs.getUpperBound());
+    return lhs.withSameBounds(typename Q::Similar(lhs.valueOf() - valueOf<R>::value(rhs)));
 }
 
 /**
@@ -311,7 +325,7 @@ constexpr Q operator-(const Q &lhs, const R &rhs) requires IsomorphicFrame<Q, R>
 template <isWrappedQuantity Q>
 constexpr Q operator*(const Q &lhs, float rhs)
 {
-    return Q(typename Q::Self(lhs.valueOf() * rhs), lhs.getLowerBound(), lhs.getUpperBound());
+    return lhs.withSameBounds(typename Q::Similar(lhs.valueOfUnwrapped() * rhs));
 }
 
 /**
@@ -324,7 +338,7 @@ constexpr Q operator*(const Q &lhs, float rhs)
 template <isWrappedQuantity Q>
 constexpr Q operator/(const Q &lhs, float rhs)
 {
-    return Q(typename Q::Self(lhs.valueOf() / rhs), lhs.getLowerBound(), lhs.getUpperBound());
+    return lhs.withSameBounds(typename Q::Similar(lhs.valueOfUnwrapped() / rhs));
 }
 
 }  // namespace tap::units
