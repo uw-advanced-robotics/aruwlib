@@ -28,6 +28,18 @@
     <option name="taproot:board:pwm_pins">C1,C2,C3,C4,C5,C6,C7,Buzzer,ImuHeater</option>
     --> <!-- End For RoboMaster Development Board Type C -->
 
+    <!-- To include additional modm options: --> <!--
+    <option name="taproot:modm-project.xml:modm_hal_options">
+      modm:platform:rtt:buffer.rx 256
+      modm:platform:rtt:buffer.tx 1024
+    </option>
+    -->
+
+    <!-- To include additional modm modules: --> <!--
+    <option name="taproot:modm-project.xml:modm_hal_modules">
+      modm:platform:rtt
+    </option>
+    -->
   </options>
   <modules>
     <module>taproot:core</module>

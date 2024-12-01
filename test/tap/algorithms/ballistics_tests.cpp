@@ -25,30 +25,29 @@ using namespace tap::algorithms::ballistics;
 
 TEST(Ballistics, quadraticKinematicProjection_dt_zero_pos_unmoving)
 {
-    EXPECT_EQ(1, MeasuredKinematicState::quadraticKinematicProjection(0, 1, 2, 3));
+    EXPECT_EQ(1, AbstractKinematicState::quadraticKinematicProjection(0, 1, 2, 3));
 }
 
 TEST(
     Ballistics,
     quadraticKinematicProjection_position_constantly_increasing_when_vel_positive_acc_zero)
 {
-    EXPECT_NEAR(2, MeasuredKinematicState::quadraticKinematicProjection(1, 1, 1, 0), 1E-5);
+    EXPECT_NEAR(2, AbstractKinematicState::quadraticKinematicProjection(1, 1, 1, 0), 1E-5);
 }
 
 TEST(Ballistics, quadraticKinematicProjection_position_increases_quadratically_when_acc_positive)
 {
-    EXPECT_NEAR(1, MeasuredKinematicState::quadraticKinematicProjection(1, 0, 0, 2), 1e-5);
-    EXPECT_NEAR(4, MeasuredKinematicState::quadraticKinematicProjection(2, 0, 0, 2), 1e-5);
-    EXPECT_NEAR(9, MeasuredKinematicState::quadraticKinematicProjection(3, 0, 0, 2), 1e-5);
+    EXPECT_NEAR(1, AbstractKinematicState::quadraticKinematicProjection(1, 0, 0, 2), 1e-5);
+    EXPECT_NEAR(4, AbstractKinematicState::quadraticKinematicProjection(2, 0, 0, 2), 1e-5);
+    EXPECT_NEAR(9, AbstractKinematicState::quadraticKinematicProjection(3, 0, 0, 2), 1e-5);
 }
 
 TEST(Ballistics, projectForward_returns_constant_delta_position_when_vel_positive_no_acc)
 {
-    MeasuredKinematicState kinematicState{
-        .position = {1, 1, 1},
-        .velocity = {1, 1, 1},
-        .acceleration = {0, 0, 0},
-    };
+    SecondOrderKinematicState kinematicState(
+        modm::Vector3f(1, 1, 1),
+        modm::Vector3f(1, 1, 1),
+        modm::Vector3f(0, 0, 0));
 
     auto position1 = kinematicState.projectForward(1);
     auto position2 = kinematicState.projectForward(2);
@@ -124,11 +123,10 @@ TEST(
     Ballistics,
     findTargetProjectileIntersection_only_horizontal_distance_btwn_turret_and_target_target_stationary)
 {
-    MeasuredKinematicState targetState{
-        .position = {10, 0, 0},
-        .velocity = {0, 0, 0},
-        .acceleration = {0, 0, 0},
-    };
+    SecondOrderKinematicState targetState{
+        modm::Vector3f(10, 0, 0),
+        modm::Vector3f(0, 0, 0),
+        modm::Vector3f(0, 0, 0)};
 
     float turretPitch = 0;
     float turretYaw = 0;
@@ -152,11 +150,10 @@ TEST(
     Ballistics,
     findTargetProjectileIntersection_only_horizontal_distance_btwn_turret_and_target_target_moving_away_from_turret)
 {
-    MeasuredKinematicState targetState{
-        .position = {10, 0, 0},
-        .velocity = {1, 0, 0},
-        .acceleration = {0, 0, 0},
-    };
+    SecondOrderKinematicState targetState{
+        modm::Vector3f(10, 0, 0),
+        modm::Vector3f(1, 0, 0),
+        modm::Vector3f(0, 0, 0)};
 
     float turretPitch = 0;
     float turretYaw = 0;
@@ -180,11 +177,10 @@ TEST(
     Ballistics,
     findTargetProjectileIntersection_only_horizontal_distance_btwn_turret_and_target_moving_perpendicular_to_turret)
 {
-    MeasuredKinematicState targetState{
-        .position = {10, 0, 0},
-        .velocity = {0, 1, 0},
-        .acceleration = {0, 0, 0},
-    };
+    SecondOrderKinematicState targetState(
+        modm::Vector3f(10, 0, 0),
+        modm::Vector3f(0, 1, 0),
+        modm::Vector3f(0, 0, 0));
 
     float turretPitch = 0;
     float turretYaw = 0;
@@ -209,11 +205,10 @@ TEST(
     Ballistics,
     findTargetProjectileIntersection_only_horizontal_distance_btwn_turret_and_target_velocity_increases_lead_position_decreases)
 {
-    MeasuredKinematicState targetState{
-        .position = {10, 0, 0},
-        .velocity = {0, 1, 0},
-        .acceleration = {0, 0, 0},
-    };
+    SecondOrderKinematicState targetState(
+        modm::Vector3f(10, 0, 0),
+        modm::Vector3f(0, 1, 0),
+        modm::Vector3f(0, 0, 0));
 
     float turretPitch30ms, turretYaw30ms, timeOfFlight30ms;
     float turretPitch40ms, turretYaw40ms, timeOfFlight40ms;
@@ -254,11 +249,10 @@ TEST(
     Ballistics,
     findTargetProjectileIntersection_only_horizontal_distance_btwn_turret_and_target_with_target_moving_torwards_turret)
 {
-    MeasuredKinematicState targetState{
-        .position = {10, 0, 0},
-        .velocity = {-1, 0, 0},
-        .acceleration = {0, 0, 0},
-    };
+    SecondOrderKinematicState targetState{
+        modm::Vector3f(10, 0, 0),
+        modm::Vector3f(-1, 0, 0),
+        modm::Vector3f(0, 0, 0)};
 
     float turretPitch, turretYaw, timeOfFlight;
 
@@ -278,11 +272,10 @@ TEST(
 
 TEST(Ballistics, findTargetProjectileIntersection_target_turret_position_identical)
 {
-    MeasuredKinematicState targetState{
-        .position = {0, 0, 0},
-        .velocity = {0, 0, 0},
-        .acceleration = {0, 0, 0},
-    };
+    SecondOrderKinematicState targetState{
+        modm::Vector3f(0, 0, 0),
+        modm::Vector3f(0, 0, 0),
+        modm::Vector3f(0, 0, 0)};
 
     float turretPitch, turretYaw, timeOfFlight;
 
@@ -299,11 +292,10 @@ TEST(Ballistics, findTargetProjectileIntersection_target_turret_position_identic
 
 TEST(Ballistics, findTargetProjectileIntersection_target_out_of_range)
 {
-    MeasuredKinematicState targetState{
-        .position = {-20, 0, 0},
-        .velocity = {0, 0, 0},
-        .acceleration = {0, 0, 0},
-    };
+    SecondOrderKinematicState targetState{
+        modm::Vector3f(-20, 0, 0),
+        modm::Vector3f(0, 0, 0),
+        modm::Vector3f(0, 0, 0)};
 
     float turretPitch, turretYaw, timeOfFlight;
 
@@ -322,10 +314,10 @@ TEST(
     Ballistics,
     findTargetProjectileIntersection_only_vertical_dist_btwn_turret_and_target_with_target_moving_away_from_turret)
 {
-    MeasuredKinematicState targetState{
-        .position = {0, 0, 10},
-        .velocity = {0, 0, 1},
-        .acceleration = {0, 0, 0},
+    SecondOrderKinematicState targetState{
+        modm::Vector3f(0, 0, 10),
+        modm::Vector3f(0, 0, 1),
+        modm::Vector3f(0, 0, 0),
     };
 
     float turretPitch, turretYaw, timeOfFlight;

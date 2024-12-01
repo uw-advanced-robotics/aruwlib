@@ -64,11 +64,17 @@ public:
 
     inline int8_t getCursorIndex() const { return cursorIndex; }
 
+    /// @brief Returns the smallest (inclusive) entry index currently visible.
     inline int8_t getSmallestIndexDisplayed() const { return smallestIndexDisplayed; }
 
+    /// @brief Returns the largest (inclusive) entry index currently visible.
+    /// @note There may be blank space following the largest entry if the size is less than the max
+    ///       number of entries.
     inline int8_t getLargestIndexDisplayed() const
     {
-        return smallestIndexDisplayed + maxEntries - 1;
+        return (smallestIndexDisplayed + maxEntries < size ? smallestIndexDisplayed + maxEntries
+                                                           : size) -
+               1;
     }
 
     inline int8_t getSize() const { return size; }

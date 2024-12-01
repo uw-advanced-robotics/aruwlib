@@ -34,9 +34,8 @@ RefSerialMenu::RefSerialMenu(
       printRefSerialDataFncPtrs{
           &RefSerialMenu::printRobotTypeId,
           &RefSerialMenu::printHp,
-          &RefSerialMenu::print17mmSpeed,
-          &RefSerialMenu::print17mmHeat,
-          &RefSerialMenu::print42mmSpeed,
+          &RefSerialMenu::print17mm1Heat,
+          &RefSerialMenu::print17mm2Heat,
           &RefSerialMenu::print42mmHeat,
           &RefSerialMenu::printPowerBuf,
           &RefSerialMenu::printPower,
@@ -92,41 +91,24 @@ void RefSerialMenu::printHp(modm::IOStream& stream)
     stream << "HP: " << robotData.currentHp << "/" << robotData.maxHp << modm::endl;
 }
 
-void RefSerialMenu::print17mmSpeed(modm::IOStream& stream)
+void RefSerialMenu::print17mm1Heat(modm::IOStream& stream)
 {
     const auto& robotData = drivers->refSerial.getRobotData();
-    float bulletSpeed17 = robotData.turret.bulletType == RefSerialData::Rx::AMMO_17
-                              ? robotData.turret.bulletSpeed
-                              : 0;
-    stream.printf(
-        "17mmSpeed: %.2f / %i\n",
-        static_cast<double>(bulletSpeed17),
-        robotData.turret.barrelSpeedLimit17ID1);
-}
-
-void RefSerialMenu::print17mmHeat(modm::IOStream& stream)
-{
-    const auto& robotData = drivers->refSerial.getRobotData();
-    stream << "17mmHeat: " << robotData.turret.heat17ID1 << " / " << robotData.turret.heatLimit17ID1
+    stream << "17mm1Heat: " << robotData.turret.heat17ID1 << " / " << robotData.turret.heatLimit
            << modm::endl;
 }
 
-void RefSerialMenu::print42mmSpeed(modm::IOStream& stream)
+void RefSerialMenu::print17mm2Heat(modm::IOStream& stream)
 {
     const auto& robotData = drivers->refSerial.getRobotData();
-    float bulletSpeed42 = robotData.turret.bulletType == RefSerialData::Rx::AMMO_17
-                              ? 0
-                              : robotData.turret.bulletSpeed;
-    stream.printf(
-        "42mmSpeed: %.2f / %i\n",
-        static_cast<double>(bulletSpeed42),
-        robotData.turret.barrelSpeedLimit42);
+    stream << "17mm2Heat: " << robotData.turret.heat17ID2 << " / " << robotData.turret.heatLimit
+           << modm::endl;
 }
 
 void RefSerialMenu::print42mmHeat(modm::IOStream& stream)
 {
     const auto& robotData = drivers->refSerial.getRobotData();
-    stream << "42mmHeat: " << robotData.turret.heat42 << " / " << robotData.turret.heatLimit42
+    stream << "42mmHeat: " << robotData.turret.heat42 << " / " << robotData.turret.heatLimit
            << modm::endl;
 }
 

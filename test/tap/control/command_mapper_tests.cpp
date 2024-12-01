@@ -136,41 +136,6 @@ TEST(CommandMapper, addHoldMapping_successfully_adds_mapping_normal_case)
     EXPECT_EQ(holdCommandMappingForCompare, *holdMappingPtr);
 }
 
-TEST(CommandMapper, addHoldMapping_fails_to_add_mapping_if_identical_mapping_already_added)
-{
-    Drivers drivers;
-    TestSubsystem ts(&drivers);
-    TestCommand tc1(&ts);
-    TestCommand tc2(&ts);
-    CommandMapper cm(&drivers);
-    RemoteMapState ms(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::MID);
-    EXPECT_CALL(drivers.errorController, addToErrorList);
-    HoldCommandMapping hcm1(&drivers, {&tc1}, ms);
-    HoldCommandMapping hcm2(&drivers, {&tc2}, ms);
-
-    cm.addMap(&hcm1);
-    EXPECT_EQ(1, cm.getSize());
-    cm.addMap(&hcm2);
-    EXPECT_EQ(1, cm.getSize());
-    EXPECT_EQ(&tc1, cm.getAtIndex(0)->getAssociatedCommands()[0]);
-}
-
-TEST(CommandMapper, addHoldMapping_fails_to_add_mapping_if_RemoteMapState_matches_and_command_same)
-{
-    Drivers drivers;
-    TestSubsystem ts(&drivers);
-    TestCommand tc(&ts);
-    CommandMapper cm(&drivers);
-    RemoteMapState ms(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::DOWN);
-    EXPECT_CALL(drivers.errorController, addToErrorList);
-    HoldCommandMapping hcm1(&drivers, {&tc}, ms);
-    HoldCommandMapping hcm2(&drivers, {&tc}, ms);
-
-    cm.addMap(&hcm1);
-    cm.addMap(&hcm2);
-    EXPECT_EQ(1, cm.getSize());
-}
-
 TEST(CommandMapper, addHoldRepeatMapping_successfully_adds_mapping_normal_case)
 {
     Drivers drivers;

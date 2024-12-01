@@ -69,6 +69,12 @@ def prepare(module, options):
             description=modm_hal_options_description,
             default=""))
 
+    module.add_option(
+        StringOption(
+            name="modm_hal_modules",
+            description=modm_hal_modules_description,
+            default=""))
+
     return True
 
 def build(env):
@@ -97,12 +103,18 @@ def build(env):
     [check_modm_option_valid(o) for o in modm_hal_options]
 
     # stringify the options
-    modm_hal_options = [f"<option name=\"{option[0]}\">{option[1]}</option>\n" for option in modm_hal_options]
+    modm_hal_options = [f"<option name=\"{name}\">{val}</option>\n" for name, val in modm_hal_options]
+
+    # split modules and remove leading/trailing whitespace
+    modm_hal_modules = [module.strip(" \t") for module in env["::modm_hal_modules"].split("\n")]
+    # stringify the modules
+    modm_hal_modules = [f"<module>{module}</module>\n" for module in modm_hal_modules if module != ""]
 
     env.substitutions = {
         "modm_path": get_modm_repo_lb_file(),
         "mcu": mcu,
         "modm_hal_options": modm_hal_options,
+        "modm_hal_modules": modm_hal_modules
     }
 
     env.outbasepath = "taproot"
@@ -117,3 +129,5 @@ Add options to control modm generated files. For example, configure the modm UAR
 Options will be passed to modm-specific project.xml file. Options should be of the form \
 \"modm:option:name value\". Multiple modm options may be added. They should be separated by \
 newlines. If no options specified, some default options will be used."
+
+modm_hal_modules_description = "Add additional modm modules to be included in the project."

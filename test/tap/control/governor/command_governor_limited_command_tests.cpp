@@ -109,7 +109,7 @@ TYPED_TEST(GovernorLimitedCommandTest, isReady_false_when_single_gov_not_ready)
 
     for (size_t i = 1; i < TestFixture::governors.size(); i++)
     {
-        ON_CALL(TestFixture::governors[i], isReady).WillByDefault(Return(false));
+        ON_CALL(TestFixture::governors[i], isReady).WillByDefault(Return(true));
     }
 
     ON_CALL(TestFixture::cmdToGovern, isReady).WillByDefault(Return(true));
@@ -157,12 +157,12 @@ TYPED_TEST(GovernorLimitedCommandTest, isFinished_false_when_govs_not_finished)
 {
     for (auto &gov : TestFixture::governors)
     {
-        ON_CALL(gov, isFinished).WillByDefault(Return(true));
+        ON_CALL(gov, isFinished).WillByDefault(Return(false));
     }
 
-    ON_CALL(TestFixture::cmdToGovern, isFinished).WillByDefault(Return(true));
+    ON_CALL(TestFixture::cmdToGovern, isFinished).WillByDefault(Return(false));
 
-    EXPECT_TRUE(TestFixture::cmd->isFinished());
+    EXPECT_FALSE(TestFixture::cmd->isFinished());
 }
 
 TYPED_TEST(GovernorLimitedCommandTest, initialize_execute_end_runs_cmdToGovern)
@@ -172,6 +172,11 @@ TYPED_TEST(GovernorLimitedCommandTest, initialize_execute_end_runs_cmdToGovern)
     EXPECT_CALL(TestFixture::cmdToGovern, execute);
     EXPECT_CALL(TestFixture::cmdToGovern, end(false));
     EXPECT_CALL(TestFixture::cmdToGovern, end(true));
+
+    for (auto &gov : TestFixture::governors)
+    {
+        ON_CALL(gov, isFinished).WillByDefault(Return(false));
+    }
 
     TestFixture::cmd->initialize();
     TestFixture::cmd->execute();
