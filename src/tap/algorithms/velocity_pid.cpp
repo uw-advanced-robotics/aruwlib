@@ -61,7 +61,7 @@ float VelocityPID::update(float error, float dt)
     float dTerm = pidConfig.kd * (error - lastError) / dt;
 
     // Compute output
-    output = pTerm + iTerm + dTerm;
+    output = output + (pTerm + iTerm + dTerm);
     output = std::clamp(output, -pidConfig.maxOutput, pidConfig.maxOutput);
 
     // Update prior error
