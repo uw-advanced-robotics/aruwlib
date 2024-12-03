@@ -19,6 +19,8 @@
 
 #include "double_dji_motor.hpp"
 
+#define CAST_ENC(x) const_cast<EncoderInterface*>(static_cast<const EncoderInterface*>(x))
+
 namespace tap::motor
 {
 DoubleDjiMotor::DoubleDjiMotor(
@@ -32,7 +34,8 @@ DoubleDjiMotor::DoubleDjiMotor(
     const char* nameOne,
     const char* nameTwo,
     uint16_t encWrapped,
-    int64_t encRevolutions)
+    int64_t encRevolutions,
+    EncoderInterface* externalEncoder)
     : motorOne(
           drivers,
           desMotorIdentifierOne,
@@ -48,7 +51,11 @@ DoubleDjiMotor::DoubleDjiMotor(
           isInvertedTwo,
           nameTwo,
           encWrapped,
-          encRevolutions)
+          encRevolutions),
+      encoder(
+          {externalEncoder != nullptr ? externalEncoder : CAST_ENC(motorOne.getInternalEncoder()),
+           externalEncoder != nullptr ? CAST_ENC(motorOne.getInternalEncoder()) : CAST_ENC(motorTwo.getInternalEncoder()),
+           externalEncoder != nullptr ? CAST_ENC(motorTwo.getInternalEncoder()) : nullptr})
 {
 }
 
@@ -56,21 +63,19 @@ void DoubleDjiMotor::initialize()
 {
     motorOne.initialize();
     motorTwo.initialize();
+    // This is weird because the initialize is called twice for the internal encoders. This is 
+    // fine because the internal encoders have no initialize logic.
+    encoder.initialize();
 }
-
-int64_t DoubleDjiMotor::getEncoderUnwrapped() const { return motorOne.getEncoderUnwrapped(); }
-
-uint16_t DoubleDjiMotor::getEncoderWrapped() const { return motorOne.getEncoderWrapped(); }
 
 void DoubleDjiMotor::resetEncoderValue()
 {
-    motorOne.resetEncoderValue();
-    motorTwo.resetEncoderValue();
+    encoder.resetEncoderValue();
 }
 
-float DoubleDjiMotor::getPositionUnwrapped() const { return motorOne.getPositionUnwrapped(); }
+float DoubleDjiMotor::getPositionUnwrapped() const { return encoder.getPositionUnwrapped(); }
 
-float DoubleDjiMotor::getPositionWrapped() const { return motorOne.getPositionWrapped(); }
+float DoubleDjiMotor::getPositionWrapped() const { return encoder.getPositionWrapped(); }
 
 void DoubleDjiMotor::setDesiredOutput(int32_t desiredOutput)
 {

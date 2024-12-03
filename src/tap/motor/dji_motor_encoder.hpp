@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 Advanced Robotics at the University of Washington <robomstr@uw.edu>
+ * Copyright (c) 2024 Advanced Robotics at the University of Washington <robomstr@uw.edu>
  *
  * This file is part of Taproot.
  *
@@ -17,40 +17,19 @@
  * along with Taproot.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TAPROOT_DJI_MOTOR_HPP_
-#define TAPROOT_DJI_MOTOR_HPP_
-
-#include <string>
+#ifndef TAPROOT_DJI_MOTOR_ENCODER_HPP_
+#define TAPROOT_DJI_MOTOR_ENCODER_HPP_
 
 #include "tap/architecture/timeout.hpp"
-#include "tap/communication/can/can_rx_listener.hpp"
+#include "tap/util_macros.hpp"
 
+#include "modm/architecture/interface/can_message.hpp"
 #include "modm/math/geometry/angle.hpp"
 
-#include "dji_motor_encoder.hpp"
-#include "fallback_encoder.hpp"
-#include "motor_interface.hpp"
+#include "encoder_interface.hpp"
 
 namespace tap::motor
 {
-/**
- * CAN IDs for the feedback messages sent by DJI motor controllers. Motor `i` in the set
- * {1, 2,...,8} sends feedback data with in a CAN message with ID 0x200 + `i`.
- * for declaring a new motor, must be one of these motor
- * identifiers
- */
-enum MotorId : uint32_t
-{
-    MOTOR1 = 0X201,
-    MOTOR2 = 0x202,
-    MOTOR3 = 0x203,
-    MOTOR4 = 0x204,
-    MOTOR5 = 0x205,
-    MOTOR6 = 0x206,
-    MOTOR7 = 0x207,
-    MOTOR8 = 0x208,
-};
-
 /**
  * A class designed to interface with DJI brand motors and motor controllers over CAN.
  * This includes the C610 and C620 motor controllers and the GM6020 motor (that has a
@@ -72,24 +51,11 @@ enum MotorId : uint32_t
  * @note Currently there is no error handling for using a motor without having it be properly
  * initialize. You must call the `initialize` function in order for this class to work properly.
  */
-class DjiMotor : public can::CanRxListener, public MotorInterface
+class DjiMotorEncoder : public EncoderInterface
 {
 public:
     // 0 - 8191 for dji motors
     static constexpr uint16_t ENC_RESOLUTION = 8192;
-
-    // Maximum values for following motors
-    // Controller for the M2006, in mA output
-    static constexpr uint16_t MAX_OUTPUT_C610 = 10000;
-    // Controller for the M3508, in mA output (Mapped to a 20A range though, not 1:1)
-    static constexpr uint16_t MAX_OUTPUT_C620 = 16384;
-    // Controller for the M3510, in mA output (Not known if mapped to 20A range)
-    static constexpr uint16_t MAX_OUTPUT_820R = 32767;
-
-    // Output is in mV
-    static constexpr uint16_t MAX_OUTPUT_GM6020 = 25000;
-    // Output is in mV
-    static constexpr uint16_t MAX_OUTPUT_GM3510 = 29000;
 
     // Internal gear ratio of the following motors
     static constexpr float GEAR_RATIO_M3508 = 3591.0f / 187.0f;
@@ -112,27 +78,22 @@ public:
      * @param encoderRevolutions the starting number of encoder revolutions to store.
      *      See comment for DjiMotor::encoderRevolutions for more details.
      */
-    DjiMotor(
-        Drivers* drivers,
-        MotorId desMotorIdentifier,
-        tap::can::CanBus motorCanBus,
+    DjiMotorEncoder(
         bool isInverted,
-        const char* name,
         uint16_t encoderWrapped = ENC_RESOLUTION / 2,
-        int64_t encoderRevolutions = 0,
-        EncoderInterface* externalEncoder = nullptr);
+        int64_t encoderRevolutions = 0);
 
-    mockable ~DjiMotor();
+    void initialize() override {};
 
-    void initialize() override;
+    bool isOnline() const override;
 
     float getPositionUnwrapped() const override;
 
     float getPositionWrapped() const override;
 
-    const EncoderInterface* getEncoder() const override { return &this->encoder; }
+    int64_t getEncoderUnwrapped() const;
 
-    const DjiMotorEncoder* getInternalEncoder() const { return &this->internalEncoder; }
+    uint16_t getEncoderWrapped() const;
 
     /**
      * Resets this motor's current encoder home position to the current encoder position reported by
@@ -140,7 +101,7 @@ public:
      */
     void resetEncoderValue() override;
 
-    DISALLOW_COPY_AND_ASSIGN(DjiMotor)
+    DISALLOW_COPY_AND_ASSIGN(DjiMotorEncoder)
 
     /**
      * Overrides virtual method in the can class, called every time a message with the
@@ -149,74 +110,37 @@ public:
      *
      * @param[in] message the message to be processed.
      */
-    void processMessage(const modm::can::Message& message) override;
+    void processMessage(const modm::can::Message& message);
 
-    /**
-     * Set the desired output for the motor. The meaning of this value is motor
-     * controller specific.
-     *
-     * @param[in] desiredOutput the desired motor output. Limited to the range of a 16-bit int.
-     *
-     * @note: `desiredOutput` is cast to an int16_t and limited to an int16_t's range! The
-     *      user should make sure their value is in range. The declaration takes an int32_t
-     *      in hopes to mitigate overflow.
-     */
-    void setDesiredOutput(int32_t desiredOutput) override;
+    template <typename T>
+    static void assertEncoderType()
+    {
+        constexpr bool good_type =
+            std::is_same<typename std::decay<T>::type, std::int64_t>::value ||
+            std::is_same<typename std::decay<T>::type, std::uint16_t>::value;
+        static_assert(good_type, "x is not of the correct type");
+    }
 
-    /**
-     * @return `true` if a CAN message has been received from the motor within the last
-     *      `MOTOR_DISCONNECT_TIME` ms, `false` otherwise.
-     */
-    bool isMotorOnline() const override;
+    template <typename T>
+    static T degreesToEncoder(float angle)
+    {
+        assertEncoderType<T>();
+        return static_cast<T>((ENC_RESOLUTION * angle) / 360);
+    }
 
-    /**
-     * Serializes send data and deposits it in a message to be sent.
-     */
-    mockable void serializeCanSendData(modm::can::Message* txMessage) const;
-
-    /**
-     * @return the raw `desiredOutput` value which will be sent to the motor controller
-     *      (specified via `setDesiredOutput()`)
-     */
-    int16_t getOutputDesired() const override;
-
-    mockable uint32_t getMotorIdentifier() const;
-
-    /**
-     * @return the temperature of the motor as reported by the motor in degrees Celsius
-     */
-    int8_t getTemperature() const override;
-
-    int16_t getTorque() const override;
-
-    /// For interpreting the sign of return value see class comment
-    int16_t getShaftRPM() const override;
-
-    mockable bool isMotorInverted() const;
-
-    mockable tap::can::CanBus getCanBus() const;
-
-    mockable const char* getName() const;
+    template <typename T>
+    static float encoderToDegrees(T encoder)
+    {
+        assertEncoderType<T>();
+        return (360.0f * static_cast<float>(encoder)) / ENC_RESOLUTION;
+    }
 
 private:
-    // wait time before the motor is considered disconnected, in milliseconds
-    static const uint32_t MOTOR_DISCONNECT_TIME = 100;
-
-    const char* motorName;
-
-    Drivers* drivers;
-
-    uint32_t motorIdentifier;
-
-    tap::can::CanBus motorCanBus;
-
-    int16_t desiredOutput;
-
-    int16_t shaftRPM;
-
-    int8_t temperature;
-
-    int16_t torque;
+    /**
+     * Updates the stored encoder value given a newly received encoder value
+     * special logic necessary for keeping track of unwrapped encoder value.
+     */
+    void updateEncoderValue(uint16_t newEncWrapped);
 
     /**
      * If `false` the positive rotation direction of the shaft is counter-clockwise when
@@ -225,13 +149,33 @@ private:
      */
     bool motorInverted;
 
-    DjiMotorEncoder internalEncoder;
-    FallbackEncoder<2> encoder;
-    // EncoderInterface* externalEncoder = nullptr;
+    /**
+     * The raw encoder value reported by the motor controller relative to
+     * encoderHomePosition. It wraps around from {0..8191}, hence "Wrapped"
+     */
+    uint16_t encoderWrapped;
 
-    tap::arch::MilliTimeout motorDisconnectTimeout;
+    /**
+     * Absolute unwrapped encoder position =
+     *      encoderRevolutions * ENCODER_RESOLUTION + encoderWrapped
+     * This lets us keep track of some sense of absolute position even while
+     * raw encoderValue continuosly loops within {0..8191}. Origin value is
+     * arbitrary.
+     */
+    int64_t encoderRevolutions;
+
+    /**
+     * The actual encoder wrapped value received from CAN messages where this motor
+     * is considered to have an encoder value of 0. encoderHomePosition is 0 by default.
+     */
+    uint16_t encoderHomePosition;
+
+    // wait time before the motor is considered disconnected, in milliseconds
+    static const uint32_t MOTOR_DISCONNECT_TIME = 100;
+
+    tap::arch::MilliTimeout encoderDisconnectTimeout;
 };
 
 }  // namespace tap::motor
 
-#endif  // TAPROOT_DJI_MOTOR_HPP_
+#endif  // TAPROOT_DJI_MOTOR_ENCODER_HPP_

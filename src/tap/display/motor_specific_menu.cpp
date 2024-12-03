@@ -57,7 +57,7 @@ void MotorSpecificMenu::draw()
 
     currDesiredOutput = associatedMotor->getOutputDesired();
     currIsInverted = associatedMotor->isMotorInverted();
-    currEncoderWrapped = associatedMotor->getEncoderWrapped();
+    currEncoderWrapped = associatedMotor->getInternalEncoder()->getEncoderWrapped();
     currRPM = associatedMotor->getShaftRPM();
 
     display << "  Motor ID: " << associatedMotor->getMotorIdentifier() << modm::endl
@@ -79,7 +79,7 @@ bool MotorSpecificMenu::hasChanged()
 {
     bool sameOutputDesired = (associatedMotor->getOutputDesired() == currDesiredOutput);
     bool sameInverted = (associatedMotor->isMotorInverted() == currIsInverted);
-    bool sameEncoderWrapped = (associatedMotor->getEncoderWrapped() == currEncoderWrapped);
+    bool sameEncoderWrapped = (associatedMotor->getInternalEncoder()->getEncoderWrapped() == currEncoderWrapped);
 
     return !(sameOutputDesired && sameInverted && sameEncoderWrapped);
 }
