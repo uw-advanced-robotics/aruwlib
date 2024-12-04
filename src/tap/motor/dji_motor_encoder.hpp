@@ -91,9 +91,9 @@ public:
 
     float getPositionWrapped() const override;
 
-    int64_t getEncoderUnwrapped() const;
+    mockable int64_t getEncoderUnwrapped() const;
 
-    uint16_t getEncoderWrapped() const;
+    mockable uint16_t getEncoderWrapped() const;
 
     /**
      * Resets this motor's current encoder home position to the current encoder position reported by
@@ -110,7 +110,7 @@ public:
      *
      * @param[in] message the message to be processed.
      */
-    void processMessage(const modm::can::Message& message);
+    mockable void processMessage(const modm::can::Message& message);
 
     template <typename T>
     static void assertEncoderType()

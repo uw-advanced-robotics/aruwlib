@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 Advanced Robotics at the University of Washington <robomstr@uw.edu>
+ * Copyright (c) 2024 Advanced Robotics at the University of Washington <robomstr@uw.edu>
  *
  * This file is part of Taproot.
  *
@@ -17,31 +17,20 @@
  * along with Taproot.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "dji_motor_mock.hpp"
+#include "dji_motor_encoder_mock.hpp"
 
 namespace tap::mock
 {
-DjiMotorMock::DjiMotorMock(
-    Drivers *drivers,
-    tap::motor::MotorId desMotorIdentifier,
-    tap::can::CanBus motorCanBus,
+DjiMotorEncoderMock::DjiMotorEncoderMock(
     bool isInverted,
-    const char *name,
-    uint16_t encWrapped,
-    int64_t encRevolutions)
-    : DjiMotor(
-          drivers,
-          desMotorIdentifier,
-          motorCanBus,
-          isInverted,
-          name,
-          encWrapped,
-          encRevolutions),
-      mockedInternalEncoder(
+    uint16_t encoderWrapped,
+    int64_t encoderRevolutions)
+    : DjiMotorEncoder(
         isInverted,
-        encWrapped,
-        encRevolutions)
+        encoderWrapped,
+        encoderRevolutions)
+      
 {
 }
-DjiMotorMock::~DjiMotorMock() {}
+DjiMotorEncoderMock::~DjiMotorEncoderMock() {}
 }  // namespace tap::mock

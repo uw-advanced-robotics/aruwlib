@@ -27,6 +27,8 @@
 
 #include "modm/architecture/interface/can_message.hpp"
 
+#include "dji_motor_encoder_mock.hpp"
+
 namespace tap
 {
 namespace mock
@@ -45,10 +47,6 @@ public:
     virtual ~DjiMotorMock();
 
     MOCK_METHOD(void, initialize, (), (override));
-    MOCK_METHOD(float, getPositionUnwrapped, (), (const override));
-    MOCK_METHOD(float, getPositionWrapped, (), (const override));
-    MOCK_METHOD(int64_t, getEncoderUnwrapped, (), (const override));
-    MOCK_METHOD(uint16_t, getEncoderWrapped, (), (const override));
     MOCK_METHOD(void, processMessage, (const modm::can::Message& message), (override));
     MOCK_METHOD(void, setDesiredOutput, (int32_t desiredOutput), (override));
     MOCK_METHOD(void, resetEncoderValue, (), (override));
@@ -63,6 +61,10 @@ public:
     MOCK_METHOD(bool, isMotorInverted, (), (const override));
     MOCK_METHOD(tap::can::CanBus, getCanBus, (), (const override));
     MOCK_METHOD(const char*, getName, (), (const override));
+
+    const tap::motor::DjiMotorEncoder* getInternalEncoder() const override { return &this->mockedInternalEncoder; }
+
+    testing::NiceMock<DjiMotorEncoderMock> mockedInternalEncoder;
 
 };  // class DjiMotor
 

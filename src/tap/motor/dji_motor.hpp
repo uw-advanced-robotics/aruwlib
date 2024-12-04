@@ -116,7 +116,7 @@ public:
 
     const EncoderInterface* getEncoder() const override { return &this->encoder; }
 
-    const DjiMotorEncoder* getInternalEncoder() const { return &this->internalEncoder; }
+    mockable const DjiMotorEncoder* getInternalEncoder() const { return &this->internalEncoder; }
 
     /**
      * Resets this motor's current encoder home position to the current encoder position reported by
@@ -211,7 +211,6 @@ private:
 
     DjiMotorEncoder internalEncoder;
     FallbackEncoder<2> encoder;
-    // EncoderInterface* externalEncoder = nullptr;
 
     tap::arch::MilliTimeout motorDisconnectTimeout;
 };
