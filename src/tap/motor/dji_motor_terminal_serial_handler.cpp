@@ -18,6 +18,7 @@
  */
 
 #include "dji_motor_terminal_serial_handler.hpp"
+#include "dji_motor.hpp"
 
 #include "tap/algorithms/strtok.hpp"
 #include "tap/drivers.hpp"

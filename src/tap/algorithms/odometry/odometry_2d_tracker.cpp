@@ -20,6 +20,7 @@
 
 #include <cmath>
 
+#include "tap/architecture/clock.hpp"
 #include "tap/control/chassis/chassis_subsystem_interface.hpp"
 
 #include "modm/math/geometry/angle.hpp"

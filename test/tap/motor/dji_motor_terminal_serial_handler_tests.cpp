@@ -20,6 +20,7 @@
 #include <gtest/gtest.h>
 
 #include "tap/drivers.hpp"
+#include "tap/motor/dji_motor.hpp"
 #include "tap/motor/dji_motor_terminal_serial_handler.hpp"
 #include "tap/stub/terminal_device_stub.hpp"
 

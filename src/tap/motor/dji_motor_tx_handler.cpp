@@ -18,6 +18,7 @@
  */
 
 #include "dji_motor_tx_handler.hpp"
+#include "dji_motor.hpp"
 
 #include <cassert>
 

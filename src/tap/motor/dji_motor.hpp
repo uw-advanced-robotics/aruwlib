@@ -27,29 +27,13 @@
 
 #include "modm/math/geometry/angle.hpp"
 
+#include "dji_motor_ids.hpp"
 #include "dji_motor_encoder.hpp"
 #include "fallback_encoder.hpp"
 #include "motor_interface.hpp"
 
 namespace tap::motor
 {
-/**
- * CAN IDs for the feedback messages sent by DJI motor controllers. Motor `i` in the set
- * {1, 2,...,8} sends feedback data with in a CAN message with ID 0x200 + `i`.
- * for declaring a new motor, must be one of these motor
- * identifiers
- */
-enum MotorId : uint32_t
-{
-    MOTOR1 = 0X201,
-    MOTOR2 = 0x202,
-    MOTOR3 = 0x203,
-    MOTOR4 = 0x204,
-    MOTOR5 = 0x205,
-    MOTOR6 = 0x206,
-    MOTOR7 = 0x207,
-    MOTOR8 = 0x208,
-};
 
 /**
  * A class designed to interface with DJI brand motors and motor controllers over CAN.
