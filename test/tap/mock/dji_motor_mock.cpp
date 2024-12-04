@@ -37,10 +37,7 @@ DjiMotorMock::DjiMotorMock(
           name,
           encWrapped,
           encRevolutions),
-      mockedInternalEncoder(
-        isInverted,
-        encWrapped,
-        encRevolutions)
+      mockedInternalEncoder(isInverted, encWrapped, encRevolutions)
 {
 }
 DjiMotorMock::~DjiMotorMock() {}

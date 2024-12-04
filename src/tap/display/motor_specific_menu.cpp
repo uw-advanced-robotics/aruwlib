@@ -79,7 +79,8 @@ bool MotorSpecificMenu::hasChanged()
 {
     bool sameOutputDesired = (associatedMotor->getOutputDesired() == currDesiredOutput);
     bool sameInverted = (associatedMotor->isMotorInverted() == currIsInverted);
-    bool sameEncoderWrapped = (associatedMotor->getInternalEncoder()->getEncoderWrapped() == currEncoderWrapped);
+    bool sameEncoderWrapped =
+        (associatedMotor->getInternalEncoder()->getEncoderWrapped() == currEncoderWrapped);
 
     return !(sameOutputDesired && sameInverted && sameEncoderWrapped);
 }

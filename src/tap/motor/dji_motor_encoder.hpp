@@ -83,7 +83,7 @@ public:
         uint16_t encoderWrapped = ENC_RESOLUTION / 2,
         int64_t encoderRevolutions = 0);
 
-    void initialize() override {};
+    void initialize() override{};
 
     bool isOnline() const override;
 

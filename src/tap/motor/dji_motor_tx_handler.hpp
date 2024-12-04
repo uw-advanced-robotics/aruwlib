@@ -23,9 +23,10 @@
 #include <limits.h>
 
 #include "tap/util_macros.hpp"
-#include "dji_motor_ids.hpp"
 
 #include "modm/architecture/interface/can_message.hpp"
+
+#include "dji_motor_ids.hpp"
 
 namespace tap
 {

@@ -27,14 +27,13 @@
 
 #include "modm/math/geometry/angle.hpp"
 
-#include "dji_motor_ids.hpp"
 #include "dji_motor_encoder.hpp"
+#include "dji_motor_ids.hpp"
 #include "fallback_encoder.hpp"
 #include "motor_interface.hpp"
 
 namespace tap::motor
 {
-
 /**
  * A class designed to interface with DJI brand motors and motor controllers over CAN.
  * This includes the C610 and C620 motor controllers and the GM6020 motor (that has a

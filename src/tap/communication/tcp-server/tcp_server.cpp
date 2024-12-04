@@ -36,6 +36,7 @@
 #include <stdexcept>
 
 #include "tap/util_macros.hpp"
+
 #include "json_messages.hpp"
 using std::cerr;
 /**

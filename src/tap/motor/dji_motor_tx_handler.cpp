@@ -18,7 +18,6 @@
  */
 
 #include "dji_motor_tx_handler.hpp"
-#include "dji_motor.hpp"
 
 #include <cassert>
 
@@ -28,6 +27,8 @@
 
 #include "modm/architecture/interface/assert.h"
 #include "modm/architecture/interface/can_message.hpp"
+
+#include "dji_motor.hpp"
 
 namespace tap::motor
 {

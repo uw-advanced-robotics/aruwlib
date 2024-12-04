@@ -22,6 +22,7 @@
 
 #include "tap/communication/serial/terminal_serial.hpp"
 #include "tap/util_macros.hpp"
+
 #include "dji_motor_ids.hpp"
 
 namespace tap

@@ -54,7 +54,8 @@ DoubleDjiMotor::DoubleDjiMotor(
           encRevolutions),
       encoder(
           {externalEncoder != nullptr ? externalEncoder : CAST_ENC(motorOne.getInternalEncoder()),
-           externalEncoder != nullptr ? CAST_ENC(motorOne.getInternalEncoder()) : CAST_ENC(motorTwo.getInternalEncoder()),
+           externalEncoder != nullptr ? CAST_ENC(motorOne.getInternalEncoder())
+                                      : CAST_ENC(motorTwo.getInternalEncoder()),
            externalEncoder != nullptr ? CAST_ENC(motorTwo.getInternalEncoder()) : nullptr})
 {
 }
@@ -63,15 +64,12 @@ void DoubleDjiMotor::initialize()
 {
     motorOne.initialize();
     motorTwo.initialize();
-    // This is weird because the initialize is called twice for the internal encoders. This is 
+    // This is weird because the initialize is called twice for the internal encoders. This is
     // fine because the internal encoders have no initialize logic.
     encoder.initialize();
 }
 
-void DoubleDjiMotor::resetEncoderValue()
-{
-    encoder.resetEncoderValue();
-}
+void DoubleDjiMotor::resetEncoderValue() { encoder.resetEncoderValue(); }
 
 float DoubleDjiMotor::getPositionUnwrapped() const { return encoder.getPositionUnwrapped(); }
 

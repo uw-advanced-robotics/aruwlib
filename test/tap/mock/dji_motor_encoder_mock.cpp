@@ -25,11 +25,8 @@ DjiMotorEncoderMock::DjiMotorEncoderMock(
     bool isInverted,
     uint16_t encoderWrapped,
     int64_t encoderRevolutions)
-    : DjiMotorEncoder(
-        isInverted,
-        encoderWrapped,
-        encoderRevolutions)
-      
+    : DjiMotorEncoder(isInverted, encoderWrapped, encoderRevolutions)
+
 {
 }
 DjiMotorEncoderMock::~DjiMotorEncoderMock() {}
