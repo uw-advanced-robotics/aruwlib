@@ -78,8 +78,11 @@ class TaprootTests(Module):
             env.copy("tap/communication/serial/remote_tests.cpp")
         if env.has_module(":communication:can"):
             env.copy("tap/communication/can")
-        if env.has_module(":communication:tcp-server") and platform.system() == "Linux":
-            env.copy("tap/communication/tcp-server")
+        if env.has_module(":communication:tcp-server"):
+            if platform.system() == "Linux":
+                env.copy("tap/communication/tcp-server")
+            else:
+                env.copy("tap/communication/tcp-server/json_generation_tests.cpp")
         if env.has_module(":communication:serial:ref_serial"):
             env.copy("tap/communication/serial/ref_serial_tests.cpp")
             env.copy("tap/communication/serial/ref_serial_transmitter_tests.cpp")
