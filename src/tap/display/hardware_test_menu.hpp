@@ -54,11 +54,9 @@ private:
 
     Drivers *drivers;
 
-    control::subsystem_scheduler_bitmap_t completeSubsystems = 0;
+    int runningTests = 0;
 
     VerticalScrollLogicHandler vertScrollHandler;
-
-    bool hardwareTestsStarted;
 };  // class HardwareTestMenu
 }  // namespace display
 }  // namespace tap

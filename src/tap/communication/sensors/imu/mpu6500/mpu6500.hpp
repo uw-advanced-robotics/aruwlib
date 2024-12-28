@@ -275,6 +275,11 @@ public:
 
     inline void setCalibrationSamples(float samples) { MPU6500_OFFSET_SAMPLES = samples; }
 
+    inline void setTargetTemperature(float temperatureC)
+    {
+        imuHeater.setDesiredTemperature(temperatureC);
+    }
+
 private:
     static constexpr float ACCELERATION_GRAVITY = 9.80665f;
 

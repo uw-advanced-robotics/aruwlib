@@ -21,6 +21,7 @@
 
 #include <algorithm>
 
+#include "tap/control/command.hpp"
 #include "tap/control/command_scheduler.hpp"
 #include "tap/control/subsystem.hpp"
 #include "tap/drivers.hpp"
@@ -34,41 +35,53 @@ HardwareTestMenu::HardwareTestMenu(
     Drivers* drivers)
     : AbstractMenu<DummyAllocator<modm::IAbstractView> >(vs, HARDWARE_TEST_MENU_ID),
       drivers(drivers),
-      vertScrollHandler(drivers, 0, MAX_ENTRIES_DISPLAYED),
-      hardwareTestsStarted(false)
+      vertScrollHandler(drivers, 0, MAX_ENTRIES_DISPLAYED)
 {
 }
 
-void HardwareTestMenu::update()
-{
-    if (!hardwareTestsStarted)
-    {
-        hardwareTestsStarted = true;
-        drivers->commandScheduler.startHardwareTests();
-    }
-}
+void HardwareTestMenu::update() {}
 
 void HardwareTestMenu::shortButtonPress(modm::MenuButtons::Button button)
 {
     if (button == modm::MenuButtons::LEFT)
     {
-        drivers->commandScheduler.stopHardwareTests();
+        drivers->commandScheduler.stopAllHardwareTests();
         this->remove();
     }
     else if (button == modm::MenuButtons::OK)
     {
-        int subsystemIndex = 0;
+        if (vertScrollHandler.getCursorIndex() == 0)
+        {
+            if (drivers->commandScheduler.countRunningHardwareTests() != 0)
+            {
+                drivers->commandScheduler.stopAllHardwareTests();
+            }
+            else
+            {
+                drivers->commandScheduler.runAllHardwareTests();
+            }
+            return;
+        }
+
+        int subsystemIndex = 1;
         for (auto it = drivers->commandScheduler.subMapBegin();
              it != drivers->commandScheduler.subMapEnd();
              it++)
         {
-            if (subsystemIndex++ == vertScrollHandler.getCursorIndex())
+            if ((*it)->getTestCommand() != nullptr)
             {
-                if (!(*it)->isHardwareTestComplete())
+                if (subsystemIndex++ == vertScrollHandler.getCursorIndex())
                 {
-                    (*it)->setHardwareTestsComplete();
+                    if (drivers->commandScheduler.isRunningTest(*it))
+                    {
+                        drivers->commandScheduler.stopHardwareTest(*it);
+                    }
+                    else
+                    {
+                        drivers->commandScheduler.runHardwareTest(*it);
+                    }
+                    return;
                 }
-                break;
             }
         }
     }
@@ -80,20 +93,11 @@ void HardwareTestMenu::shortButtonPress(modm::MenuButtons::Button button)
 
 bool HardwareTestMenu::hasChanged()
 {
-    control::subsystem_scheduler_bitmap_t changedSubsystems = 0;
-    int i = 0;
-    std::for_each(
-        drivers->commandScheduler.subMapBegin(),
-        drivers->commandScheduler.subMapEnd(),
-        [&](control::Subsystem* sub)
-        {
-            changedSubsystems += (sub->isHardwareTestComplete() ? 1UL : 0UL) << i;
-            i++;
-        });
+    int runningTests = drivers->commandScheduler.countRunningHardwareTests();
 
     bool changed =
-        vertScrollHandler.acknowledgeCursorChanged() || (changedSubsystems != completeSubsystems);
-    completeSubsystems = changedSubsystems;
+        vertScrollHandler.acknowledgeCursorChanged() || (runningTests != this->runningTests);
+    this->runningTests = runningTests;
     return changed;
 }
 
@@ -103,7 +107,17 @@ void HardwareTestMenu::draw()
     // at the beginning of the program and subsystemListSize is not free
     if (vertScrollHandler.getSize() == 0)
     {
-        vertScrollHandler.setSize(drivers->commandScheduler.subsystemListSize());
+        int testableSubsystems = 0;
+        for (auto it = drivers->commandScheduler.subMapBegin();
+             it != drivers->commandScheduler.subMapEnd();
+             it++)
+        {
+            if ((*it)->getTestCommand() != nullptr)
+            {
+                testableSubsystems++;
+            }
+        }
+        vertScrollHandler.setSize(testableSubsystems + 1);
     }
 
     modm::GraphicDisplay& display = getViewStack()->getDisplay();
@@ -111,20 +125,39 @@ void HardwareTestMenu::draw()
     display.setCursor(0, 2);
     display << HardwareTestMenu::getMenuName() << modm::endl;
 
-    int subsystemIndex = 0;
+    if (drivers->commandScheduler.countRunningHardwareTests() != 0)
+    {
+        display << "Running " << drivers->commandScheduler.countRunningHardwareTests() << " tests."
+                << modm::endl;
+        display << ((vertScrollHandler.getCursorIndex() == 0) ? ">" : " ");
+        display << "[stop all] " << modm::endl;
+    }
+    else
+    {
+        display << "No tests running." << modm::endl;
+        display << ((vertScrollHandler.getCursorIndex() == 0) ? ">" : " ");
+        display << "[run all]" << modm::endl;
+    }
+
+    int subsystemIndex = 1;
     std::for_each(
         drivers->commandScheduler.subMapBegin(),
         drivers->commandScheduler.subMapEnd(),
         [&](control::Subsystem* sub)
         {
-            if (subsystemIndex <= vertScrollHandler.getLargestIndexDisplayed() &&
-                subsystemIndex >= vertScrollHandler.getSmallestIndexDisplayed())
+            if (sub->getTestCommand() != nullptr)
             {
-                display << ((subsystemIndex == vertScrollHandler.getCursorIndex()) ? ">" : " ")
-                        << (sub->isHardwareTestComplete() ? "[done] " : "[not]  ") << sub->getName()
-                        << modm::endl;
+                if (subsystemIndex <= (vertScrollHandler.getLargestIndexDisplayed()) &&
+                    subsystemIndex >= (vertScrollHandler.getSmallestIndexDisplayed()))
+                {
+                    display << ((subsystemIndex == vertScrollHandler.getCursorIndex()) ? ">" : " ")
+                            << ((drivers->commandScheduler.hasPassedTest(sub)) ? " + " : " x ")
+                            << (drivers->commandScheduler.isRunningTest(sub) ? "[stop] "
+                                                                             : "[run]  ")
+                            << sub->getName() << modm::endl;
+                }
+                subsystemIndex++;
             }
-            subsystemIndex++;
         });
 }
 }  // namespace display
