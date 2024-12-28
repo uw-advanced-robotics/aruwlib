@@ -23,10 +23,11 @@ Resumable functions are provided by the `RefSerialTransmitter`, `StateHUDIndicat
 
 ### Tool versions
 - ARM GCC and GCC should be updated to 13.3.
-- Scons should be updated to 4.7.0.
+- Scons should be updated to 4.8.1.
 - lbuild should be updated to 1.21.8.
 - Other tools should be updated to compatible versions.
 Generally, Ubuntu 24.04 is a good point of reference for package versions.
+You may also try newer package versions, but use caution as compatibility is not guaranteed.
 
 ### Other
 UART port TX and RX buffer sizes (default 256) are now controlled using the

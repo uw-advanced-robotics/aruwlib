@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-scons = "==4.7.0"
+scons = "==4.8.1"
 lbuild = "==1.21.8"
 pyelftools = "==0.31"
 setuptools = "*"
