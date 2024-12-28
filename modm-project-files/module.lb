@@ -93,6 +93,7 @@ def build(env):
     for target in ALL_HOSTED_TARGET_NAMES:
         env.substitutions["hosted_target"] = target
         env.template("sim-modm/project.xml.in", f"sim-modm/{target}/project.xml")
+        env.template("sim-modm/device.hpp.in", f"sim-modm/{target}/modm/src/modm/platform/device.hpp")
 
 modm_hal_options_description = "\
 Add options to control modm generated files. For example, configure the modm UART buffer sizes. \
