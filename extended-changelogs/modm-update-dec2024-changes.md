@@ -16,7 +16,7 @@ To ease the transition to fibers, modm added a fiber compatibility backend to pr
 **This backend is now enabled by default.**
 
 **These changes require teams to change the way they handle concurrency.**
-See the [modm fiber module documentation](https://github.com/modm-io/modm/blob/39b77479ed008b2d9851545e9dc6cbbf3afa2c0f/src/modm/processing/fiber/module.md) for more information.
+See the [modm fiber module documentation](https://github.com/modm-io/modm/blob/develop/src/modm/processing/fiber/module.md) for more information.
 
 The only Taproot component that directly implements a Protothread is the `MPU6500`.
 Resumable functions are provided by the `RefSerialTransmitter`, `StateHUDIndicator`, and `SH1106` components.
