@@ -32,12 +32,13 @@ COPY --from=run-clang-format /run-clang-format.py /
 COPY --from=gcc-arm /gcc-arm /gcc-arm
 ENV PATH="/gcc-arm/bin:$PATH"
 
-RUN apt-get update -qq
+RUN apt-get update -qq \
     && DEBIAN_FRONTEND=noninteractive apt-get install -qq --no-install-recommends \
     clang-format \
     g++ \
     gcovr \
     git \
+    lcov \
     libcpanel-json-xs-perl \
     libgmock-dev \
     locales \
