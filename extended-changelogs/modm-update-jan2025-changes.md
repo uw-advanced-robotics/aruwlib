@@ -1,4 +1,4 @@
-# Modm Update - December 2024
+# Modm Update - January 2025
 
 This update brings modm up to date along with many tools and dependencies that depend on or work alongside it.
 
