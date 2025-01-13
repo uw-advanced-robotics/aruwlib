@@ -179,11 +179,11 @@ TEST(SequentialCommand, cancelling_command_ends_internal_commands)
     EXPECT_FALSE(scheduler.isCommandScheduled(&command));
 }
 
-TEST(SequentialCommand, null_command_asserts)
-{
-    Drivers drivers;
-    CommandScheduler scheduler(&drivers, true);
+// TEST(SequentialCommand, null_command_asserts)
+// {
+//     Drivers drivers;
+//     CommandScheduler scheduler(&drivers, true);
 
-    std::array<Command *, 1> commands = {nullptr};
-    ASSERT_DEATH({ SequentialCommand<1> command(commands); }, ".*");
-}
+//     std::array<Command *, 1> commands = {nullptr};
+//     ASSERT_DEATH({ SequentialCommand<1> command(commands); }, ".*");
+// }

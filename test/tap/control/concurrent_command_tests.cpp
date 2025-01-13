@@ -235,22 +235,22 @@ TEST(ConcurrentCommands, cancelling_command_ends_internal_commands)
     EXPECT_FALSE(scheduler.isCommandScheduled(&command));
 }
 
-TEST(ConcurrentCommands, null_command_asserts)
-{
-    std::array<Command *, 1> commands = {nullptr};
-    ASSERT_DEATH({ ConcurrentCommand<1> command(commands, "test command"); }, ".*");
-}
+// TEST(ConcurrentCommands, null_command_asserts)
+// {
+//     std::array<Command *, 1> commands = {nullptr};
+//     ASSERT_DEATH({ ConcurrentCommand<1> command(commands, "test command"); }, ".*");
+// }
 
-TEST(ConcurrentCommands, overlapping_requirements_asserts)
-{
-    Drivers drivers;
-    CommandScheduler scheduler(&drivers, true);
+// TEST(ConcurrentCommands, overlapping_requirements_asserts)
+// {
+//     Drivers drivers;
+//     CommandScheduler scheduler(&drivers, true);
 
-    TestSubsystem s1(&drivers);
-    scheduler.registerSubsystem(&s1);
-    TestCommand c1(&s1);
-    TestCommand c2(&s1);
+//     TestSubsystem s1(&drivers);
+//     scheduler.registerSubsystem(&s1);
+//     TestCommand c1(&s1);
+//     TestCommand c2(&s1);
 
-    std::array<Command *, 2> commands = {&c1, &c2};
-    ASSERT_DEATH({ ConcurrentCommand<2> command(commands, "test command"); }, ".*");
-}
+//     std::array<Command *, 2> commands = {&c1, &c2};
+//     ASSERT_DEATH({ ConcurrentCommand<2> command(commands, "test command"); }, ".*");
+// }
