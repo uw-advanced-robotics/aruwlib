@@ -46,7 +46,7 @@ template <uint32_t COUNT>
 class FallbackEncoder : public EncoderInterface
 {
 public:
-    FallbackEncoder(std::array<EncoderInterface*, COUNT> encoders) : encoders(encoders)
+    FallbackEncoder(std::array<EncoderInterface*, COUNT> encoders) : encoders(encoders), seenEncoders(0)
     {
         modm_assert(this->encoders[0] != nullptr, "FallbackEncoder", "FallbackEncoder");
     }
