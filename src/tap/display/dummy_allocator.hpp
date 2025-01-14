@@ -37,6 +37,7 @@ public:
     T* allocate(size_t) { return nullptr; }
 
     void deallocate(T*) {}
+    void destroy(T*) {}
 };  // class DummyAllocator
 }  // namespace display
 }  // namespace tap
