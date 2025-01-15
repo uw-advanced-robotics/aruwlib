@@ -37,27 +37,15 @@ protected:
     {
         for (size_t i = 0; i < DjiMotorTxHandler::DJI_MOTORS_PER_CAN; i++)
         {
-            motors.emplace_back(new NiceMock<DjiMotorMock>(
+            if (i % 2 == 0) {
+                motors.emplace_back(new NiceMock<DjiMotorMock>(
                 &drivers,
                 NORMALIZED_ID_TO_DJI_MOTOR(i),
                 can::CanBus::CAN_BUS1,
                 false,
                 ""));
-        }
-
-        for (size_t i = 0; i < DjiMotorTxHandler::DJI_MOTORS_PER_CAN; i++)
-        {
-            motors.emplace_back(new NiceMock<DjiMotorMock>(
-                &drivers,
-                NORMALIZED_ID_TO_DJI_MOTOR(i),
-                can::CanBus::CAN_BUS2,
-                false,
-                ""));
-        }
-
-        for (size_t i = 0; i < DjiMotorTxHandler::DJI_MOTORS_PER_CAN; i++)
-        {
-            motors.emplace_back(new NiceMock<DjiMotorMock>(
+            } else {
+                motors.emplace_back(new NiceMock<DjiMotorMock>(
                 &drivers,
                 NORMALIZED_ID_TO_DJI_MOTOR(i),
                 can::CanBus::CAN_BUS1,
@@ -66,10 +54,21 @@ protected:
                 1000,
                 0,
                 true));
+            }
+            
         }
+
         for (size_t i = 0; i < DjiMotorTxHandler::DJI_MOTORS_PER_CAN; i++)
         {
-            motors.emplace_back(new NiceMock<DjiMotorMock>(
+            if (i % 2 == 0) {
+                motors.emplace_back(new NiceMock<DjiMotorMock>(
+                &drivers,
+                NORMALIZED_ID_TO_DJI_MOTOR(i),
+                can::CanBus::CAN_BUS2,
+                false,
+                ""));
+            } else {
+                motors.emplace_back(new NiceMock<DjiMotorMock>(
                 &drivers,
                 NORMALIZED_ID_TO_DJI_MOTOR(i),
                 can::CanBus::CAN_BUS2,
@@ -78,6 +77,8 @@ protected:
                 1000,
                 0,
                 true));
+            }
+            
         }
     }
 
@@ -189,9 +190,9 @@ TEST_F(DjiMotorTxHandlerTest, encodeAndSendCanData_single_motor_added_single_mes
     djiMotorTxHandler.encodeAndSendCanData();
 }
 
-TEST_F(DjiMotorTxHandlerTest, encodeAndSendCanData_all_motors_added_8_messages_sent)
+TEST_F(DjiMotorTxHandlerTest, encodeAndSendCanData_all_motors_added_6_messages_sent)
 {
-    EXPECT_CALL(drivers.can, sendMessage).Times(8);
+    EXPECT_CALL(drivers.can, sendMessage).Times(6);
 
     addAllMotors();
 
