@@ -35,50 +35,7 @@ class DjiMotorTxHandlerTest : public Test
 protected:
     DjiMotorTxHandlerTest() : drivers(), djiMotorTxHandler(&drivers), motors()
     {
-        for (size_t i = 0; i < DjiMotorTxHandler::DJI_MOTORS_PER_CAN; i++)
-        {
-            motors.emplace_back(new NiceMock<DjiMotorMock>(
-                &drivers,
-                NORMALIZED_ID_TO_DJI_MOTOR(i),
-                can::CanBus::CAN_BUS1,
-                false,
-                ""));
-        }
-
-        for (size_t i = 0; i < DjiMotorTxHandler::DJI_MOTORS_PER_CAN; i++)
-        {
-            motors.emplace_back(new NiceMock<DjiMotorMock>(
-                &drivers,
-                NORMALIZED_ID_TO_DJI_MOTOR(i),
-                can::CanBus::CAN_BUS2,
-                false,
-                ""));
-        }
-
-        for (size_t i = 0; i < DjiMotorTxHandler::DJI_MOTORS_PER_CAN; i++)
-        {
-            motors.emplace_back(new NiceMock<DjiMotorMock>(
-                &drivers,
-                NORMALIZED_ID_TO_DJI_MOTOR(i),
-                can::CanBus::CAN_BUS1,
-                false,
-                "",
-                1000,
-                0,
-                true));
-        }
-        for (size_t i = 0; i < DjiMotorTxHandler::DJI_MOTORS_PER_CAN; i++)
-        {
-            motors.emplace_back(new NiceMock<DjiMotorMock>(
-                &drivers,
-                NORMALIZED_ID_TO_DJI_MOTOR(i),
-                can::CanBus::CAN_BUS2,
-                false,
-                "",
-                1000,
-                0,
-                true));
-        }
+        createAllMotors(false);  // By default, don't create any motors with current control mode
     }
 
     ~DjiMotorTxHandlerTest()
@@ -96,17 +53,63 @@ protected:
 
         for (auto *motor : motors)
         {
-            ON_CALL(*motor, getMotorIdentifier).WillByDefault([motor]() {
-                return motor->DjiMotor::getMotorIdentifier();
-            });
+            ON_CALL(*motor, getMotorIdentifier)
+                .WillByDefault([motor]() { return motor->DjiMotor::getMotorIdentifier(); });
 
-            ON_CALL(*motor, getCanBus).WillByDefault([motor]() {
-                return motor->DjiMotor::getCanBus();
-            });
+            ON_CALL(*motor, getCanBus)
+                .WillByDefault([motor]() { return motor->DjiMotor::getCanBus(); });
         }
     }
 
     void TearDown() override {}
+
+    void createAllMotors(bool enableCurrentControl)
+    {
+        // Clear the existing motors
+        motors.clear();
+
+        if (enableCurrentControl){
+            std::cout << "Creating motors with current control enabled" << std::endl;
+        }
+
+        for (size_t i = 0; i < DjiMotorTxHandler::DJI_MOTORS_PER_CAN; i++)
+        {
+            bool isCurrentControl =
+                enableCurrentControl ? i >= DjiMotorTxHandler::DJI_MOTORS_PER_CAN - 2 : false;
+
+            if(isCurrentControl){
+                std::cout << "Creating motor on CAN1 with current control enabled on " << i << std::endl;
+            }
+
+            std::cout << "Motor made with id: " << i << std::endl;
+
+            motors.emplace_back(new NiceMock<DjiMotorMock>(
+                &drivers,
+                NORMALIZED_ID_TO_DJI_MOTOR(i),
+                can::CanBus::CAN_BUS1,
+                isCurrentControl,
+                ""));
+        }
+
+        for (size_t i = 0; i < DjiMotorTxHandler::DJI_MOTORS_PER_CAN; i++)
+        {
+            bool isCurrentControl =
+                enableCurrentControl ? i >= DjiMotorTxHandler::DJI_MOTORS_PER_CAN - 2 : false;
+
+            if (isCurrentControl){
+                std::cout << "Creating motor on CAN2 with current control enabled on " << i << std::endl;
+            }
+
+            std::cout << "Motor made with id: " << i << std::endl;
+
+            motors.emplace_back(new NiceMock<DjiMotorMock>(
+                &drivers,
+                NORMALIZED_ID_TO_DJI_MOTOR(i),
+                can::CanBus::CAN_BUS2,
+                isCurrentControl,
+                ""));
+        }
+    }
 
     void addAllMotors()
     {
@@ -115,6 +118,15 @@ protected:
             djiMotorTxHandler.addMotorToManager(motor);
         }
     }
+
+    void resetMotorStore(){
+        for (size_t i = 0; i < DjiMotorTxHandler::DJI_MOTORS_PER_CAN; i++)
+        {
+            djiMotorTxHandler.can1MotorStore[i] = nullptr;
+            djiMotorTxHandler.can2MotorStore[i] = nullptr;
+        }
+    }
+
 
     Drivers drivers;
     DjiMotorTxHandler djiMotorTxHandler;
@@ -189,11 +201,31 @@ TEST_F(DjiMotorTxHandlerTest, encodeAndSendCanData_single_motor_added_single_mes
     djiMotorTxHandler.encodeAndSendCanData();
 }
 
+TEST_F(DjiMotorTxHandlerTest, encodeAndSendCanData_4_messages_sent_without_current_control)
+{
+    EXPECT_CALL(drivers.can, sendMessage).Times(4);
+
+    resetMotorStore();
+
+    createAllMotors(false);
+
+    // Default creation is no current control 6020s, so only 4 messages sent (regular CAN L/H)
+    addAllMotors();
+
+    djiMotorTxHandler.encodeAndSendCanData();
+}
+
 TEST_F(DjiMotorTxHandlerTest, encodeAndSendCanData_all_motors_added_6_messages_sent)
 {
     EXPECT_CALL(drivers.can, sendMessage).Times(6);
 
+    resetMotorStore();
+
+    createAllMotors(true);  // Enable current control
+
+    std::cout << "Adding all motors to the manager" << std::endl;
     addAllMotors();
+    std::cout << "Encoding and sending CAN data" << std::endl;
 
     djiMotorTxHandler.encodeAndSendCanData();
 }
@@ -257,25 +289,24 @@ TEST_F(DjiMotorTxHandlerTest, encodeAndSendCanData_valid_encoding)
         false);
     convertToLittleEndian<int16_t>(6, can2Message6020Current.data);
 
-    ON_CALL(*motors[0], serializeCanSendData).WillByDefault([](modm::can::Message *txMessage) {
-        convertToLittleEndian(1, txMessage->data);
-    });
-    ON_CALL(*motors[4], serializeCanSendData).WillByDefault([](modm::can::Message *txMessage) {
-        convertToLittleEndian(2, txMessage->data);
-    });
-    ON_CALL(*motors[8], serializeCanSendData).WillByDefault([](modm::can::Message *txMessage) {
-        convertToLittleEndian(4, txMessage->data);
-    });
-    ON_CALL(*motors[12], serializeCanSendData).WillByDefault([](modm::can::Message *txMessage) {
-        convertToLittleEndian(5, txMessage->data);
-    });
-    ON_CALL(*motors[16], serializeCanSendData).WillByDefault([](modm::can::Message *txMessage) {
-        convertToLittleEndian(3, txMessage->data);
-    });
-    ON_CALL(*motors[24], serializeCanSendData).WillByDefault([](modm::can::Message *txMessage) {
-        convertToLittleEndian(6, txMessage->data);
-    });
-
+    ON_CALL(*motors[0], serializeCanSendData)
+        .WillByDefault([](modm::can::Message *txMessage)
+                       { convertToLittleEndian(1, txMessage->data); });
+    ON_CALL(*motors[4], serializeCanSendData)
+        .WillByDefault([](modm::can::Message *txMessage)
+                       { convertToLittleEndian(2, txMessage->data); });
+    ON_CALL(*motors[8], serializeCanSendData)
+        .WillByDefault([](modm::can::Message *txMessage)
+                       { convertToLittleEndian(4, txMessage->data); });
+    ON_CALL(*motors[12], serializeCanSendData)
+        .WillByDefault([](modm::can::Message *txMessage)
+                       { convertToLittleEndian(5, txMessage->data); });
+    ON_CALL(*motors[16], serializeCanSendData)
+        .WillByDefault([](modm::can::Message *txMessage)
+                       { convertToLittleEndian(3, txMessage->data); });
+    ON_CALL(*motors[24], serializeCanSendData)
+        .WillByDefault([](modm::can::Message *txMessage)
+                       { convertToLittleEndian(6, txMessage->data); });
 
     EXPECT_CALL(drivers.can, sendMessage(can::CanBus::CAN_BUS1, can1MessageLow));
     EXPECT_CALL(drivers.can, sendMessage(can::CanBus::CAN_BUS1, can1MessageHigh));
@@ -291,7 +322,6 @@ TEST_F(DjiMotorTxHandlerTest, encodeAndSendCanData_valid_encoding)
     djiMotorTxHandler.addMotorToManager(motors[12]);
     djiMotorTxHandler.addMotorToManager(motors[16]);
     djiMotorTxHandler.addMotorToManager(motors[24]);
-
 
     djiMotorTxHandler.encodeAndSendCanData();
 }
