@@ -260,22 +260,22 @@ TEST_F(DjiMotorTxHandlerTest, encodeAndSendCanData_valid_encoding)
 
     ON_CALL(*motors[0], serializeCanSendData).WillByDefault([](modm::can::Message *txMessage) {
         convertToLittleEndian(1, txMessage->data);
-    });
+    }); //can1 low
     ON_CALL(*motors[4], serializeCanSendData).WillByDefault([](modm::can::Message *txMessage) {
         convertToLittleEndian(2, txMessage->data);
-    });
+    }); //can1 high
     ON_CALL(*motors[8], serializeCanSendData).WillByDefault([](modm::can::Message *txMessage) {
         convertToLittleEndian(4, txMessage->data);
-    });
+    }); //can2 low
     ON_CALL(*motors[12], serializeCanSendData).WillByDefault([](modm::can::Message *txMessage) {
         convertToLittleEndian(5, txMessage->data);
-    });
+    }); //can2 high
     ON_CALL(*motors[16], serializeCanSendData).WillByDefault([](modm::can::Message *txMessage) {
         convertToLittleEndian(3, txMessage->data);
-    });
+    }); //can1 6020
     ON_CALL(*motors[24], serializeCanSendData).WillByDefault([](modm::can::Message *txMessage) {
         convertToLittleEndian(6, txMessage->data);
-    });
+    }); //can2 6020
 
     EXPECT_CALL(drivers.can, sendMessage(can::CanBus::CAN_BUS1, can1MessageLow));
     EXPECT_CALL(drivers.can, sendMessage(can::CanBus::CAN_BUS1, can1MessageHigh));
