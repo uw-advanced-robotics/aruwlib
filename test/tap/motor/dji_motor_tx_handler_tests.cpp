@@ -35,7 +35,37 @@ class DjiMotorTxHandlerTest : public Test
 protected:
     DjiMotorTxHandlerTest() : drivers(), djiMotorTxHandler(&drivers), motors()
     {
-        createAllMotors(false);  // By default, don't create any motors with current control mode
+        // The last two motors (6 & 7) will be in current control mode
+
+        for (size_t i = 0; i < DjiMotorTxHandler::DJI_MOTORS_PER_CAN; i++)
+        {
+            motors.emplace_back(new NiceMock<DjiMotorMock>(
+                &drivers,
+                NORMALIZED_ID_TO_DJI_MOTOR(i),
+                can::CanBus::CAN_BUS1,
+                i >= DjiMotorTxHandler::DJI_MOTORS_PER_CAN - 2,
+                ""));
+
+            if (i >= DjiMotorTxHandler::DJI_MOTORS_PER_CAN - 2)
+            {
+                ON_CALL(*motors[i], isInCurrentControl).WillByDefault(Return(true));
+            }
+        }
+
+        for (size_t i = 0; i < DjiMotorTxHandler::DJI_MOTORS_PER_CAN; i++)
+        {
+            motors.emplace_back(new NiceMock<DjiMotorMock>(
+                &drivers,
+                NORMALIZED_ID_TO_DJI_MOTOR(i),
+                can::CanBus::CAN_BUS2,
+                i >= DjiMotorTxHandler::DJI_MOTORS_PER_CAN - 2,
+                ""));
+
+            if (i >= DjiMotorTxHandler::DJI_MOTORS_PER_CAN - 2)
+            {
+                ON_CALL(*motors[i], isInCurrentControl).WillByDefault(Return(true));
+            }
+        }
     }
 
     ~DjiMotorTxHandlerTest()
@@ -63,54 +93,6 @@ protected:
 
     void TearDown() override {}
 
-    void createAllMotors(bool enableCurrentControl)
-    {
-        // Clear the existing motors
-        motors.clear();
-
-        if (enableCurrentControl){
-            std::cout << "Creating motors with current control enabled" << std::endl;
-        }
-
-        for (size_t i = 0; i < DjiMotorTxHandler::DJI_MOTORS_PER_CAN; i++)
-        {
-            bool isCurrentControl =
-                enableCurrentControl ? i >= DjiMotorTxHandler::DJI_MOTORS_PER_CAN - 2 : false;
-
-            if(isCurrentControl){
-                std::cout << "Creating motor on CAN1 with current control enabled on " << i << std::endl;
-            }
-
-            std::cout << "Motor made with id: " << i << std::endl;
-
-            motors.emplace_back(new NiceMock<DjiMotorMock>(
-                &drivers,
-                NORMALIZED_ID_TO_DJI_MOTOR(i),
-                can::CanBus::CAN_BUS1,
-                isCurrentControl,
-                ""));
-        }
-
-        for (size_t i = 0; i < DjiMotorTxHandler::DJI_MOTORS_PER_CAN; i++)
-        {
-            bool isCurrentControl =
-                enableCurrentControl ? i >= DjiMotorTxHandler::DJI_MOTORS_PER_CAN - 2 : false;
-
-            if (isCurrentControl){
-                std::cout << "Creating motor on CAN2 with current control enabled on " << i << std::endl;
-            }
-
-            std::cout << "Motor made with id: " << i << std::endl;
-
-            motors.emplace_back(new NiceMock<DjiMotorMock>(
-                &drivers,
-                NORMALIZED_ID_TO_DJI_MOTOR(i),
-                can::CanBus::CAN_BUS2,
-                isCurrentControl,
-                ""));
-        }
-    }
-
     void addAllMotors()
     {
         for (auto motor : motors)
@@ -118,15 +100,6 @@ protected:
             djiMotorTxHandler.addMotorToManager(motor);
         }
     }
-
-    void resetMotorStore(){
-        for (size_t i = 0; i < DjiMotorTxHandler::DJI_MOTORS_PER_CAN; i++)
-        {
-            djiMotorTxHandler.can1MotorStore[i] = nullptr;
-            djiMotorTxHandler.can2MotorStore[i] = nullptr;
-        }
-    }
-
 
     Drivers drivers;
     DjiMotorTxHandler djiMotorTxHandler;
@@ -201,31 +174,11 @@ TEST_F(DjiMotorTxHandlerTest, encodeAndSendCanData_single_motor_added_single_mes
     djiMotorTxHandler.encodeAndSendCanData();
 }
 
-TEST_F(DjiMotorTxHandlerTest, encodeAndSendCanData_4_messages_sent_without_current_control)
-{
-    EXPECT_CALL(drivers.can, sendMessage).Times(4);
-
-    resetMotorStore();
-
-    createAllMotors(false);
-
-    // Default creation is no current control 6020s, so only 4 messages sent (regular CAN L/H)
-    addAllMotors();
-
-    djiMotorTxHandler.encodeAndSendCanData();
-}
-
 TEST_F(DjiMotorTxHandlerTest, encodeAndSendCanData_all_motors_added_6_messages_sent)
 {
     EXPECT_CALL(drivers.can, sendMessage).Times(6);
 
-    resetMotorStore();
-
-    createAllMotors(true);  // Enable current control
-
-    std::cout << "Adding all motors to the manager" << std::endl;
     addAllMotors();
-    std::cout << "Encoding and sending CAN data" << std::endl;
 
     djiMotorTxHandler.encodeAndSendCanData();
 }

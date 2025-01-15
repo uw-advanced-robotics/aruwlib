@@ -34,10 +34,11 @@ void DjiMotorTxHandler::addMotorToManager(DjiMotor** canMotorStore, DjiMotor* co
 {
     assert(motor != nullptr);
     uint32_t idIndex = DJI_MOTOR_TO_NORMALIZED_ID(motor->getMotorIdentifier());
+    // std::cout << "Motor ID index: " << idIndex << std::endl;
     bool motorOverloaded = canMotorStore[idIndex] != nullptr;
     bool motorOutOfBounds = idIndex >= DJI_MOTORS_PER_CAN;
-    std::cout << "Adding motor " << idIndex << ", overloaded: " << motorOverloaded
-              << ", out of bounds: " << motorOutOfBounds << std::endl;
+    // std::cout << "Adding motor " << idIndex << ", overloaded: " << motorOverloaded
+    //           << ", out of bounds: " << motorOutOfBounds << std::endl;
     modm_assert(
         !motorOverloaded && !motorOutOfBounds,
         "DjiMotorTxHandler",
@@ -103,6 +104,7 @@ void DjiMotorTxHandler::encodeAndSendCanData()
     bool can2ValidMotorMessageHigh = false;
     bool can2ValidMotorMessage6020Current = false;
 
+    std::cout << "Serializing motor store send data for CAN1" << std::endl;
     serializeMotorStoreSendData(
         can1MotorStore,
         &can1MessageLow,
@@ -112,6 +114,7 @@ void DjiMotorTxHandler::encodeAndSendCanData()
         &can1ValidMotorMessageHigh,
         &can1ValidMotorMessage6020Current);
 
+    std::cout << "Serializing motor store send data for CAN2" << std::endl;
     serializeMotorStoreSendData(
         can2MotorStore,
         &can2MessageLow,
@@ -177,6 +180,7 @@ void DjiMotorTxHandler::serializeMotorStoreSendData(
         if (motor != nullptr)
         {
             std::cout << "Motor " << DJI_MOTOR_TO_NORMALIZED_ID(motor->getMotorIdentifier());
+
             if (DJI_MOTOR_TO_NORMALIZED_ID(motor->getMotorIdentifier()) <=
                 DJI_MOTOR_TO_NORMALIZED_ID(tap::motor::MOTOR4))
             {
