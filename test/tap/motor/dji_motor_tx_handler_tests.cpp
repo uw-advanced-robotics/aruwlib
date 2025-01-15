@@ -189,9 +189,9 @@ TEST_F(DjiMotorTxHandlerTest, encodeAndSendCanData_single_motor_added_single_mes
     djiMotorTxHandler.encodeAndSendCanData();
 }
 
-TEST_F(DjiMotorTxHandlerTest, encodeAndSendCanData_all_motors_added_6_messages_sent)
+TEST_F(DjiMotorTxHandlerTest, encodeAndSendCanData_all_motors_added_8_messages_sent)
 {
-    EXPECT_CALL(drivers.can, sendMessage).Times(6);
+    EXPECT_CALL(drivers.can, sendMessage).Times(8);
 
     addAllMotors();
 
@@ -276,7 +276,6 @@ TEST_F(DjiMotorTxHandlerTest, encodeAndSendCanData_valid_encoding)
         convertToLittleEndian(6, txMessage->data);
     });
 
-
     EXPECT_CALL(drivers.can, sendMessage(can::CanBus::CAN_BUS1, can1MessageLow));
     EXPECT_CALL(drivers.can, sendMessage(can::CanBus::CAN_BUS1, can1MessageHigh));
     EXPECT_CALL(drivers.can, sendMessage(can::CanBus::CAN_BUS2, can2MessageLow));
@@ -291,7 +290,6 @@ TEST_F(DjiMotorTxHandlerTest, encodeAndSendCanData_valid_encoding)
     djiMotorTxHandler.addMotorToManager(motors[12]);
     djiMotorTxHandler.addMotorToManager(motors[16]);
     djiMotorTxHandler.addMotorToManager(motors[24]);
-
 
     djiMotorTxHandler.encodeAndSendCanData();
 }
