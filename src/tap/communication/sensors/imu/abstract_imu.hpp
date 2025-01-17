@@ -17,7 +17,7 @@ public:
     virtual void initialize(float sampleFrequency, float mahonyKp, float mahonyKi);
     virtual void requestCalibration();
     virtual void periodicIMUUpdate();
-    virtual void read() = 0;  // Must be implemented by derived classes
+    virtual bool read() = 0;  
 
     virtual float getYaw() final { return mahonyAlgorithm.getYaw(); }
     virtual float getPitch() final { return mahonyAlgorithm.getPitch(); }

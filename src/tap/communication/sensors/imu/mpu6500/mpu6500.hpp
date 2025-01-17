@@ -27,9 +27,11 @@
 #include "tap/communication/sensors/imu/imu_interface.hpp"
 #include "tap/communication/sensors/imu_heater/imu_heater.hpp"
 #include "tap/util_macros.hpp"
+#include "tap/communication/sensors/imu/abstract_imu.hpp"
 
 #include "modm/math/geometry.hpp"
 #include "modm/processing/protothread.hpp"
+
 
 #define LITTLE_ENDIAN_INT16_TO_FLOAT(buff) \
     (static_cast<float>(static_cast<int16_t>((*(buff) << 8) | *(buff + 1))))
@@ -51,7 +53,7 @@ namespace tap::communication::sensors::imu::mpu6500
  * @note if you are shaking the imu while it is initializing, the offsets will likely
  *      be calibrated poorly and unexpectedly bad results may occur.
  */
-class Mpu6500 final_mockable : public ::modm::pt::Protothread, public ImuInterface
+class Mpu6500 final_mockable : public ::modm::pt::Protothread, public AbstractIMU
 {
 public:
     /**
@@ -89,6 +91,9 @@ public:
         modm::Vector3f gyroOffset;
     };
 
+    void initialize(float sampleFrequency, float mahonyKp, float mahonyKi) override;
+    void resetOffsets() override;
+    void computeOffsets() override;
     using ProcessRawMpu6500DataFn = void (*)(
         const uint8_t (&)[ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE],
         modm::Vector3f &accel,
@@ -119,7 +124,7 @@ public:
      *
      * @return `true` if the function is not done, `false` otherwise
      */
-    mockable bool read();
+    mockable bool read() override;
 
     /**
      * Returns the state of the IMU. Can be not connected, connected but not calibrated, calibrating
@@ -132,7 +137,7 @@ public:
      * temperature, and angle) data, call this function to ensure the data you are about to receive
      * is not undefined.
      */
-    mockable inline ImuState getImuState() const { return imuState; }
+    // mockable inline ImuState getImuState() const { return imuState; }
 
     virtual inline const char *getName() const { return "mpu6500"; }
 
@@ -241,17 +246,17 @@ public:
     /**
      * Returns yaw angle. in degrees.
      */
-    inline float getYaw() final_mockable { return validateReading(mahonyAlgorithm.getYaw()); }
+    // inline float getYaw() final_mockable { return validateReading(mahonyAlgorithm.getYaw()); }
 
     /**
      * Returns pitch angle in degrees.
      */
-    inline float getPitch() final_mockable { return validateReading(mahonyAlgorithm.getPitch()); }
+    // inline float getPitch() final_mockable { return validateReading(mahonyAlgorithm.getPitch()); }
 
     /**
      * Returns roll angle in degrees.
      */
-    inline float getRoll() final_mockable { return validateReading(mahonyAlgorithm.getRoll()); }
+    // inline float getRoll() final_mockable { return validateReading(mahonyAlgorithm.getRoll()); }
 
     mockable inline uint32_t getPrevIMUDataReceivedTime() const { return prevIMUDataReceivedTime; }
 

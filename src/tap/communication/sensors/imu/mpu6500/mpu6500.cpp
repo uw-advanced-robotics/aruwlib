@@ -36,7 +36,8 @@ using namespace tap::arch;
 namespace tap::communication::sensors::imu::mpu6500
 {
 Mpu6500::Mpu6500(Drivers *drivers)
-    : drivers(drivers),
+    : AbstractIMU(drivers),
+      drivers(drivers),
       processRawMpu6500DataFn(Mpu6500::defaultProcessRawMpu6500Data),
       raw(),
       imuHeater(drivers)
@@ -56,6 +57,14 @@ void Mpu6500::requestCalibration()
         calibrationSample = 0;
         imuState = ImuState::IMU_CALIBRATING;
     }
+}
+
+void Mpu6500::initialize(float sampleFrequency, float mahonyKp, float mahonyKi)
+{
+    mahonyAlgorithm.begin(sampleFrequency, mahonyKp, mahonyKi);
+    imuHeater.initialize();
+    imuState = ImuState::IMU_NOT_CALIBRATED;
+    init(sampleFrequency, mahonyKp, mahonyKi);
 }
 
 void Mpu6500::init(float sampleFrequency, float mahonyKp, float mahonyKi)
@@ -128,6 +137,41 @@ void Mpu6500::init(float sampleFrequency, float mahonyKp, float mahonyKi)
     mahonyAlgorithm.begin(sampleFrequency, mahonyKp, mahonyKi);
 
     imuState = ImuState::IMU_NOT_CALIBRATED;
+}
+
+void Mpu6500::resetOffsets()
+{
+    raw.gyroOffset.x = 0;
+    raw.gyroOffset.y = 0;
+    raw.gyroOffset.z = 0;
+    raw.accelOffset.x = 0;
+    raw.accelOffset.y = 0;
+    raw.accelOffset.z = 0;
+}
+
+void Mpu6500::computeOffsets()
+{
+    calibrationSample++;
+
+    raw.gyroOffset.x += raw.gyro.x;
+    raw.gyroOffset.y += raw.gyro.y;
+    raw.gyroOffset.z += raw.gyro.z;
+    raw.accelOffset.x += raw.accel.x;
+    raw.accelOffset.y += raw.accel.y;
+    raw.accelOffset.z += raw.accel.z - ACCELERATION_SENSITIVITY;
+
+    if (calibrationSample >= MPU6500_OFFSET_SAMPLES)
+    {
+        calibrationSample = 0;
+        raw.gyroOffset.x /= MPU6500_OFFSET_SAMPLES;
+        raw.gyroOffset.y /= MPU6500_OFFSET_SAMPLES;
+        raw.gyroOffset.z /= MPU6500_OFFSET_SAMPLES;
+        raw.accelOffset.x /= MPU6500_OFFSET_SAMPLES;
+        raw.accelOffset.y /= MPU6500_OFFSET_SAMPLES;
+        raw.accelOffset.z /= MPU6500_OFFSET_SAMPLES;
+        imuState = ImuState::IMU_CALIBRATED;
+        mahonyAlgorithm.reset();
+    }
 }
 
 void Mpu6500::periodicIMUUpdate()
