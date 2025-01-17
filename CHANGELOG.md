@@ -70,11 +70,7 @@ be called at a fixed rate of mahony, and `read` should be called at a rate such 
 - Updated Ref Serial to support version 1.6.1. This has major breaking changes, but these are nessecary for working robots. See [this document](./extended-changelogs/ref-serial-1.6.1-changes.md) for more information.
 
 - Added in I2C support for development board type A
-- Make subsystem getName() const.
-- Replaced `ContiguousFloat` with `WrappedFloat`
-  - "`[x]=`" operators are now overloaded for arithmetic between WrappedFloats with identical bounds (Replaces `WrappedFloat.shiftUp/Down`)
-  - `WrappedFloat.difference` is now `WrappedFloat.minDifference` and returns a float
-  - `WrappedFloat.get/setValue` is now `WrappedFloat.get/setWrappedValue`, with the addition of `WrappedFloat.get/setUnwrappedValue`
+- Updated Ref Serial to support version 1.6.1. This has major breaking changes, but these are nessecary for working robots. See [this document](./extended-changelogs/ref-serial-1.6.1-changes.md) for more information.
 
 ## March 2024
 
