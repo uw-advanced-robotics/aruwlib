@@ -113,22 +113,26 @@ void tap::display::Sh1107<SPI, A0, Reset, Width, Height, Flipped>::initializeBlo
     modm::delay_ms(20);
 
     // reset the controller
+    reset.set();
+    modm::delay_ms(1);
     reset.reset();
     modm::delay_ms(20);
     reset.set();
+    modm::delay_ms(100);
 
     a0.reset();
+    modm::delay_ms(20);
 
-    // if (Flipped)
-    // {
-    //     spi.transferBlocking(SH1106_ADC_NORMAL);
-    //     spi.transferBlocking(SH1106_SCAN_DIR_NORMAL);
-    // }
-    // else
-    // {
-    //     spi.transferBlocking(SH1106_ADC_REVERSE);
-    //     spi.transferBlocking(SH1106_SCAN_DIR_REVERSE);
-    // }
+    if (Flipped)
+    {
+        spi.transferBlocking(SH1107_ADC_NORMAL);
+        spi.transferBlocking(SH1107_SCAN_DIR_NORMAL);
+    }
+    else
+    {
+        spi.transferBlocking(SH1107_ADC_REVERSE);
+        spi.transferBlocking(SH1107_SCAN_DIR_REVERSE);
+    }
 
 
     spi.transferBlocking(SH1107_ON);
