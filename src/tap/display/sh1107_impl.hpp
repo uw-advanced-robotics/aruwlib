@@ -118,7 +118,6 @@ void tap::display::Sh1107<SPI, A0, Reset, Width, Height, Flipped>::initializeBlo
     reset.reset();
     modm::delay_ms(20);
     reset.set();
-    modm::delay_ms(100);
 
     a0.reset();
     modm::delay_ms(20);
