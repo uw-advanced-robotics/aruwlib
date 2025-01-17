@@ -47,10 +47,10 @@ protected:
                 0,
                 i >= DjiMotorTxHandler::DJI_MOTORS_PER_CAN - 2));
 
-            // if (i >= DjiMotorTxHandler::DJI_MOTORS_PER_CAN - 2)
-            // {
-            //     ON_CALL(*motors[i], isInCurrentControl).WillByDefault(Return(true));
-            // }
+            if (i >= DjiMotorTxHandler::DJI_MOTORS_PER_CAN - 2)
+            {
+                ON_CALL(*motors[i], isInCurrentControl).WillByDefault(Return(true));
+            }
         }
 
         for (size_t i = 0; i < DjiMotorTxHandler::DJI_MOTORS_PER_CAN; i++)
@@ -65,11 +65,11 @@ protected:
                 0,
                 i >= DjiMotorTxHandler::DJI_MOTORS_PER_CAN - 2));
 
-            // if (i >= DjiMotorTxHandler::DJI_MOTORS_PER_CAN - 2)
-            // {
-            //     ON_CALL(*motors[DjiMotorTxHandler::DJI_MOTORS_PER_CAN + i], isInCurrentControl)
-            //         .WillByDefault(Return(true));
-            // }
+            if (i >= DjiMotorTxHandler::DJI_MOTORS_PER_CAN - 2)
+            {
+                ON_CALL(*motors[DjiMotorTxHandler::DJI_MOTORS_PER_CAN + i], isInCurrentControl)
+                    .WillByDefault(Return(true));
+            }
         }
     }
 
