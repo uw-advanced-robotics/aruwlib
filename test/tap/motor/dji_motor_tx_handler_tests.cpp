@@ -41,8 +41,11 @@ protected:
                 &drivers,
                 NORMALIZED_ID_TO_DJI_MOTOR(i),
                 can::CanBus::CAN_BUS1,
-                i >= DjiMotorTxHandler::DJI_MOTORS_PER_CAN - 2,
-                ""));
+                false,
+                "",
+                0,
+                0,
+                i >= DjiMotorTxHandler::DJI_MOTORS_PER_CAN - 2));
 
             if (i >= DjiMotorTxHandler::DJI_MOTORS_PER_CAN - 2)
             {
@@ -56,8 +59,11 @@ protected:
                 &drivers,
                 NORMALIZED_ID_TO_DJI_MOTOR(i),
                 can::CanBus::CAN_BUS2,
-                i >= DjiMotorTxHandler::DJI_MOTORS_PER_CAN - 2,
-                ""));
+                false,
+                "",
+                0,
+                0,
+                i >= DjiMotorTxHandler::DJI_MOTORS_PER_CAN - 2));
 
             if (i >= DjiMotorTxHandler::DJI_MOTORS_PER_CAN - 2)
             {
