@@ -264,12 +264,11 @@ TEST_F(DjiMotorTxHandlerTest, encodeAndSendCanData_valid_encoding)
 
     EXPECT_CALL(drivers.can, sendMessage(can::CanBus::CAN_BUS1, can1MessageLow));
     EXPECT_CALL(drivers.can, sendMessage(can::CanBus::CAN_BUS1, can1MessageHigh));
+    EXPECT_CALL(drivers.can, sendMessage(can::CanBus::CAN_BUS1, can1Message6020Current));
     EXPECT_CALL(drivers.can, sendMessage(can::CanBus::CAN_BUS2, can2MessageLow));
     EXPECT_CALL(drivers.can, sendMessage(can::CanBus::CAN_BUS2, can2MessageHigh));
-    EXPECT_CALL(drivers.can, sendMessage(can::CanBus::CAN_BUS1, can1Message6020Current));
     EXPECT_CALL(drivers.can, sendMessage(can::CanBus::CAN_BUS2, can2Message6020Current));
 
-    // sending info about single motor on can1/2 low/high
     djiMotorTxHandler.addMotorToManager(motors[0]);
     djiMotorTxHandler.addMotorToManager(motors[4]);
     djiMotorTxHandler.addMotorToManager(motors[6]);
