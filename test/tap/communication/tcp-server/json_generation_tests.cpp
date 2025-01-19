@@ -40,7 +40,7 @@ TEST(JSONMessages, ReturnsCorrectString)
 
     EXPECT_CALL(mockMotor, getCanBus()).Times(1).WillOnce(Return(tap::can::CanBus::CAN_BUS2));
     EXPECT_CALL(mockMotor, getMotorIdentifier()).Times(1);
-    EXPECT_CALL(mockMotor.mockedInternalEncoder, getVelocity()).Times(1);
+    EXPECT_CALL(mockMotor.mockedInternalEncoder, getShaftRPM()).Times(1);
     EXPECT_CALL(mockMotor, getTorque()).Times(1);
     EXPECT_CALL(mockMotor.mockedInternalEncoder, getEncoderUnwrapped()).Times(1);
     EXPECT_CALL(drivers.canRxHandler, removeReceiveHandler).Times(AnyNumber());
