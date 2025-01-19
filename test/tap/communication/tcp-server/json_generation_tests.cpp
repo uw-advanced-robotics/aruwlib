@@ -36,9 +36,11 @@ TEST(JSONMessages, ReturnsCorrectString)
 {
     Drivers drivers;
     DjiMotorMock mockMotor(&drivers, MotorId::MOTOR1, CanBus::CAN_BUS1, false, "MockMotor");
+    ON_CALL(mockMotor.mockedInternalEncoder, isOnline).WillByDefault(Return(true));
+
     EXPECT_CALL(mockMotor, getCanBus()).Times(1).WillOnce(Return(tap::can::CanBus::CAN_BUS2));
     EXPECT_CALL(mockMotor, getMotorIdentifier()).Times(1);
-    EXPECT_CALL(mockMotor, getShaftRPM()).Times(1);
+    EXPECT_CALL(mockMotor.mockedInternalEncoder, getVelocity()).Times(1);
     EXPECT_CALL(mockMotor, getTorque()).Times(1);
     EXPECT_CALL(mockMotor.mockedInternalEncoder, getEncoderUnwrapped()).Times(1);
     EXPECT_CALL(drivers.canRxHandler, removeReceiveHandler).Times(AnyNumber());

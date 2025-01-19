@@ -77,7 +77,7 @@ public:
         return false;
     }
 
-    float getPositionUnwrapped() const override
+    tap::algorithms::WrappedFloat getPosition() const override
     {
         const_cast<FallbackEncoder<COUNT>*>(this)->syncEncoders();
         int onlineEncoders = 0;
@@ -87,31 +87,31 @@ public:
         {
             if (this->validEncoder(i))
             {
-                position += this->encoders[i]->getPositionUnwrapped();
+                position += this->encoders[i]->getPosition().getUnwrappedValue();
                 onlineEncoders += 1;
             }
         }
 
-        return position / onlineEncoders;
+        return tap::algorithms::WrappedFloat(position / onlineEncoders, 0, static_cast<float>(M_TWOPI));
     }
 
-    float getPositionWrapped() const override
+    float getVelocity() const override
     {
         const_cast<FallbackEncoder<COUNT>*>(this)->syncEncoders();
         int onlineEncoders = 0;
-        float position = 0;
+        float velocity = 0;
 
         for (uint32_t i = 0; i < COUNT; i++)
         {
             if (this->validEncoder(i))
             {
-                position += this->encoders[i]->getPositionWrapped();
+                velocity += this->encoders[i]->getVelocity();
                 onlineEncoders += 1;
             }
         }
 
-        return position / onlineEncoders;
-    }
+        return velocity / onlineEncoders;
+    };
 
     void resetEncoderValue() override
     {

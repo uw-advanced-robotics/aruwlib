@@ -20,6 +20,8 @@
 #ifndef TAPROOT_ENCODER_INTERFACE_HPP_
 #define TAPROOT_ENCODER_INTERFACE_HPP_
 
+#include "tap/algorithms/wrapped_float.hpp"
+
 namespace tap::motor
 {
 class EncoderInterface
@@ -28,8 +30,9 @@ public:
     virtual void initialize() = 0;
     virtual bool isOnline() const = 0;
     virtual void resetEncoderValue() = 0;
-    virtual float getPositionUnwrapped() const = 0;
-    virtual float getPositionWrapped() const = 0;
+    virtual tap::algorithms::WrappedFloat getPosition() const = 0;
+    // rad/s
+    virtual float getVelocity() const = 0; 
 };
 
 }  // namespace tap::motor

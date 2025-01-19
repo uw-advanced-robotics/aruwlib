@@ -97,7 +97,14 @@ elif args["TARGET_ENV"] == "tests":
     # Add target environment-specific SCons aliases
     # WARNING: all aliases must be checked during argument validation
     env.Alias("build-tests", program)
-    env.Alias("run-tests", env.Run(program))
+    env.Alias("run-tests", 
+        env.Command(
+            'thisfileshouldnotexist',
+            program,
+            '@"%s"' % program[0].abspath 
+                + (f" --gtest_filter=\"{args['TEST']}.*\"" if 'TEST' in args else "")
+            )
+        )
     env.Alias("run-tests-gcov", [env.RunGCOV(program, True, GCOV_SOURCES_TO_IGNORE)])
 else:
     program = env.Program(target=env["CONFIG_PROJECT_NAME"]+".elf", source=sources)

@@ -109,19 +109,9 @@ public:
 
     void initialize() override;
 
-    float getPositionUnwrapped() const override;
-
-    float getPositionWrapped() const override;
-
-    const EncoderInterface* getEncoder() const override { return &this->encoder; }
+    EncoderInterface* getEncoder() const override { return const_cast<FallbackEncoder<2>*>(&this->encoder); }
 
     mockable const DjiMotorEncoder* getInternalEncoder() const { return &this->internalEncoder; }
-
-    /**
-     * Resets this motor's current encoder home position to the current encoder position reported by
-     * CAN messages, and resets this motor's encoder revolutions to 0.
-     */
-    void resetEncoderValue() override;
 
     DISALLOW_COPY_AND_ASSIGN(DjiMotor)
 
@@ -171,9 +161,6 @@ public:
     int8_t getTemperature() const override;
 
     int16_t getTorque() const override;
-
-    /// For interpreting the sign of return value see class comment
-    int16_t getShaftRPM() const override;
 
     mockable bool isMotorInverted() const;
 

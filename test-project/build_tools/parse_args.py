@@ -25,7 +25,7 @@ HARDWARE_BUILD_TARGET_ACCEPTED_ARGS = ["build", "run", "size", "gdb"]
 VALID_BUILD_PROFILES                = ["debug", "release", "fast"]
 VALID_PROFILING_TYPES               = ["true", "false"]
 
-USAGE = "Usage: scons <target> [profile=<debug|release|fast>] [profiling=<true|false>]\n\
+USAGE = "Usage: scons <target> [profile=<debug|release|fast>] [profiling=<true|false>] [test=\"<test>\"]\n\
     \"<target>\" is one of:\n\
         - \"build\": build all code for the hardware platform.\n\
         - \"run\": build all code for the hardware platform, and deploy it to the board via a connected ST-Link.\n\
@@ -75,5 +75,8 @@ def parse_args():
     args["PROFILING"] = ARGUMENTS.get("profiling", "false")
     if args["PROFILING"] not in VALID_PROFILING_TYPES:
         raise Exception("You specified an invalid profiling type.\n" + USAGE)
+
+    if "test" in ARGUMENTS:
+        args["TEST"] = ARGUMENTS.get("test", None)
 
     return args

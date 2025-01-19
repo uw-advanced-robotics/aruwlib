@@ -168,22 +168,25 @@ TEST(DoubleDjiMotor, getShaftRPM__returns_average_RPM)
 {
     SETUP_TEST();
 
-    int16_t motorOneRPM = 0, motorTwoRPM = 0;
+    float motorOneVel = 0, motorTwoVel = 0;
 
-    ON_CALL(motor.motorOne, getShaftRPM).WillByDefault(ReturnPointee(&motorOneRPM));
-    ON_CALL(motor.motorTwo, getShaftRPM).WillByDefault(ReturnPointee(&motorTwoRPM));
+    ON_CALL(motor.motorOne.mockedInternalEncoder, isOnline).WillByDefault(Return(true));
+    ON_CALL(motor.motorTwo.mockedInternalEncoder, isOnline).WillByDefault(Return(true));
+
+    ON_CALL(motor.motorOne.mockedInternalEncoder, getVelocity).WillByDefault(ReturnPointee(&motorOneVel));
+    ON_CALL(motor.motorTwo.mockedInternalEncoder, getVelocity).WillByDefault(ReturnPointee(&motorTwoVel));
 
     EXPECT_EQ(0, motor.getShaftRPM());
 
-    motorOneRPM = -1000;
-    motorTwoRPM = -1000;
-    EXPECT_EQ(-1000, motor.getShaftRPM());
+    motorOneVel = -static_cast<float>(M_TWOPI);
+    motorTwoVel = -static_cast<float>(M_TWOPI);
+    EXPECT_EQ(-60, motor.getShaftRPM());
 
-    motorOneRPM = -1000;
-    motorTwoRPM = 1000;
+    motorOneVel = -static_cast<float>(M_TWOPI);
+    motorTwoVel = static_cast<float>(M_TWOPI);
     EXPECT_EQ(0, motor.getShaftRPM());
 
-    motorOneRPM = 2000;
-    motorTwoRPM = 2000;
-    EXPECT_EQ(2000, motor.getShaftRPM());
+    motorOneVel = 2.f * static_cast<float>(M_TWOPI);
+    motorTwoVel = 2.f * static_cast<float>(M_TWOPI);
+    EXPECT_EQ(120, motor.getShaftRPM());
 }

@@ -41,9 +41,9 @@ public:
 
     MOCK_METHOD(bool, isOnline, (), (const override));
 
-    MOCK_METHOD(float, getPositionUnwrapped, (), (const override));
+    MOCK_METHOD(tap::algorithms::WrappedFloat, getPosition, (), (const override));
 
-    MOCK_METHOD(float, getPositionWrapped, (), (const override));
+    MOCK_METHOD(float, getVelocity, (), (const override));
 
     MOCK_METHOD(int64_t, getEncoderUnwrapped, (), (const));
 

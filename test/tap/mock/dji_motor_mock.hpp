@@ -57,7 +57,6 @@ public:
     MOCK_METHOD(uint32_t, getMotorIdentifier, (), (const override));
     MOCK_METHOD(int8_t, getTemperature, (), (const override));
     MOCK_METHOD(int16_t, getTorque, (), (const override));
-    MOCK_METHOD(int16_t, getShaftRPM, (), (const override));
     MOCK_METHOD(bool, isMotorInverted, (), (const override));
     MOCK_METHOD(tap::can::CanBus, getCanBus, (), (const override));
     MOCK_METHOD(const char*, getName, (), (const override));

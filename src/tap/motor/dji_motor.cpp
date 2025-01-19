@@ -58,8 +58,8 @@ DjiMotor::DjiMotor(
       motorInverted(isInverted),
       internalEncoder(isInverted, encoderWrapped, encoderRevolutions),
       encoder(
-          {externalEncoder != nullptr ? externalEncoder : &internalEncoder,
-           externalEncoder != nullptr ? &internalEncoder : nullptr})
+          {externalEncoder != nullptr ? externalEncoder : const_cast<DjiMotorEncoder*>(this->getInternalEncoder()),
+           externalEncoder != nullptr ? const_cast<DjiMotorEncoder*>(this->getInternalEncoder()) : nullptr})
 {
     motorDisconnectTimeout.stop();
 }
@@ -77,8 +77,6 @@ void DjiMotor::processMessage(const modm::can::Message& message)
     {
         return;
     }
-    shaftRPM = static_cast<int16_t>(message.data[2] << 8 | message.data[3]);  // rpm
-    shaftRPM = motorInverted ? -shaftRPM : shaftRPM;
     torque = static_cast<int16_t>(message.data[4] << 8 | message.data[5]);  // torque
     torque = motorInverted ? -torque : torque;
     temperature = static_cast<int8_t>(message.data[6]);  // temperature
@@ -126,19 +124,11 @@ int8_t DjiMotor::getTemperature() const { return temperature; }
 
 int16_t DjiMotor::getTorque() const { return torque; }
 
-int16_t DjiMotor::getShaftRPM() const { return shaftRPM; }
-
 bool DjiMotor::isMotorInverted() const { return motorInverted; }
 
 tap::can::CanBus DjiMotor::getCanBus() const { return motorCanBus; }
 
 const char* DjiMotor::getName() const { return motorName; }
-
-void DjiMotor::resetEncoderValue() { this->encoder.resetEncoderValue(); }
-
-float DjiMotor::getPositionUnwrapped() const { return this->encoder.getPositionUnwrapped(); }
-
-float DjiMotor::getPositionWrapped() const { return this->encoder.getPositionWrapped(); }
 }  // namespace motor
 
 }  // namespace tap

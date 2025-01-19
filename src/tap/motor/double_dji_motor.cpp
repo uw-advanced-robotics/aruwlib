@@ -69,12 +69,6 @@ void DoubleDjiMotor::initialize()
     encoder.initialize();
 }
 
-void DoubleDjiMotor::resetEncoderValue() { encoder.resetEncoderValue(); }
-
-float DoubleDjiMotor::getPositionUnwrapped() const { return encoder.getPositionUnwrapped(); }
-
-float DoubleDjiMotor::getPositionWrapped() const { return encoder.getPositionWrapped(); }
-
 void DoubleDjiMotor::setDesiredOutput(int32_t desiredOutput)
 {
     motorOne.setDesiredOutput(desiredOutput);
@@ -100,17 +94,11 @@ int8_t DoubleDjiMotor::getTemperature() const
 {
     return std::max(motorOne.getTemperature(), motorTwo.getTemperature());
 }
+
 int16_t DoubleDjiMotor::getTorque() const
 {
     return (static_cast<int32_t>(motorOne.getTorque()) +
             static_cast<int32_t>(motorTwo.getTorque())) /
-           2;
-}
-
-int16_t DoubleDjiMotor::getShaftRPM() const
-{
-    return (static_cast<int32_t>(motorOne.getShaftRPM()) +
-            static_cast<int32_t>(motorTwo.getShaftRPM())) /
            2;
 }
 }  // namespace tap::motor

@@ -87,9 +87,9 @@ public:
 
     bool isOnline() const override;
 
-    float getPositionUnwrapped() const override;
+    tap::algorithms::WrappedFloat getPosition() const override;
 
-    float getPositionWrapped() const override;
+    float getVelocity() const override;
 
     mockable int64_t getEncoderUnwrapped() const;
 
@@ -156,6 +156,12 @@ private:
     uint16_t encoderWrapped;
 
     /**
+     * The raw encoder value reported by the motor controller relative to
+     * encoderHomePosition.
+     */
+    int16_t encoderUnwrapped;
+
+    /**
      * Absolute unwrapped encoder position =
      *      encoderRevolutions * ENCODER_RESOLUTION + encoderWrapped
      * This lets us keep track of some sense of absolute position even while
@@ -174,6 +180,8 @@ private:
     static const uint32_t MOTOR_DISCONNECT_TIME = 100;
 
     tap::arch::MilliTimeout encoderDisconnectTimeout;
+
+    int16_t shaftRPM;
 };
 
 }  // namespace tap::motor

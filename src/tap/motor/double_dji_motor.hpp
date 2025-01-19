@@ -55,16 +55,12 @@ public:
         EncoderInterface* externalEncoder = nullptr);
 
     void initialize() override;
-    float getPositionUnwrapped() const override;
-    float getPositionWrapped() const override;
-    void resetEncoderValue() override;
-    const EncoderInterface* getEncoder() const override { return &this->encoder; }
+    EncoderInterface* getEncoder() const override { return const_cast<FallbackEncoder<3>*>(&this->encoder); }
     void setDesiredOutput(int32_t desiredOutput) override;
     bool isMotorOnline() const override;
     int16_t getOutputDesired() const override;
     int8_t getTemperature() const override;
     int16_t getTorque() const override;
-    int16_t getShaftRPM() const override;
 
 protected:
 #if defined(PLATFORM_HOSTED) && defined(ENV_UNIT_TESTS)

@@ -31,6 +31,7 @@ DjiMotorEncoder::DjiMotorEncoder(
     int64_t encoderRevolutions)
     : motorInverted(isInverted),
       encoderWrapped(encoderWrapped),
+      encoderUnwrapped(encoderWrapped),
       encoderRevolutions(encoderRevolutions),
       encoderHomePosition(0)
 {
@@ -40,6 +41,9 @@ DjiMotorEncoder::DjiMotorEncoder(
 void DjiMotorEncoder::processMessage(const modm::can::Message& message)
 {
     encoderDisconnectTimeout.restart(MOTOR_DISCONNECT_TIME);
+    shaftRPM = static_cast<int16_t>(message.data[2] << 8 | message.data[3]);  // rpm
+    shaftRPM = motorInverted ? -shaftRPM : shaftRPM;
+
     uint16_t encoderActual =
         static_cast<uint16_t>(message.data[0] << 8 | message.data[1]);  // encoder value
 
@@ -68,22 +72,22 @@ void DjiMotorEncoder::resetEncoderValue()
     encoderRevolutions = 0;
     encoderHomePosition = (encoderWrapped + encoderHomePosition) % ENC_RESOLUTION;
     encoderWrapped = 0;
+    encoderUnwrapped = 0;
 }
 
-float DjiMotorEncoder::getPositionUnwrapped() const
+tap::algorithms::WrappedFloat DjiMotorEncoder::getPosition() const
 {
-    return getEncoderUnwrapped() * M_TWOPI / ENC_RESOLUTION;
+    return tap::algorithms::WrappedFloat(getEncoderUnwrapped() * M_TWOPI / ENC_RESOLUTION, 0, M_TWOPI);
 }
 
-float DjiMotorEncoder::getPositionWrapped() const
+float DjiMotorEncoder::getVelocity() const
 {
-    return getEncoderWrapped() * M_TWOPI / ENC_RESOLUTION;
+    return this->shaftRPM * static_cast<float>(M_TWOPI) / 60.f;
 }
 
 int64_t DjiMotorEncoder::getEncoderUnwrapped() const
 {
-    return static_cast<int64_t>(encoderWrapped) +
-           static_cast<int64_t>(ENC_RESOLUTION) * encoderRevolutions;
+    return encoderUnwrapped;
 }
 
 uint16_t DjiMotorEncoder::getEncoderWrapped() const { return encoderWrapped; }
@@ -93,13 +97,14 @@ void DjiMotorEncoder::updateEncoderValue(uint16_t newEncWrapped)
     int16_t enc_dif = newEncWrapped - encoderWrapped;
     if (enc_dif < -ENC_RESOLUTION / 2)
     {
-        encoderRevolutions++;
+        encoderUnwrapped += ENC_RESOLUTION;
     }
     else if (enc_dif > ENC_RESOLUTION / 2)
     {
-        encoderRevolutions--;
+        encoderUnwrapped -= ENC_RESOLUTION;
     }
     encoderWrapped = newEncWrapped;
+    encoderUnwrapped += enc_dif;
 }
 }  // namespace motor
 
