@@ -144,7 +144,7 @@ private:
     void syncEncoders()
     {
         // The primary encoder *must* be online before syncing anything to it
-        if (this->encoders[0]->isOnline())  
+        if (this->encoders[0]->isOnline())
         {
             for (uint32_t i = 1; i < COUNT; i++)
             {

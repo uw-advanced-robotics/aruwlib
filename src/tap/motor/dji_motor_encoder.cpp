@@ -33,7 +33,8 @@ DjiMotorEncoder::DjiMotorEncoder(
       encoderWrapped(encoderWrapped),
       encoderUnwrapped(encoderWrapped),
       encoderRevolutions(encoderRevolutions),
-      encoderHomePosition(0)
+      encoderHomePosition(0),
+      shaftRPM(0)
 {
     encoderDisconnectTimeout.stop();
 }

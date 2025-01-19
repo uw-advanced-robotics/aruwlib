@@ -32,7 +32,7 @@ public:
     virtual void resetEncoderValue() = 0;
     virtual tap::algorithms::WrappedFloat getPosition() const = 0;
     // rad/s
-    virtual float getVelocity() const = 0; 
+    virtual float getVelocity() const = 0;
 };
 
 }  // namespace tap::motor
