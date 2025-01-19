@@ -46,7 +46,9 @@ template <uint32_t COUNT>
 class FallbackEncoder : public EncoderInterface
 {
 public:
-    FallbackEncoder(std::array<EncoderInterface*, COUNT> encoders) : encoders(encoders), seenEncoders(0)
+    FallbackEncoder(std::array<EncoderInterface*, COUNT> encoders)
+        : encoders(encoders),
+          seenEncoders(0)
     {
         modm_assert(this->encoders[0] != nullptr, "FallbackEncoder", "FallbackEncoder");
     }
@@ -92,7 +94,10 @@ public:
             }
         }
 
-        return tap::algorithms::WrappedFloat(position / onlineEncoders, 0, static_cast<float>(M_TWOPI));
+        return tap::algorithms::WrappedFloat(
+            position / onlineEncoders,
+            0,
+            static_cast<float>(M_TWOPI));
     }
 
     float getVelocity() const override
@@ -138,8 +143,8 @@ private:
 
     void syncEncoders()
     {
-        if (this->encoders[0]
-                ->isOnline())  // The primary encoder *must* be online before syncing anything to it
+        // The primary encoder *must* be online before syncing anything to it
+        if (this->encoders[0]->isOnline())  
         {
             for (uint32_t i = 1; i < COUNT; i++)
             {
@@ -149,8 +154,8 @@ private:
                     this->seenEncoders |= 1 << i;
                     // encoders[i]->zeroTo(encoders[0]);
                 }
-                else if (validEncoder(i) && !seenEncoder(0))  // We reset the encoder positions but
-                                                              // the primary encoder was not online
+                // We reset the encoder positions but the primary encoder was not online
+                else if (validEncoder(i) && !seenEncoder(0))
                 {
                     this->seenEncoders |= 1;
                     // encoders[0]->zeroTo(encoders(i));

@@ -55,7 +55,10 @@ public:
         EncoderInterface* externalEncoder = nullptr);
 
     void initialize() override;
-    EncoderInterface* getEncoder() const override { return const_cast<FallbackEncoder<3>*>(&this->encoder); }
+    EncoderInterface* getEncoder() const override
+    {
+        return const_cast<FallbackEncoder<3>*>(&this->encoder);
+    }
     void setDesiredOutput(int32_t desiredOutput) override;
     bool isMotorOnline() const override;
     int16_t getOutputDesired() const override;

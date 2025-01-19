@@ -95,6 +95,8 @@ public:
 
     mockable uint16_t getEncoderWrapped() const;
 
+    mockable int16_t getShaftRPM() const;
+
     /**
      * Resets this motor's current encoder home position to the current encoder position reported by
      * CAN messages, and resets this motor's encoder revolutions to 0.

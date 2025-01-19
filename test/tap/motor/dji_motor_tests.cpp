@@ -203,7 +203,7 @@ TEST(DjiMotor, resetEncoderValue_zeroes_encoder_fields)
     motorData.encode(msg.data);
     motor.processMessage(msg);
 
-    motor.resetEncoderValue();
+    motor.getEncoder()->resetEncoderValue();
     EXPECT_EQ(0, motor.getInternalEncoder()->getEncoderUnwrapped());
     EXPECT_EQ(0, motor.getInternalEncoder()->getEncoderWrapped());
 
@@ -211,7 +211,7 @@ TEST(DjiMotor, resetEncoderValue_zeroes_encoder_fields)
     motorData.encode(msg.data);
     motor.processMessage(msg);
 
-    motor.resetEncoderValue();
+    motor.getEncoder()->resetEncoderValue();
     EXPECT_EQ(0, motor.getInternalEncoder()->getEncoderUnwrapped());
     EXPECT_EQ(0, motor.getInternalEncoder()->getEncoderWrapped());
 }
@@ -237,7 +237,7 @@ TEST(DjiMotor, moving_relative_to_home_after_zeroed_ok)
     EXPECT_EQ(1000, motor.getInternalEncoder()->getEncoderUnwrapped());
     EXPECT_EQ(1000, motor.getInternalEncoder()->getEncoderWrapped());
 
-    motor.resetEncoderValue();
+    motor.getEncoder()->resetEncoderValue();
     EXPECT_EQ(0, motor.getInternalEncoder()->getEncoderUnwrapped());
     EXPECT_EQ(0, motor.getInternalEncoder()->getEncoderWrapped());
 
@@ -281,7 +281,7 @@ TEST(DjiMotor, inverted_moving_relative_to_home_after_zeroed_ok)
     EXPECT_EQ(ENC_RESOLUTION - 1001, motor.getInternalEncoder()->getEncoderUnwrapped());
     EXPECT_EQ(ENC_RESOLUTION - 1001, motor.getInternalEncoder()->getEncoderWrapped());
 
-    motor.resetEncoderValue();
+    motor.getEncoder()->resetEncoderValue();
     EXPECT_EQ(0, motor.getInternalEncoder()->getEncoderUnwrapped());
     EXPECT_EQ(0, motor.getInternalEncoder()->getEncoderWrapped());
 

@@ -50,7 +50,7 @@ string makeMotorMessage(const tap::motor::DjiMotor& motor)
         "\"canBus\":" +
         std::to_string(static_cast<int>(motor.getCanBus()) + 1) + "," +
         "\"motorID\":" + std::to_string(motor.getMotorIdentifier()) + "," +
-        "\"shaftRPM\":" + std::to_string((int16_t) (motor.getInternalEncoder()->getVelocity() / static_cast<float>(M_TWOPI) * 60.f)) + "," +
+        "\"shaftRPM\":" + std::to_string(motor.getInternalEncoder()->getShaftRPM()) + "," +
         "\"torque\":" + std::to_string(motor.getTorque()) + "," +
         "\"encoderValue\":" + std::to_string(motor.getInternalEncoder()->getEncoderUnwrapped()) +
         "}";

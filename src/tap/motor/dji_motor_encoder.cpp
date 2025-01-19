@@ -77,7 +77,10 @@ void DjiMotorEncoder::resetEncoderValue()
 
 tap::algorithms::WrappedFloat DjiMotorEncoder::getPosition() const
 {
-    return tap::algorithms::WrappedFloat(getEncoderUnwrapped() * M_TWOPI / ENC_RESOLUTION, 0, M_TWOPI);
+    return tap::algorithms::WrappedFloat(
+        getEncoderUnwrapped() * M_TWOPI / ENC_RESOLUTION,
+        0,
+        M_TWOPI);
 }
 
 float DjiMotorEncoder::getVelocity() const
@@ -85,12 +88,11 @@ float DjiMotorEncoder::getVelocity() const
     return this->shaftRPM * static_cast<float>(M_TWOPI) / 60.f;
 }
 
-int64_t DjiMotorEncoder::getEncoderUnwrapped() const
-{
-    return encoderUnwrapped;
-}
+int64_t DjiMotorEncoder::getEncoderUnwrapped() const { return encoderUnwrapped; }
 
 uint16_t DjiMotorEncoder::getEncoderWrapped() const { return encoderWrapped; }
+
+int16_t DjiMotorEncoder::getShaftRPM() const { return shaftRPM; }
 
 void DjiMotorEncoder::updateEncoderValue(uint16_t newEncWrapped)
 {

@@ -109,7 +109,10 @@ public:
 
     void initialize() override;
 
-    EncoderInterface* getEncoder() const override { return const_cast<FallbackEncoder<2>*>(&this->encoder); }
+    EncoderInterface* getEncoder() const override
+    {
+        return const_cast<FallbackEncoder<2>*>(&this->encoder);
+    }
 
     mockable const DjiMotorEncoder* getInternalEncoder() const { return &this->internalEncoder; }
 
@@ -163,6 +166,11 @@ public:
     int16_t getTorque() const override;
 
     mockable bool isMotorInverted() const;
+
+    mockable int16_t getShaftRPM() const override
+    {
+        return this->getInternalEncoder()->getShaftRPM();
+    }
 
     mockable tap::can::CanBus getCanBus() const;
 
