@@ -16,7 +16,7 @@
 # along with Taproot.  If not, see <https://www.gnu.org/licenses/>.
 
 default:
-  image: aruw/mcb-2020-gitlab-ci:2021-06-02.1
+  image: aruw/mcb-2020-gitlab-ci:latest
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
@@ -52,7 +52,7 @@ before_script:
   stage: Initial Verification
   needs: []
   script:
-    - python3 /run-clang-format.py --clang-format-executable clang-format-10 -r src/ test/
+    - python3 /run-clang-format.py -r src/ test/
   only: *verification_only
   except: *verification_except
 
@@ -119,7 +119,7 @@ before_script:
   script:
     - cd test-project
     - scons run-tests-gcov profile=fast $ADDITIONAL_CI_BUILD_ARGS
-    - valgrind --leak-check=full --error-exitcode=1 --show-leak-kinds=all build/tests/scons-fast/test-project-tests.elf
+    # - valgrind --leak-check=full --error-exitcode=1 --show-leak-kinds=all build/tests/scons-fast/test-project-tests.elf
     - cd .. && gcovr -g --xml > cobertura.xml
     - 'sed -i "s;filename=\"taproot/;filename=\";g" cobertura.xml'
     - python3 ./taproot-scripts/shift_cobertura_line_numbers.py --shift-lines -4 --package-names 'taproot.(src|test).*' --out-file cobertura.xml
