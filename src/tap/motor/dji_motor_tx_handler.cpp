@@ -62,32 +62,42 @@ void DjiMotorTxHandler::encodeAndSendCanData()
     // set up new can messages to be sent via CAN bus 1 and 2
     Message can1MessageLow(CAN_DJI_LOW_IDENTIFIER, CAN_DJI_MESSAGE_SEND_LENGTH);
     Message can1MessageHigh(CAN_DJI_HIGH_IDENTIFIER, CAN_DJI_MESSAGE_SEND_LENGTH);
+    Message can1Message6020Current(CAN_DJI_6020_CURRENT_IDENTIFIER, CAN_DJI_MESSAGE_SEND_LENGTH);
     Message can2MessageLow(CAN_DJI_LOW_IDENTIFIER, CAN_DJI_MESSAGE_SEND_LENGTH);
     Message can2MessageHigh(CAN_DJI_HIGH_IDENTIFIER, CAN_DJI_MESSAGE_SEND_LENGTH);
+    Message can2Message6020Current(CAN_DJI_6020_CURRENT_IDENTIFIER, CAN_DJI_MESSAGE_SEND_LENGTH);
 
     can1MessageLow.setExtended(false);
     can1MessageHigh.setExtended(false);
+    can1Message6020Current.setExtended(false);
     can2MessageLow.setExtended(false);
     can2MessageHigh.setExtended(false);
+    can2Message6020Current.setExtended(false);
 
     bool can1ValidMotorMessageLow = false;
     bool can1ValidMotorMessageHigh = false;
+    bool can1ValidMotorMessage6020Current = false;
     bool can2ValidMotorMessageLow = false;
     bool can2ValidMotorMessageHigh = false;
+    bool can2ValidMotorMessage6020Current = false;
 
     serializeMotorStoreSendData(
         can1MotorStore,
         &can1MessageLow,
         &can1MessageHigh,
+        &can1Message6020Current,
         &can1ValidMotorMessageLow,
-        &can1ValidMotorMessageHigh);
+        &can1ValidMotorMessageHigh,
+        &can1ValidMotorMessage6020Current);
 
     serializeMotorStoreSendData(
         can2MotorStore,
         &can2MessageLow,
         &can2MessageHigh,
+        &can2Message6020Current,
         &can2ValidMotorMessageLow,
-        &can2ValidMotorMessageHigh);
+        &can2ValidMotorMessageHigh,
+        &can2ValidMotorMessage6020Current);
 
     bool messageSuccess = true;
 
@@ -101,6 +111,11 @@ void DjiMotorTxHandler::encodeAndSendCanData()
         {
             messageSuccess &= drivers->can.sendMessage(can::CanBus::CAN_BUS1, can1MessageHigh);
         }
+        if (can1ValidMotorMessage6020Current)
+        {
+            messageSuccess &=
+                drivers->can.sendMessage(can::CanBus::CAN_BUS1, can1Message6020Current);
+        }
     }
     if (drivers->can.isReadyToSend(can::CanBus::CAN_BUS2))
     {
@@ -111,6 +126,11 @@ void DjiMotorTxHandler::encodeAndSendCanData()
         if (can2ValidMotorMessageHigh)
         {
             messageSuccess &= drivers->can.sendMessage(can::CanBus::CAN_BUS2, can2MessageHigh);
+        }
+        if (can2ValidMotorMessage6020Current)
+        {
+            messageSuccess &=
+                drivers->can.sendMessage(can::CanBus::CAN_BUS2, can2Message6020Current);
         }
     }
 
@@ -124,8 +144,10 @@ void DjiMotorTxHandler::serializeMotorStoreSendData(
     DjiMotor** canMotorStore,
     Message* messageLow,
     Message* messageHigh,
+    Message* message6020Current,
     bool* validMotorMessageLow,
-    bool* validMotorMessageHigh)
+    bool* validMotorMessageHigh,
+    bool* validMotorMessage6020Current)
 {
     for (int i = 0; i < DJI_MOTORS_PER_CAN; i++)
     {
@@ -137,6 +159,11 @@ void DjiMotorTxHandler::serializeMotorStoreSendData(
             {
                 motor->serializeCanSendData(messageLow);
                 *validMotorMessageLow = true;
+            }
+            else if (motor->isInCurrentControl())
+            {
+                motor->serializeCanSendData(message6020Current);
+                *validMotorMessage6020Current = true;
             }
             else
             {
