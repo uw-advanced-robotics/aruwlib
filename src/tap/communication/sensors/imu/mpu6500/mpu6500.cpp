@@ -234,17 +234,18 @@ static void Mpu6500::defaultProcessRawMpu6500Data(
     accel.y = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 2);
     accel.z = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 4);
 
-    accel.x = (accel.x - imuData.accOffsetRaw) * ACCELERATION_GRAVITY / ACCELERATION_SENSITIVITY;
-    accel.y = (accel.y - imuData.accOffsetRaw) * ACCELERATION_GRAVITY / ACCELERATION_SENSITIVITY;
-    accel.z = (accel.z - imuData.accOffsetRaw) * ACCELERATION_GRAVITY / ACCELERATION_SENSITIVITY;
+    accel.x = (accel.x - imuData.accOffsetRaw[ImuData::X]) * ACCELERATION_GRAVITY / ACCELERATION_SENSITIVITY;
+    accel.y = (accel.y - imuData.accOffsetRaw[ImuData::Y]) * ACCELERATION_GRAVITY / ACCELERATION_SENSITIVITY;
+    accel.z = (accel.z - imuData.accOffsetRaw[ImuData::Z]) * ACCELERATION_GRAVITY / ACCELERATION_SENSITIVITY;
 
     gyro.x = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 8);
     gyro.y = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 10);
     gyro.z = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 12);
 
-    gyro.x = (gyro.x - imuData.accOffsetRaw) / LSB_D_PER_S_TO_D_PER_S;
-    gyro.y = (gyro.y - imuData.accOffsetRaw) / LSB_D_PER_S_TO_D_PER_S;
-    gyro.z = (gyro.z - imuData.accOffsetRaw) / LSB_D_PER_S_TO_D_PER_S;
+    gyro.x = (gyro.x - imuData.gyroOffsetRaw[ImuData::X]) / LSB_D_PER_S_TO_D_PER_S;
+    gyro.y = (gyro.y - imuData.gyroOffsetRaw[ImuData::Y]) / LSB_D_PER_S_TO_D_PER_S;
+    gyro.z = (gyro.z - imuData.gyroOffsetRaw[ImuData::Z]) / LSB_D_PER_S_TO_D_PER_S;
 }
+
 
 }  // namespace tap::communication::sensors::imu::mpu6500
