@@ -17,11 +17,6 @@ void AbstractIMU::requestCalibration() {
 
 
 void AbstractIMU::periodicIMUUpdate() {
-    if (imuState == ImuState::IMU_NOT_CONNECTED)
-    {
-        RAISE_ERROR(drivers, "periodicIMUUpdate called w/ imu not connected");
-        return;
-    }
     if (imuState == ImuState::IMU_CALIBRATED) {
          mahonyAlgorithm.updateIMU(
             imuData.gyroDegPerSec[ImuData::X],
