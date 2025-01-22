@@ -61,35 +61,6 @@ public:
      */
     static constexpr uint8_t ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE = 14;
 
-    /**
-     * Storage for the raw data we receive from the mpu6500, as well as offsets
-     * that are used each time we receive data.
-     */
-    struct RawData
-    {
-        /**
-         * Raw acceleration data.
-         */
-        modm::Vector3f accel;
-        /**
-         * Raw gyroscope data.
-         */
-        modm::Vector3f gyro;
-
-        /**
-         * Raw temperature.
-         */
-        uint16_t temperature = 0;
-
-        /**
-         * Acceleration offset calculated in init.
-         */
-        modm::Vector3f accelOffset;
-        /**
-         * Gyroscope offset calculated in init.
-         */
-        modm::Vector3f gyroOffset;
-    };
 
     void initialize(float sampleFrequency, float mahonyKp, float mahonyKi) override;
     void resetOffsets() override;
@@ -175,7 +146,7 @@ public:
     inline float getAx() final_mockable
     {
         return validateReading(
-            static_cast<float>(raw.accel.x - raw.accelOffset.x) * ACCELERATION_GRAVITY /
+            static_cast<float>(imuData.accRaw[ImuData::X] - imuData.accOffsetRaw[ImuData::X]) * ACCELERATION_GRAVITY /
             ACCELERATION_SENSITIVITY);
     }
 
@@ -186,7 +157,7 @@ public:
     inline float getAy() final_mockable
     {
         return validateReading(
-            static_cast<float>(raw.accel.y - raw.accelOffset.y) * ACCELERATION_GRAVITY /
+            static_cast<float>(imuData.accRaw[ImuData::Y] - imuData.accOffsetRaw[ImuData::Y]) * ACCELERATION_GRAVITY /
             ACCELERATION_SENSITIVITY);
     }
 
@@ -197,7 +168,7 @@ public:
     inline float getAz() final_mockable
     {
         return validateReading(
-            static_cast<float>(raw.accel.z - raw.accelOffset.z) * ACCELERATION_GRAVITY /
+            static_cast<float>(imuData.accRaw[ImuData::Z] - imuData.accOffsetRaw[ImuData::Z]) * ACCELERATION_GRAVITY /
             ACCELERATION_SENSITIVITY);
     }
 
@@ -208,7 +179,7 @@ public:
     inline float getGx() final_mockable
     {
         return validateReading(
-            static_cast<float>(raw.gyro.x - raw.gyroOffset.x) / LSB_D_PER_S_TO_D_PER_S);
+            static_cast<float>(imuData.gyroRaw[ImuData::X] - imuData.gyroOffsetRaw[ImuData::X]) / LSB_D_PER_S_TO_D_PER_S);
     }
 
     /**
@@ -218,7 +189,7 @@ public:
     inline float getGy() final_mockable
     {
         return validateReading(
-            static_cast<float>(raw.gyro.y - raw.gyroOffset.y) / LSB_D_PER_S_TO_D_PER_S);
+            static_cast<float>(imuData.gyroRaw[ImuData::Y] - imuData.gyroOffsetRaw[ImuData::Y]) / LSB_D_PER_S_TO_D_PER_S);
     }
 
     /**
@@ -228,7 +199,7 @@ public:
     inline float getGz() final_mockable
     {
         return validateReading(
-            static_cast<float>(raw.gyro.z - raw.gyroOffset.z) / LSB_D_PER_S_TO_D_PER_S);
+            static_cast<float>(imuData.gyroRaw[ImuData::Z] - imuData.gyroOffsetRaw[ImuData::Z]) / LSB_D_PER_S_TO_D_PER_S);
     }
 
     /**
@@ -240,7 +211,7 @@ public:
      */
     inline float getTemp() final_mockable
     {
-        return 21.0f + static_cast<float>(raw.temperature) / 333.87f;
+        return 21.0f + static_cast<float>(imuData.temperature) / 333.87f;
     }
 
     /**
@@ -329,8 +300,6 @@ private:
     tap::arch::MicroTimeout readRegistersTimeout;
     uint8_t tx = 0;  ///< Byte used for reading data in the read protothread
     uint8_t rx = 0;  ///< Byte used for reading data in the read protothread
-
-    RawData raw;
 
     Mahony mahonyAlgorithm;
 

@@ -39,7 +39,6 @@ Mpu6500::Mpu6500(Drivers *drivers)
     : AbstractIMU(drivers),
       drivers(drivers),
       processRawMpu6500DataFn(Mpu6500::defaultProcessRawMpu6500Data),
-      raw(),
       imuHeater(drivers)
 {
 }
@@ -48,12 +47,12 @@ void Mpu6500::requestCalibration()
 {
     if (imuState == ImuState::IMU_NOT_CALIBRATED || imuState == ImuState::IMU_CALIBRATED)
     {
-        raw.gyroOffset.x = 0;
-        raw.gyroOffset.y = 0;
-        raw.gyroOffset.z = 0;
-        raw.accelOffset.x = 0;
-        raw.accelOffset.y = 0;
-        raw.accelOffset.z = 0;
+        imuData.gyroOffsetRaw[ImuData::X] = 0;
+        imuData.gyroOffsetRaw[ImuData::Y] = 0;
+        imuData.gyroOffsetRaw[ImuData::Z] = 0;
+        imuData.accOffsetRaw[ImuData::X] = 0;
+        imuData.accOffsetRaw[ImuData::Y] = 0;
+        imuData.accOffsetRaw[ImuData::Z] = 0;
         calibrationSample = 0;
         imuState = ImuState::IMU_CALIBRATING;
     }
@@ -141,34 +140,34 @@ void Mpu6500::init(float sampleFrequency, float mahonyKp, float mahonyKi)
 
 void Mpu6500::resetOffsets()
 {
-    raw.gyroOffset.x = 0;
-    raw.gyroOffset.y = 0;
-    raw.gyroOffset.z = 0;
-    raw.accelOffset.x = 0;
-    raw.accelOffset.y = 0;
-    raw.accelOffset.z = 0;
+    imuData.gyroOffsetRaw[ImuData::X] = 0;
+    imuData.gyroOffsetRaw[ImuData::Y] = 0;
+    imuData.gyroOffsetRaw[ImuData::Z] = 0;
+    imuData.accOffsetRaw[ImuData::X] = 0;
+    imuData.accOffsetRaw[ImuData::Y] = 0;
+    imuData.accOffsetRaw[ImuData::Z] = 0;
 }
 
 void Mpu6500::computeOffsets()
 {
     calibrationSample++;
 
-    raw.gyroOffset.x += raw.gyro.x;
-    raw.gyroOffset.y += raw.gyro.y;
-    raw.gyroOffset.z += raw.gyro.z;
-    raw.accelOffset.x += raw.accel.x;
-    raw.accelOffset.y += raw.accel.y;
-    raw.accelOffset.z += raw.accel.z - ACCELERATION_SENSITIVITY;
+    imuData.gyroOffsetRaw[ImuData::X] += imuData.gyroRaw[ImuData::X];
+    imuData.gyroOffsetRaw[ImuData::Y] += imuData.gyroRaw[ImuData::Y];
+    imuData.gyroOffsetRaw[ImuData::Z] += imuData.gyroRaw[ImuData::Z];
+    imuData.accOffsetRaw[ImuData::X] += imuData.accRaw[ImuData::X];
+    imuData.accOffsetRaw[ImuData::Y] += imuData.accRaw[ImuData::Y];
+    imuData.accOffsetRaw[ImuData::Z] += imuData.accRaw[ImuData::Z] - ACCELERATION_SENSITIVITY;
 
     if (calibrationSample >= MPU6500_OFFSET_SAMPLES)
     {
         calibrationSample = 0;
-        raw.gyroOffset.x /= MPU6500_OFFSET_SAMPLES;
-        raw.gyroOffset.y /= MPU6500_OFFSET_SAMPLES;
-        raw.gyroOffset.z /= MPU6500_OFFSET_SAMPLES;
-        raw.accelOffset.x /= MPU6500_OFFSET_SAMPLES;
-        raw.accelOffset.y /= MPU6500_OFFSET_SAMPLES;
-        raw.accelOffset.z /= MPU6500_OFFSET_SAMPLES;
+        imuData.gyroOffsetRaw[ImuData::X] /= MPU6500_OFFSET_SAMPLES;
+        imuData.gyroOffsetRaw[ImuData::Y] /= MPU6500_OFFSET_SAMPLES;
+        imuData.gyroOffsetRaw[ImuData::Z] /= MPU6500_OFFSET_SAMPLES;
+        imuData.accOffsetRaw[ImuData::X] /= MPU6500_OFFSET_SAMPLES;
+        imuData.accOffsetRaw[ImuData::Y] /= MPU6500_OFFSET_SAMPLES;
+        imuData.accOffsetRaw[ImuData::Z] /= MPU6500_OFFSET_SAMPLES;
         imuState = ImuState::IMU_CALIBRATED;
         mahonyAlgorithm.reset();
     }
@@ -186,22 +185,22 @@ void Mpu6500::periodicIMUUpdate()
     {
         calibrationSample++;
 
-        raw.gyroOffset.x += raw.gyro.x;
-        raw.gyroOffset.y += raw.gyro.y;
-        raw.gyroOffset.z += raw.gyro.z;
-        raw.accelOffset.x += raw.accel.x;
-        raw.accelOffset.y += raw.accel.y;
-        raw.accelOffset.z += raw.accel.z - ACCELERATION_SENSITIVITY;
+        imuData.gyroOffsetRaw[ImuData::X] += imuData.gyroRaw[ImuData::X];
+        imuData.gyroOffsetRaw[ImuData::Y] += imuData.gyroRaw[ImuData::Y];
+        imuData.gyroOffsetRaw[ImuData::Z] += imuData.gyroRaw[ImuData::Z];
+        imuData.accOffsetRaw[ImuData::X] += imuData.accRaw[ImuData::X];
+        imuData.accOffsetRaw[ImuData::Y] += imuData.accRaw[ImuData::Y];
+        imuData.accOffsetRaw[ImuData::Z] += imuData.accRaw[ImuData::Z] - ACCELERATION_SENSITIVITY;
 
         if (calibrationSample >= MPU6500_OFFSET_SAMPLES)
         {
             calibrationSample = 0;
-            raw.gyroOffset.x /= MPU6500_OFFSET_SAMPLES;
-            raw.gyroOffset.y /= MPU6500_OFFSET_SAMPLES;
-            raw.gyroOffset.z /= MPU6500_OFFSET_SAMPLES;
-            raw.accelOffset.x /= MPU6500_OFFSET_SAMPLES;
-            raw.accelOffset.y /= MPU6500_OFFSET_SAMPLES;
-            raw.accelOffset.z /= MPU6500_OFFSET_SAMPLES;
+            imuData.gyroOffsetRaw[ImuData::X] /= MPU6500_OFFSET_SAMPLES;
+            imuData.gyroOffsetRaw[ImuData::Y] /= MPU6500_OFFSET_SAMPLES;
+            imuData.gyroOffsetRaw[ImuData::Z] /= MPU6500_OFFSET_SAMPLES;
+            imuData.accOffsetRaw[ImuData::X] /= MPU6500_OFFSET_SAMPLES;
+            imuData.accOffsetRaw[ImuData::Y] /= MPU6500_OFFSET_SAMPLES;
+            imuData.accOffsetRaw[ImuData::Z] /= MPU6500_OFFSET_SAMPLES;
             imuState = ImuState::IMU_CALIBRATED;
             mahonyAlgorithm.reset();
         }
@@ -230,9 +229,9 @@ bool Mpu6500::read()
         PT_CALL(Board::ImuSpiMaster::transfer(txBuff, rxBuff, ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE));
         mpuNssHigh();
 
-        (*processRawMpu6500DataFn)(rxBuff, raw.accel, raw.gyro);
+        (*processRawMpu6500DataFn)(rxBuff, imuData.accRaw, imuData.gyroRaw);
 
-        raw.temperature = rxBuff[6] << 8 | rxBuff[7];
+        imuData.temperature = rxBuff[6] << 8 | rxBuff[7];
 
         prevIMUDataReceivedTime = tap::arch::clock::getTimeMicroseconds();
     }

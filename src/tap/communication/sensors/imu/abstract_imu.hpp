@@ -25,25 +25,49 @@ public:
 
     virtual ImuState getImuState() const final { return imuState; }
 
-    virtual float getAx() = 0;
-    virtual float getAy() = 0;
-    virtual float getAz() = 0;
+    inline float getAx()  override { return imuData.accG[ImuData::X]; }
+    inline float getAy()  override { return imuData.accG[ImuData::Y]; }
+    inline float getAz()  override { return imuData.accG[ImuData::Z]; }
 
-    virtual float getGx() = 0;
-    virtual float getGy() = 0;
-    virtual float getGz() = 0;
+    inline float getGx()  override { return imuData.gyroDegPerSec[ImuData::X]; }
+    inline float getGy()  override { return imuData.gyroDegPerSec[ImuData::Y]; }
+    inline float getGz()  override { return imuData.gyroDegPerSec[ImuData::Z]; }
 
-    virtual float getTemp() = 0;
+    inline float getTemp() override { return imuData.temperature; }
+
+    struct ImuData
+    {
+        enum Axis
+        {
+            X = 0,
+            Y = 1,
+            Z = 2,
+        };
+
+        float accRaw[3] = {0};
+        float gyroRaw[3] = {0};
+        float accOffsetRaw[3] = {0};
+        float gyroOffsetRaw[3] = {0};
+        float accG[3] = {0};
+        float gyroDegPerSec[3] = {0};
+
+        float temperature = 0;
+    };
 
 protected:
     virtual void resetOffsets() = 0;
     virtual void computeOffsets() = 0;
 
+    virtual float getAccelerationSenstivity() = 0;
+
     tap::Drivers *drivers;
+
     Mahony mahonyAlgorithm;
-    imu_heater::ImuHeater imuHeater;
+    
     ImuState imuState = ImuState::IMU_NOT_CONNECTED;
     int calibrationSample = 0;
+    
+    ImuData imuData;
 };
 
 }  // namespace tap::communication::sensors::imu
