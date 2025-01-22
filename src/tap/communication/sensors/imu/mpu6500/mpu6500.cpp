@@ -224,7 +224,7 @@ void Mpu6500::mpuNssHigh()
 #endif
 }
 
-static void Mpu6500::defaultProcessRawMpu6500Data(
+void Mpu6500::defaultProcessRawMpu6500Data(
     const uint8_t (&rxBuff)[ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE],
     modm::Vector3f &accel,
     modm::Vector3f &gyro,
