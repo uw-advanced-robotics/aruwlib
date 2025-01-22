@@ -205,10 +205,11 @@ private:
     void spiReadRegisters(uint8_t regAddr, uint8_t *pData, uint8_t len);
 
     /// Default processing function when IMU is lying flat on the robot.
-    static void processRawMpu6500Data(
+    static void processRawMpu6500DataFn(
         const uint8_t (&rxBuff)[ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE],
         modm::Vector3f &accel,
-        modm::Vector3f &gyro);
+        modm::Vector3f &gyro,
+        ImuData &imuData);
     
     float parseTemp(float temperature){
         return 21.0f + temperature / 333.87f;
