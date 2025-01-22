@@ -138,7 +138,15 @@ bool Mpu6500::read()
         PT_CALL(Board::ImuSpiMaster::transfer(txBuff, rxBuff, ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE));
         mpuNssHigh();
 
-        processRawMpu6500Data(rxBuff, imuData.accRaw, imuData.gyroRaw);
+        modm::Vector3f accVector(imuData.accRaw[0], imuData.accRaw[1], imuData.accRaw[2]);
+        modm::Vector3f gyroVector(imuData.gyroRaw[0], imuData.gyroRaw[1], imuData.gyroRaw[2]);
+        (*processRawMpu6500DataFn)(rxBuff, accVector, gyroVector, imuData);
+        imuData.accRaw[0] = accVector.x;
+        imuData.accRaw[1] = accVector.y;
+        imuData.accRaw[2] = accVector.z;
+        imuData.gyroRaw[0] = gyroVector.x;
+        imuData.gyroRaw[1] = gyroVector.y;
+        imuData.gyroRaw[2] = gyroVector.z;
 
         imuData.temperature = parseTemp(static_cast<float>(rxBuff[6] << 8 | rxBuff[7]));
 
@@ -216,10 +224,11 @@ void Mpu6500::mpuNssHigh()
 #endif
 }
 
-void Mpu6500::processRawMpu6500Data(
+void Mpu6500::defaultProcessRawMpu6500Data(
     const uint8_t (&rxBuff)[ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE],
     modm::Vector3f &accel,
-    modm::Vector3f &gyro)
+    modm::Vector3f &gyro,
+    const ImuData &imuData)
 {
     accel.x = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff);
     accel.y = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 2);
