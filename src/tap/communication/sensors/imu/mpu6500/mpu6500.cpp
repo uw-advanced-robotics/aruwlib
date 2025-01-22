@@ -38,7 +38,7 @@ namespace tap::communication::sensors::imu::mpu6500
 Mpu6500::Mpu6500(Drivers *drivers)
     : AbstractIMU(drivers),
       drivers(drivers),
-      processRawMpu6500DataFn(Mpu6500::defaultProcessRawMpu6500Data),
+      processRawMpu6500DataFn(::defaultProcessRawMpu6500Data),
       imuHeater(drivers)
 {
 }
