@@ -32,9 +32,7 @@ public:
 
     virtual bool read() = 0;  
 
-    virtual float getYaw() final { return mahonyAlgorithm.getYaw(); }
-    virtual float getPitch() final { return mahonyAlgorithm.getPitch(); }
-    virtual float getRoll() final { return mahonyAlgorithm.getRoll(); }
+
 
     /**
      * Returns the state of the IMU. Can be not connected, connected but not calibrated, or
@@ -58,20 +56,9 @@ public:
 
     inline float getTemp() override { return imuData.temperature; }
 
-     /**
-     * Returns yaw angle in degrees.
-     */
-    inline float getYaw() override { return (mahonyAlgorithm.getYaw()); }
-
-    /**
-     * Returns pitch angle in degrees.
-     */
-    inline float getPitch() override { return (mahonyAlgorithm.getPitch()); }
-
-    /**
-     * Returns roll angle in degrees.
-     */
-    inline float getRoll() override { return (mahonyAlgorithm.getRoll()); }
+    virtual float getYaw() override { return mahonyAlgorithm.getYaw(); }
+    virtual float getPitch() override { return mahonyAlgorithm.getPitch(); }
+    virtual float getRoll() override { return mahonyAlgorithm.getRoll(); }
 
     struct ImuData
     {

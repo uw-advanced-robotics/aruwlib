@@ -113,8 +113,6 @@ void Mpu6500::initialize(float sampleFrequency, float mahonyKp, float mahonyKi)
     AbstractIMU::initialize(sampleFrequency, mahonyKp, mahonyKi);
 }
 
-
-
 void Mpu6500::periodicIMUUpdate()
 {
     AbstractIMU::periodicIMUUpdate();
@@ -218,8 +216,6 @@ void Mpu6500::mpuNssHigh()
 #endif
 }
 
-
-
 void Mpu6500::processRawMpu6500Data(
     const uint8_t (&rxBuff)[ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE],
     modm::Vector3f &accel,
@@ -229,9 +225,17 @@ void Mpu6500::processRawMpu6500Data(
     accel.y = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 2);
     accel.z = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 4);
 
+    accel.x = (accel.x - imuData.accOffsetRaw) * ACCELERATION_GRAVITY / ACCELERATION_SENSITIVITY;
+    accel.y = (accel.y - imuData.accOffsetRaw) * ACCELERATION_GRAVITY / ACCELERATION_SENSITIVITY;
+    accel.z = (accel.z - imuData.accOffsetRaw) * ACCELERATION_GRAVITY / ACCELERATION_SENSITIVITY;
+
     gyro.x = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 8);
     gyro.y = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 10);
     gyro.z = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 12);
+
+    gyro.x = (gyro.x - imuData.accOffsetRaw) / LSB_D_PER_S_TO_D_PER_S;
+    gyro.y = (gyro.y - imuData.accOffsetRaw) / LSB_D_PER_S_TO_D_PER_S;
+    gyro.z = (gyro.z - imuData.accOffsetRaw) / LSB_D_PER_S_TO_D_PER_S;
 }
 
 }  // namespace tap::communication::sensors::imu::mpu6500
