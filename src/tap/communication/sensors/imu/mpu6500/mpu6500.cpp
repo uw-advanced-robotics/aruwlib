@@ -224,6 +224,7 @@ void Mpu6500::mpuNssHigh()
 #endif
 }
 
+namespace {
 void Mpu6500::defaultProcessRawMpu6500Data(
     const uint8_t (&rxBuff)[ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE],
     modm::Vector3f &accel,
@@ -246,6 +247,6 @@ void Mpu6500::defaultProcessRawMpu6500Data(
     gyro.y = (gyro.y - imuData.gyroOffsetRaw[ImuData::Y]) / LSB_D_PER_S_TO_D_PER_S;
     gyro.z = (gyro.z - imuData.gyroOffsetRaw[ImuData::Z]) / LSB_D_PER_S_TO_D_PER_S;
 }
-
+}
 
 }  // namespace tap::communication::sensors::imu::mpu6500
