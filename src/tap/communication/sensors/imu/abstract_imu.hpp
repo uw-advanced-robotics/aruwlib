@@ -5,6 +5,11 @@
 #include "tap/communication/sensors/imu/imu_interface.hpp"
 #include "tap/architecture/timeout.hpp"
 
+namespace tap
+{
+class Drivers;
+}
+
 namespace tap::communication::sensors::imu {
 
 class AbstractIMU : public ImuInterface {

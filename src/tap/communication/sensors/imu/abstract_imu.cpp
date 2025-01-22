@@ -45,22 +45,22 @@ void AbstractIMU::resetOffsets(){
 void AbstractIMU::computeOffsets(){
     calibrationSample++;
 
-    imuData.gyroOffsetRaw.x += imuData.gyroRaw[ImuData::X];
-    imuData.gyroOffsetRaw.y += imuData.gyroRaw[ImuData::Y];
-    imuData.gyroOffsetRaw.z += imuData.gyroRaw[ImuData::Z];
-    imuData.accOffsetRaw.x += imuData.accRaw[ImuData::X];
-    imuData.accOffsetRaw.y += imuData.accRaw[ImuData::Y];
-    imuData.accOffsetRaw.z += imuData.accRaw.z - getAccelerationSenstivity();
+    imuData.gyroOffsetRaw[ImuData::X] += imuData.gyroRaw[ImuData::X];
+    imuData.gyroOffsetRaw[ImuData::Y] += imuData.gyroRaw[ImuData::Y];
+    imuData.gyroOffsetRaw[ImuData::Z] += imuData.gyroRaw[ImuData::Z];
+    imuData.accOffsetRaw[ImuData::X] += imuData.accRaw[ImuData::X];
+    imuData.accOffsetRaw[ImuData::Y] += imuData.accRaw[ImuData::Y];
+    imuData.accOffsetRaw[ImuData::Z] += imuData.accRaw[ImuData::Z] - getAccelerationSensitivity();
 
     if (calibrationSample >= offsetSampleCount)
     {
         calibrationSample = 0;
-        imuData.gyroOffsetRaw.x /= offsetSampleCount;
-        imuData.gyroOffsetRaw.y /= offsetSampleCount;
-        imuData.gyroOffsetRaw.z /= offsetSampleCount;
-        imuData.accelOffset.x /= offsetSampleCount;
-        imuData.accelOffset.y /= offsetSampleCount;
-        imuData.accelOffset.z /= offsetSampleCount;
+        imuData.gyroOffsetRaw[ImuData::X] /= offsetSampleCount;
+        imuData.gyroOffsetRaw[ImuData::Y] /= offsetSampleCount;
+        imuData.gyroOffsetRaw[ImuData::Z] /= offsetSampleCount;
+        imuData.accOffsetRaw[ImuData::X] /= offsetSampleCount;
+        imuData.accOffsetRaw[ImuData::Y] /= offsetSampleCount;
+        imuData.accOffsetRaw[ImuData::Z] /= offsetSampleCount;
         imuState = ImuState::IMU_CALIBRATED;
         mahonyAlgorithm.reset();
     }
