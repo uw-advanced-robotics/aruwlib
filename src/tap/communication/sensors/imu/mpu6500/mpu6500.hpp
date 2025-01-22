@@ -131,7 +131,7 @@ private:
      */
     static constexpr float ACCELERATION_SENSITIVITY = 4096.0f;
     
-    inline float getAccelerationSenstivity() override {
+    inline float getAccelerationSensitivity() override {
         return ACCELERATION_SENSITIVITY;
     }
 
