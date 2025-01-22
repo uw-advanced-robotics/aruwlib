@@ -49,10 +49,6 @@ def _get_sim_modm_instance_path():
 # Set up target environment-specific modm paths and compiler
 if args["TARGET_ENV"] == "tests" or args["TARGET_ENV"] == "sim":
     modm_path = _get_sim_modm_instance_path()
-    if env.Detect(["gcc-11", "gcc-10"]) is not None:
-        env["COMPILERSUFFIX"] = env.Detect(["gcc-11", "gcc-10"])[3:]
-    else:
-        print("No gcc-10 or gcc-11 found, using default gcc")
 elif args["TARGET_ENV"] == "hardware":
     modm_path = HARDWARE_MODM_PATH
     env["COMPILERSUFFIX"] = ""

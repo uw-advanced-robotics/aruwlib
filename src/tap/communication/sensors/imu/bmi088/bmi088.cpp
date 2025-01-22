@@ -72,8 +72,8 @@ void Bmi088::requestRecalibration()
 void Bmi088::initialize(float sampleFrequency, float mahonyKp, float mahonyKi)
 {
 #if !defined(PLATFORM_HOSTED)
-    ImuCS1Accel::GpioOutput();
-    ImuCS1Gyro::GpioOutput();
+    ImuCS1Accel::configure(Gpio::OutputType::PushPull);
+    ImuCS1Gyro::configure(Gpio::OutputType::PushPull);
 
     DELAY_MS(100);
 

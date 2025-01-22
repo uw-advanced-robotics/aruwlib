@@ -24,8 +24,7 @@
 #include <cstdlib>
 
 #ifndef PLATFORM_HOSTED
-#include "modm/platform.hpp"
-#include "modm/platform/uart/uart_base.hpp"
+#include "modm/platform/uart/uart.hpp"
 #endif
 
 #include "tap/board/board.hpp"
@@ -42,14 +41,14 @@ namespace tap::communication::serial
  */
 class Uart
 {
-public:
-    enum UartPort
-    {
+#ifndef PLATFORM_HOSTED
+private:
 %% for port in uart_ports
-        Uart{{ port }},
+    using Port{{ port }} = BufferedUart<{{ port_type[port] }}Hal{{ port }}, UartTxBuffer<{{ configured_tx_size[port] }}>, UartRxBuffer<{{ configured_rx_size[port] }}>>;
 %% endfor
-    };
+#endif
 
+public:
 #ifdef PLATFORM_HOSTED
     enum Parity
     {
@@ -60,6 +59,13 @@ public:
 #else
     using Parity = modm::platform::UartBase::Parity;
 #endif
+
+    enum UartPort
+    {
+%% for port in uart_ports
+        Uart{{ port }},
+%% endfor
+    };
 
     Uart() = default;
     DISALLOW_COPY_AND_ASSIGN(Uart)
@@ -78,8 +84,8 @@ public:
     {
 #ifndef PLATFORM_HOSTED
 %% macro init_port(port, rxPin, txPin)
-            modm::platform::{{ full_port_name[port] }}::connect<{% if txPin != None %}{{ txPin }}::Tx{% if rxPin != None %}, {% endif %}{% endif %}{% if rxPin != None %}{{ rxPin }}::Rx{% endif %}>();
-            modm::platform::{{ full_port_name[port] }}::initialize<Board::SystemClock, baudrate>(parity);
+            Port{{ port }}::connect<{% if txPin != None %}{{ txPin }}::Tx{% if rxPin != None %}, {% endif %}{% endif %}{% if rxPin != None %}{{ rxPin }}::Rx{% endif %}>();
+            Port{{ port }}::initialize<Board::SystemClock, baudrate>(parity);
 %% endmacro
 %% if uart_ports|length > 0
         if constexpr (port == UartPort::Uart{{ uart_ports[0] }})

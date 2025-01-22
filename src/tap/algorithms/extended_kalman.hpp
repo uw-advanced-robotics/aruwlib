@@ -104,7 +104,7 @@ private:
     float Q;      ///< system parameter
     float R;      ///< system parameter.
     float H;      ///< system parameter.
-};                // class ExtendedKalman
+};  // class ExtendedKalman
 
 }  // namespace algorithms
 

@@ -143,7 +143,8 @@ void HardwareTestMenu::draw()
     std::for_each(
         drivers->commandScheduler.subMapBegin(),
         drivers->commandScheduler.subMapEnd(),
-        [&](control::Subsystem* sub) {
+        [&](control::Subsystem* sub)
+        {
             if (sub->getTestCommand() != nullptr)
             {
                 if (subsystemIndex <= (vertScrollHandler.getLargestIndexDisplayed()) &&

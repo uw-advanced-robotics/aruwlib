@@ -121,6 +121,8 @@ public:
      */
     mockable bool read();
 
+    bool run() { return this->read(); }
+
     /**
      * Returns the state of the IMU. Can be not connected, connected but not calibrated, calibrating
      * or calibrated. When not connected, IMU data is undefiend. When not calibrated, IMU data is

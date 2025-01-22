@@ -26,26 +26,8 @@ MCU_VARIANTS_BY_BOARD = {
 }
 
 DEFAULT_MODM_OPTIONS_BY_BOARD = {
-    "rm-dev-board-a": "\
-        modm:platform:uart:1:buffer.rx 256\n\
-        modm:platform:uart:1:buffer.tx 256\n\
-        modm:platform:uart:2:buffer.rx 256\n\
-        modm:platform:uart:2:buffer.tx 256\n\
-        modm:platform:uart:3:buffer.tx 256\n\
-        modm:platform:uart:3:buffer.rx 256\n\
-        modm:platform:uart:6:buffer.rx 256\n\
-        modm:platform:uart:6:buffer.tx 256\n\
-        modm:platform:uart:7:buffer.tx 256\n\
-        modm:platform:uart:7:buffer.rx 256\n\
-        modm:platform:uart:8:buffer.tx 256\n\
-        modm:platform:uart:8:buffer.rx 256",
-    "rm-dev-board-c": "\
-        modm:platform:uart:1:buffer.rx 256\n\
-        modm:platform:uart:1:buffer.tx 256\n\
-        modm:platform:uart:3:buffer.tx 256\n\
-        modm:platform:uart:3:buffer.rx 256\n\
-        modm:platform:uart:6:buffer.rx 256\n\
-        modm:platform:uart:6:buffer.tx 256",
+    "rm-dev-board-a": "",
+    "rm-dev-board-c": "",
 }
 
 def get_modm_repo_lb_file() -> str:
@@ -123,6 +105,7 @@ def build(env):
     for target in ALL_HOSTED_TARGET_NAMES:
         env.substitutions["hosted_target"] = target
         env.template("sim-modm/project.xml.in", f"sim-modm/{target}/project.xml")
+        env.template("sim-modm/device.hpp.in", f"sim-modm/{target}/modm/src/modm/platform/device.hpp")
 
 modm_hal_options_description = "\
 Add options to control modm generated files. For example, configure the modm UART buffer sizes. \

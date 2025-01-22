@@ -57,7 +57,6 @@ TEST(TCPServerTests, SendingCorrectMessages)
     }
 
     // Wait for all children to exit
-    while ((finished_child = wait(&status)) > 0)
-        ;
+    while ((finished_child = wait(&status)) > 0);
     EXPECT_STREQ(response, "Test message 1 2 3");
 }

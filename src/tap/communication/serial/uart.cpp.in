@@ -37,7 +37,7 @@ bool Uart::read(UartPort port, uint8_t *data)
     {
 %% for port in uart_ports:
         case UartPort::Uart{{ port }}:
-            return {{ full_port_name[port] }}::read(*data);
+            return Port{{ port }}::read(*data);
 %% endfor
         default:
             return false;
@@ -57,7 +57,7 @@ std::size_t Uart::read(UartPort port, uint8_t *data, std::size_t length)
     {
 %% for port in uart_ports
         case UartPort::Uart{{ port }}:
-            return {{ full_port_name[port] }}::read(data, length);
+            return Port{{ port }}::read(data, length);
 %% endfor
         default:
             return 0;
@@ -75,7 +75,7 @@ std::size_t Uart::discardReceiveBuffer(UartPort port)
     {
 %% for port in uart_ports
         case UartPort::Uart{{ port }}:
-            return {{ full_port_name[port] }}::discardReceiveBuffer();
+            return Port{{ port }}::discardReceiveBuffer();
 %% endfor
         default:
             return 0;
@@ -94,7 +94,7 @@ bool Uart::write(UartPort port, uint8_t data)
     {
 %% for port in uart_ports
         case UartPort::Uart{{ port }}:
-            return {{ full_port_name[port] }}::write(data);
+            return Port{{ port }}::write(data);
 %% endfor
         default:
             return false;
@@ -114,7 +114,7 @@ std::size_t Uart::write(UartPort port, const uint8_t *data, std::size_t length)
     {
 %% for port in uart_ports
         case UartPort::Uart{{ port }}:
-            return {{ full_port_name[port] }}::write(data, length);
+            return Port{{ port }}::write(data, length);
 %% endfor
         default:
             return 0;
@@ -132,7 +132,7 @@ bool Uart::isWriteFinished(UartPort port) const
     {
 %% for port in uart_ports
         case UartPort::Uart{{ port }}:
-            return {{ full_port_name[port] }}::isWriteFinished();
+            return Port{{ port }}::isWriteFinished();
 %% endfor
         default:
             return false;
@@ -149,7 +149,7 @@ void Uart::flushWriteBuffer(UartPort port)
     {
 %% for port in uart_ports
         case UartPort::Uart{{ port }}:
-            {{ full_port_name[port] }}::flushWriteBuffer();
+            Port{{ port }}::flushWriteBuffer();
             break;
 %% endfor
         default:

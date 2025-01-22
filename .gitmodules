@@ -1,7 +1,6 @@
 [submodule "modm"]
 	path = modm
-	url = https://github.com/uw-advanced-robotics/modm.git
-	branch = aruw-master
+	url = https://github.com/modm-io/modm.git
 [submodule "taproot-scripts"]
 	path = taproot-scripts
 	url = https://gitlab.com/aruw/controls/taproot-scripts.git

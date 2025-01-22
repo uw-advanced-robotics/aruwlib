@@ -109,12 +109,12 @@ TEST(
 
     DjiMotor m1(&drivers, MotorId::MOTOR7, tap::can::CanBus::CAN_BUS1, false, "cool motor");
     DjiMotor m2(&drivers, MotorId::MOTOR7, tap::can::CanBus::CAN_BUS2, true, "coolest motorino");
-    ON_CALL(drivers.djiMotorTxHandler, getCan1Motor).WillByDefault([&](tap::motor::MotorId mid) {
-        return (mid == MotorId::MOTOR7) ? &m1 : nullptr;
-    });
-    ON_CALL(drivers.djiMotorTxHandler, getCan2Motor).WillByDefault([&](tap::motor::MotorId mid) {
-        return (mid == MotorId::MOTOR7) ? &m2 : nullptr;
-    });
+    ON_CALL(drivers.djiMotorTxHandler, getCan1Motor)
+        .WillByDefault([&](tap::motor::MotorId mid)
+                       { return (mid == MotorId::MOTOR7) ? &m1 : nullptr; });
+    ON_CALL(drivers.djiMotorTxHandler, getCan2Motor)
+        .WillByDefault([&](tap::motor::MotorId mid)
+                       { return (mid == MotorId::MOTOR7) ? &m2 : nullptr; });
 
     char input1[] = "motor 7";
     EXPECT_TRUE(serialHandler.terminalSerialCallback(input1, stream, false));
@@ -149,9 +149,9 @@ TEST(
     motors[DJI_MOTOR_TO_NORMALIZED_ID(MotorId::MOTOR6)] =
         new DjiMotor(&drivers, MotorId::MOTOR6, tap::can::CanBus::CAN_BUS1, false, "m3");
 
-    ON_CALL(drivers.djiMotorTxHandler, getCan1Motor).WillByDefault([&](tap::motor::MotorId mid) {
-        return motors[DJI_MOTOR_TO_NORMALIZED_ID(mid)];
-    });
+    ON_CALL(drivers.djiMotorTxHandler, getCan1Motor)
+        .WillByDefault([&](tap::motor::MotorId mid)
+                       { return motors[DJI_MOTOR_TO_NORMALIZED_ID(mid)]; });
 
     char input[] = "can 1";
     EXPECT_TRUE(serialHandler.terminalSerialCallback(input, stream, false));
@@ -211,12 +211,12 @@ TEST(DjiMotorTerminalSerialHandler, terminalSerialCallback__all_prints_all_motor
 
     DjiMotor m1(&drivers, MotorId::MOTOR1, tap::can::CanBus::CAN_BUS1, false, "cool motor");
     DjiMotor m2(&drivers, MotorId::MOTOR3, tap::can::CanBus::CAN_BUS2, true, "coolest motorino");
-    ON_CALL(drivers.djiMotorTxHandler, getCan1Motor).WillByDefault([&](tap::motor::MotorId mid) {
-        return (mid == MotorId::MOTOR1) ? &m1 : nullptr;
-    });
-    ON_CALL(drivers.djiMotorTxHandler, getCan2Motor).WillByDefault([&](tap::motor::MotorId mid) {
-        return (mid == MotorId::MOTOR3) ? &m2 : nullptr;
-    });
+    ON_CALL(drivers.djiMotorTxHandler, getCan1Motor)
+        .WillByDefault([&](tap::motor::MotorId mid)
+                       { return (mid == MotorId::MOTOR1) ? &m1 : nullptr; });
+    ON_CALL(drivers.djiMotorTxHandler, getCan2Motor)
+        .WillByDefault([&](tap::motor::MotorId mid)
+                       { return (mid == MotorId::MOTOR3) ? &m2 : nullptr; });
 
     char input[] = "all";
     EXPECT_TRUE(serialHandler.terminalSerialCallback(input, stream, false));
@@ -234,9 +234,9 @@ TEST(DjiMotorTerminalSerialHandler, terminalSerialStreamCallback__prints_motor_i
     modm::IOStream stream(terminalDevice);
 
     DjiMotor m1(&drivers, MotorId::MOTOR1, tap::can::CanBus::CAN_BUS1, false, "cool motor");
-    ON_CALL(drivers.djiMotorTxHandler, getCan1Motor).WillByDefault([&](tap::motor::MotorId mid) {
-        return (mid == MotorId::MOTOR1) ? &m1 : nullptr;
-    });
+    ON_CALL(drivers.djiMotorTxHandler, getCan1Motor)
+        .WillByDefault([&](tap::motor::MotorId mid)
+                       { return (mid == MotorId::MOTOR1) ? &m1 : nullptr; });
 
     char input[] = "motor 1 can 1";
     EXPECT_TRUE(serialHandler.terminalSerialCallback(input, stream, true));
@@ -278,9 +278,9 @@ TEST(
     motors[DJI_MOTOR_TO_NORMALIZED_ID(MotorId::MOTOR6)] =
         new DjiMotor(&drivers, MotorId::MOTOR6, tap::can::CanBus::CAN_BUS2, false, "m3");
 
-    ON_CALL(drivers.djiMotorTxHandler, getCan2Motor).WillByDefault([&](tap::motor::MotorId mid) {
-        return motors[DJI_MOTOR_TO_NORMALIZED_ID(mid)];
-    });
+    ON_CALL(drivers.djiMotorTxHandler, getCan2Motor)
+        .WillByDefault([&](tap::motor::MotorId mid)
+                       { return motors[DJI_MOTOR_TO_NORMALIZED_ID(mid)]; });
 
     char input[] = "can 2";
     EXPECT_TRUE(serialHandler.terminalSerialCallback(input, stream, false));
@@ -308,9 +308,9 @@ TEST(
     motors[DJI_MOTOR_TO_NORMALIZED_ID(MotorId::MOTOR1)] =
         new DjiMotor(&drivers, MotorId::MOTOR1, tap::can::CanBus::CAN_BUS2, false, "m1");
 
-    ON_CALL(drivers.djiMotorTxHandler, getCan2Motor).WillByDefault([&](tap::motor::MotorId mid) {
-        return motors[DJI_MOTOR_TO_NORMALIZED_ID(mid)];
-    });
+    ON_CALL(drivers.djiMotorTxHandler, getCan2Motor)
+        .WillByDefault([&](tap::motor::MotorId mid)
+                       { return motors[DJI_MOTOR_TO_NORMALIZED_ID(mid)]; });
 
     char input[] = "motor 1 can 2";
     EXPECT_TRUE(serialHandler.terminalSerialCallback(input, stream, false));
