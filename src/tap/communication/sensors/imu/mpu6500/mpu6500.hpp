@@ -123,19 +123,9 @@ public:
         imuHeater.setDesiredTemperature(temperatureC);
     }
 
-    using ProcessRawMpu6500DataFn = void (*)(
-        const uint8_t (&)[ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE],
-        modm::Vector3f &accel,
-        modm::Vector3f &gyro,
-        ImuData &imuData);
-
-
-    void attachProcessRawMpu6500DataFn(ProcessRawMpu6500DataFn fn) { processRawMpu6500DataFn = fn; }
-
 private:
 
     Drivers *drivers;
-    ProcessRawMpu6500DataFn processRawMpu6500DataFn;
 
     static constexpr float ACCELERATION_GRAVITY = 9.80665f;
 

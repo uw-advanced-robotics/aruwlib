@@ -38,7 +38,6 @@ namespace tap::communication::sensors::imu::mpu6500
 Mpu6500::Mpu6500(Drivers *drivers)
     : AbstractIMU(drivers),
       drivers(drivers),
-      processRawMpu6500DataFn(::defaultProcessRawMpu6500Data),
       imuHeater(drivers)
 {
 }
@@ -138,16 +137,31 @@ bool Mpu6500::read()
         PT_CALL(Board::ImuSpiMaster::transfer(txBuff, rxBuff, ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE));
         mpuNssHigh();
 
-        modm::Vector3f accVector(imuData.accRaw[0], imuData.accRaw[1], imuData.accRaw[2]);
-        modm::Vector3f gyroVector(imuData.gyroRaw[0], imuData.gyroRaw[1], imuData.gyroRaw[2]);
-        (*processRawMpu6500DataFn)(rxBuff, accVector, gyroVector, imuData);
-        imuData.accRaw[0] = accVector.x;
-        imuData.accRaw[1] = accVector.y;
-        imuData.accRaw[2] = accVector.z;
-        imuData.gyroRaw[0] = gyroVector.x;
-        imuData.gyroRaw[1] = gyroVector.y;
-        imuData.gyroRaw[2] = gyroVector.z;
+        // Process raw acceleration data
+        imuData.accRaw[0] = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff);
+        imuData.accRaw[1] = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 2);
+        imuData.accRaw[2] = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 4);
 
+        imuData.accRaw[0] = (imuData.accRaw[0] - imuData.accOffsetRaw[ImuData::X]) * 
+                            ACCELERATION_GRAVITY / ACCELERATION_SENSITIVITY;
+        imuData.accRaw[1] = (imuData.accRaw[1] - imuData.accOffsetRaw[ImuData::Y]) * 
+                            ACCELERATION_GRAVITY / ACCELERATION_SENSITIVITY;
+        imuData.accRaw[2] = (imuData.accRaw[2] - imuData.accOffsetRaw[ImuData::Z]) * 
+                            ACCELERATION_GRAVITY / ACCELERATION_SENSITIVITY;
+
+        // Process raw gyroscope data
+        imuData.gyroRaw[0] = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 8);
+        imuData.gyroRaw[1] = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 10);
+        imuData.gyroRaw[2] = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 12);
+
+        imuData.gyroRaw[0] = (imuData.gyroRaw[0] - imuData.gyroOffsetRaw[ImuData::X]) / 
+                             LSB_D_PER_S_TO_D_PER_S;
+        imuData.gyroRaw[1] = (imuData.gyroRaw[1] - imuData.gyroOffsetRaw[ImuData::Y]) / 
+                             LSB_D_PER_S_TO_D_PER_S;
+        imuData.gyroRaw[2] = (imuData.gyroRaw[2] - imuData.gyroOffsetRaw[ImuData::Z]) / 
+                             LSB_D_PER_S_TO_D_PER_S;
+
+        // Process temperature
         imuData.temperature = parseTemp(static_cast<float>(rxBuff[6] << 8 | rxBuff[7]));
 
         prevIMUDataReceivedTime = tap::arch::clock::getTimeMicroseconds();
@@ -157,6 +171,7 @@ bool Mpu6500::read()
     return false;
 #endif
 }
+
 
 
 // Hardware interface functions (blocking functions, for initialization only)
@@ -224,29 +239,5 @@ void Mpu6500::mpuNssHigh()
 #endif
 }
 
-namespace {
-void Mpu6500::defaultProcessRawMpu6500Data(
-    const uint8_t (&rxBuff)[ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE],
-    modm::Vector3f &accel,
-    modm::Vector3f &gyro,
-    ImuData &imuData)
-{
-    accel.x = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff);
-    accel.y = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 2);
-    accel.z = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 4);
-
-    accel.x = (accel.x - imuData.accOffsetRaw[ImuData::X]) * ACCELERATION_GRAVITY / ACCELERATION_SENSITIVITY;
-    accel.y = (accel.y - imuData.accOffsetRaw[ImuData::Y]) * ACCELERATION_GRAVITY / ACCELERATION_SENSITIVITY;
-    accel.z = (accel.z - imuData.accOffsetRaw[ImuData::Z]) * ACCELERATION_GRAVITY / ACCELERATION_SENSITIVITY;
-
-    gyro.x = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 8);
-    gyro.y = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 10);
-    gyro.z = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 12);
-
-    gyro.x = (gyro.x - imuData.gyroOffsetRaw[ImuData::X]) / LSB_D_PER_S_TO_D_PER_S;
-    gyro.y = (gyro.y - imuData.gyroOffsetRaw[ImuData::Y]) / LSB_D_PER_S_TO_D_PER_S;
-    gyro.z = (gyro.z - imuData.gyroOffsetRaw[ImuData::Z]) / LSB_D_PER_S_TO_D_PER_S;
-}
-}
 
 }  // namespace tap::communication::sensors::imu::mpu6500
