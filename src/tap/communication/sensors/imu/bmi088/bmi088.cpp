@@ -44,33 +44,14 @@ namespace tap::communication::sensors::imu::bmi088
 #define DELAY_US(us) modm::delay_us(us);
 #endif
 
-Bmi088::Bmi088(tap::Drivers *drivers) : drivers(drivers), imuHeater(drivers) {}
+Bmi088::Bmi088(tap::Drivers *drivers) : AbstractIMU(drivers), drivers(drivers), imuHeater(drivers) {}
 
-Bmi088::ImuState Bmi088::getImuState() const { return imuState; }
 
-void Bmi088::requestRecalibration()
-{
-    if (imuState == ImuState::IMU_NOT_CALIBRATED || imuState == ImuState::IMU_CALIBRATED)
-    {
-        data.gyroOffsetRaw[ImuData::X] = 0;
-        data.gyroOffsetRaw[ImuData::Y] = 0;
-        data.gyroOffsetRaw[ImuData::Z] = 0;
-        data.accOffsetRaw[ImuData::X] = 0;
-        data.accOffsetRaw[ImuData::Y] = 0;
-        data.accOffsetRaw[ImuData::Z] = 0;
-        data.gyroDegPerSec[ImuData::X] = 0;
-        data.gyroDegPerSec[ImuData::Y] = 0;
-        data.gyroDegPerSec[ImuData::Z] = 0;
-        data.accG[ImuData::X] = 0;
-        data.accG[ImuData::Y] = 0;
-        data.accG[ImuData::Z] = 0;
-        calibrationSample = 0;
-        imuState = ImuState::IMU_CALIBRATING;
-    }
-}
+
 
 void Bmi088::initialize(float sampleFrequency, float mahonyKp, float mahonyKi)
 {
+    AbstractIMU::initialize(sampleFrequency, mahonyKp, mahonyKi);
 #if !defined(PLATFORM_HOSTED)
     ImuCS1Accel::GpioOutput();
     ImuCS1Gyro::GpioOutput();
@@ -90,7 +71,6 @@ void Bmi088::initialize(float sampleFrequency, float mahonyKp, float mahonyKi)
 
     imuHeater.initialize();
 
-    mahonyAlgorithm.begin(sampleFrequency, mahonyKp, mahonyKi);
 }
 
 void Bmi088::initializeAcc()
@@ -168,54 +148,8 @@ void Bmi088::initializeGyro()
 
 void Bmi088::periodicIMUUpdate()
 {
-    if (imuState == ImuState::IMU_NOT_CONNECTED)
-    {
-        RAISE_ERROR(drivers, "periodicIMUUpdate called w/ imu not connected");
-        return;
-    }
-
-    if (imuState == ImuState::IMU_CALIBRATING)
-    {
-        computeOffsets();
-    }
-    else
-    {
-        mahonyAlgorithm.updateIMU(
-            data.gyroDegPerSec[ImuData::X],
-            data.gyroDegPerSec[ImuData::Y],
-            data.gyroDegPerSec[ImuData::Z],
-            data.accG[ImuData::X],
-            data.accG[ImuData::Y],
-            data.accG[ImuData::Z]);
-    }
-
+    AbstractImu::periodicIMUUpdate();
     imuHeater.runTemperatureController(data.temperature);
-}
-
-void Bmi088::computeOffsets()
-{
-    calibrationSample++;
-
-    data.gyroOffsetRaw[ImuData::X] += data.gyroRaw[ImuData::X];
-    data.gyroOffsetRaw[ImuData::Y] += data.gyroRaw[ImuData::Y];
-    data.gyroOffsetRaw[ImuData::Z] += data.gyroRaw[ImuData::Z];
-    data.accOffsetRaw[ImuData::X] += data.accRaw[ImuData::X];
-    data.accOffsetRaw[ImuData::Y] += data.accRaw[ImuData::Y];
-    data.accOffsetRaw[ImuData::Z] +=
-        data.accRaw[ImuData::Z] - (tap::algorithms::ACCELERATION_GRAVITY / ACC_G_PER_ACC_COUNT);
-
-    if (calibrationSample >= BMI088_OFFSET_SAMPLES)
-    {
-        calibrationSample = 0;
-        data.gyroOffsetRaw[ImuData::X] /= BMI088_OFFSET_SAMPLES;
-        data.gyroOffsetRaw[ImuData::Y] /= BMI088_OFFSET_SAMPLES;
-        data.gyroOffsetRaw[ImuData::Z] /= BMI088_OFFSET_SAMPLES;
-        data.accOffsetRaw[ImuData::X] /= BMI088_OFFSET_SAMPLES;
-        data.accOffsetRaw[ImuData::Y] /= BMI088_OFFSET_SAMPLES;
-        data.accOffsetRaw[ImuData::Z] /= BMI088_OFFSET_SAMPLES;
-        imuState = ImuState::IMU_CALIBRATED;
-        mahonyAlgorithm.reset();
-    }
 }
 
 void Bmi088::read()

@@ -15,9 +15,21 @@ void AbstractIMU::requestCalibration() {
     }
 }
 
+
 void AbstractIMU::periodicIMUUpdate() {
+    if (imuState == ImuState::IMU_NOT_CONNECTED)
+    {
+        RAISE_ERROR(drivers, "periodicIMUUpdate called w/ imu not connected");
+        return;
+    }
     if (imuState == ImuState::IMU_CALIBRATED) {
-        mahonyAlgorithm.updateIMU(getGx(), getGy(), getGz(), getAx(), getAy(), getAz());
+         mahonyAlgorithm.updateIMU(
+            imuData.gyroDegPerSec[ImuData::X],
+            imuData.gyroDegPerSec[ImuData::Y],
+            imuData.gyroDegPerSec[ImuData::Z],
+            imuData.accG[ImuData::X],
+            imuData.accG[ImuData::Y],
+            imuData.accG[ImuData::Z]);
     } else if (imuState == ImuState::IMU_CALIBRATING) {
         computeOffsets();
     }
@@ -33,22 +45,22 @@ void AbstractIMU::resetOffsets(){
 void AbstractIMU::computeOffsets(){
     calibrationSample++;
 
-    imuData.gyroOffsetRaw.x += imuData.gyro[ImuData::X];
-    imuData.gyroOffsetRaw.y += imuData.gyro[ImuData::Y];
-    imuData.gyroOffsetRaw.z += imuData.gyro[ImuData::Z];
+    imuData.gyroOffsetRaw.x += imuData.gyroRaw[ImuData::X];
+    imuData.gyroOffsetRaw.y += imuData.gyroRaw[ImuData::Y];
+    imuData.gyroOffsetRaw.z += imuData.gyroRaw[ImuData::Z];
     imuData.accOffsetRaw.x += imuData.accRaw[ImuData::X];
     imuData.accOffsetRaw.y += imuData.accRaw[ImuData::Y];
     imuData.accOffsetRaw.z += imuData.accRaw.z - getAccelerationSenstivity();
 
-    if (calibrationSample >= MPU6500_OFFSET_SAMPLES)
+    if (calibrationSample >= offsetSampleCount)
     {
         calibrationSample = 0;
-        imuData.gyroOffsetRaw.x /= MPU6500_OFFSET_SAMPLES;
-        imuData.gyroOffsetRaw.y /= MPU6500_OFFSET_SAMPLES;
-        imuData.gyroOffsetRaw.z /= MPU6500_OFFSET_SAMPLES;
-        imuData.accelOffset.x /= MPU6500_OFFSET_SAMPLES;
-        imuData.accelOffset.y /= MPU6500_OFFSET_SAMPLES;
-        imuData.accelOffset.z /= MPU6500_OFFSET_SAMPLES;
+        imuData.gyroOffsetRaw.x /= offsetSampleCount;
+        imuData.gyroOffsetRaw.y /= offsetSampleCount;
+        imuData.gyroOffsetRaw.z /= offsetSampleCount;
+        imuData.accelOffset.x /= offsetSampleCount;
+        imuData.accelOffset.y /= offsetSampleCount;
+        imuData.accelOffset.z /= offsetSampleCount;
         imuState = ImuState::IMU_CALIBRATED;
         mahonyAlgorithm.reset();
     }

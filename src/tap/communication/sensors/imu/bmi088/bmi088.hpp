@@ -79,70 +79,28 @@ public:
     static constexpr float ACC_G_PER_ACC_COUNT =
         modm::pow(2, ACC_RANGE.value + 1) * 1.5f * tap::algorithms::ACCELERATION_GRAVITY / 32768.0f;
 
-    /**
-     * The number of samples we take in order to determine the mpu offsets.
-     */
-    float BMI088_OFFSET_SAMPLES = 1000;
-
     Bmi088(tap::Drivers *drivers);
 
     /**
      * Starts and configures the bmi088. Blocks for < 200 ms.
      */
-    mockable void initialize(float sampleFrequency, float mahonyKp, float mahonyKi);
+    mockable void initialize(float sampleFrequency, float mahonyKp, float mahonyKi) override;
 
     /**
      * Call this function at same rate as intialized sample frequency.
      * Performs the mahony AHRS algorithm to compute pitch/roll/yaw.
      */
-    mockable void periodicIMUUpdate();
+    mockable void periodicIMUUpdate() override;
 
     /**
      * This function reads the IMU data from SPI
      *
      * @note This function blocks for 129 microseconds to read registers from the BMI088.
      */
-    mockable void read();
-
-    /**
-     * Returns the state of the IMU. Can be not connected, connected but not calibrated, or
-     * calibrated. When not connected, IMU data will be garbage. When not calibrated, IMU data is
-     * valid but the computed yaw angle data will drift. When calibrating, the IMU data is invalid.
-     * When calibrated, the IMU data is valid and assuming proper calibration the IMU data should
-     * not drift.
-     *
-     * To be safe, whenever you call the functions below, call this function to ensure
-     * the data you are about to receive is not garbage.
-     */
-    mockable ImuState getImuState() const;
-
-    /**
-     * When this function is called, the bmi088 enters a calibration state during which time,
-     * gyro/accel calibration offsets will be computed and the mahony algorithm reset. When
-     * calibrating, angle, accelerometer, and gyroscope values will return 0. When calibrating
-     * the BMI088 should be level, otherwise the IMU will be calibrated incorrectly.
-     */
-    mockable void requestRecalibration();
+    mockable void read() override;
+    
 
     inline const char *getName() const final_mockable { return "bmi088"; }
-
-    mockable inline float getYaw() final_mockable { return mahonyAlgorithm.getYaw(); }
-    mockable inline float getPitch() final_mockable { return mahonyAlgorithm.getPitch(); }
-    mockable inline float getRoll() final_mockable { return mahonyAlgorithm.getRoll(); }
-
-    mockable inline float getGx() final_mockable { return data.gyroDegPerSec[ImuData::X]; }
-    mockable inline float getGy() final_mockable { return data.gyroDegPerSec[ImuData::Y]; }
-    mockable inline float getGz() final_mockable { return data.gyroDegPerSec[ImuData::Z]; }
-
-    mockable inline float getAx() final_mockable { return data.accG[ImuData::X]; }
-    mockable inline float getAy() final_mockable { return data.accG[ImuData::Y]; }
-    mockable inline float getAz() final_mockable { return data.accG[ImuData::Z]; }
-
-    mockable inline float getTemp() final_mockable { return data.temperature; }
-
-    mockable inline uint32_t getPrevIMUDataReceivedTime() const { return prevIMUDataReceivedTime; }
-
-    inline void setOffsetSamples(float samples) { BMI088_OFFSET_SAMPLES = samples; }
 
     inline void setAccOversampling(Acc::AccBandwidth oversampling)
     {
@@ -162,19 +120,8 @@ private:
     /// Offset parsed temperature reading by this amount if > RAW_TEMPERATURE_TO_APPLY_OFFSET.
     static constexpr int16_t RAW_TEMPERATURE_OFFSET = -2048;
 
-    
-
-    tap::Drivers *drivers;
-
-    ImuState imuState = ImuState::IMU_NOT_CONNECTED;
-
-    Mahony mahonyAlgorithm;
 
     imu_heater::ImuHeater imuHeater;
-
-    int calibrationSample = 0;
-
-    uint32_t prevIMUDataReceivedTime = 0;
 
     Acc::AccBandwidth accOversampling = Acc::AccBandwidth::NORMAL;
     Acc::AccOutputRate accOutputRate = Acc::AccOutputRate::Hz800;
@@ -184,7 +131,6 @@ private:
     Gyro::GyroBandwidth gyroOutputRate = Gyro::GyroBandwidth::ODR1000_BANDWIDTH116;
     void initializeGyro();
 
-    void computeOffsets();
 
     void setAndCheckAccRegister(Acc::Register reg, Acc::Registers_t value);
 

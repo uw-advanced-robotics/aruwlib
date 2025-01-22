@@ -43,30 +43,7 @@ Mpu6500::Mpu6500(Drivers *drivers)
 {
 }
 
-void Mpu6500::requestCalibration()
-{
-    if (imuState == ImuState::IMU_NOT_CALIBRATED || imuState == ImuState::IMU_CALIBRATED)
-    {
-        imuData.gyroOffsetRaw[ImuData::X] = 0;
-        imuData.gyroOffsetRaw[ImuData::Y] = 0;
-        imuData.gyroOffsetRaw[ImuData::Z] = 0;
-        imuData.accOffsetRaw[ImuData::X] = 0;
-        imuData.accOffsetRaw[ImuData::Y] = 0;
-        imuData.accOffsetRaw[ImuData::Z] = 0;
-        calibrationSample = 0;
-        imuState = ImuState::IMU_CALIBRATING;
-    }
-}
-
 void Mpu6500::initialize(float sampleFrequency, float mahonyKp, float mahonyKi)
-{
-    mahonyAlgorithm.begin(sampleFrequency, mahonyKp, mahonyKi);
-    imuHeater.initialize();
-    imuState = ImuState::IMU_NOT_CALIBRATED;
-    init(sampleFrequency, mahonyKp, mahonyKi);
-}
-
-void Mpu6500::init(float sampleFrequency, float mahonyKp, float mahonyKi)
 {
 #ifndef PLATFORM_HOSTED
     // Configure NSS pin
@@ -131,86 +108,20 @@ void Mpu6500::init(float sampleFrequency, float mahonyKp, float mahonyKi)
 
     assert(delayBtwnCalcAndReadReg >= 0);
 
-    readRegistersTimeout.restart(delayBtwnCalcAndReadReg);
+    readTimeout.restart(delayBtwnCalcAndReadReg);
 
-    mahonyAlgorithm.begin(sampleFrequency, mahonyKp, mahonyKi);
-
-    imuState = ImuState::IMU_NOT_CALIBRATED;
+    AbstractIMU::initialize(sampleFrequency, mahonyKp, mahonyKi);
 }
 
-void Mpu6500::resetOffsets()
-{
-    imuData.gyroOffsetRaw[ImuData::X] = 0;
-    imuData.gyroOffsetRaw[ImuData::Y] = 0;
-    imuData.gyroOffsetRaw[ImuData::Z] = 0;
-    imuData.accOffsetRaw[ImuData::X] = 0;
-    imuData.accOffsetRaw[ImuData::Y] = 0;
-    imuData.accOffsetRaw[ImuData::Z] = 0;
-}
 
-void Mpu6500::computeOffsets()
-{
-    calibrationSample++;
-
-    imuData.gyroOffsetRaw[ImuData::X] += imuData.gyroRaw[ImuData::X];
-    imuData.gyroOffsetRaw[ImuData::Y] += imuData.gyroRaw[ImuData::Y];
-    imuData.gyroOffsetRaw[ImuData::Z] += imuData.gyroRaw[ImuData::Z];
-    imuData.accOffsetRaw[ImuData::X] += imuData.accRaw[ImuData::X];
-    imuData.accOffsetRaw[ImuData::Y] += imuData.accRaw[ImuData::Y];
-    imuData.accOffsetRaw[ImuData::Z] += imuData.accRaw[ImuData::Z] - ACCELERATION_SENSITIVITY;
-
-    if (calibrationSample >= MPU6500_OFFSET_SAMPLES)
-    {
-        calibrationSample = 0;
-        imuData.gyroOffsetRaw[ImuData::X] /= MPU6500_OFFSET_SAMPLES;
-        imuData.gyroOffsetRaw[ImuData::Y] /= MPU6500_OFFSET_SAMPLES;
-        imuData.gyroOffsetRaw[ImuData::Z] /= MPU6500_OFFSET_SAMPLES;
-        imuData.accOffsetRaw[ImuData::X] /= MPU6500_OFFSET_SAMPLES;
-        imuData.accOffsetRaw[ImuData::Y] /= MPU6500_OFFSET_SAMPLES;
-        imuData.accOffsetRaw[ImuData::Z] /= MPU6500_OFFSET_SAMPLES;
-        imuState = ImuState::IMU_CALIBRATED;
-        mahonyAlgorithm.reset();
-    }
-}
 
 void Mpu6500::periodicIMUUpdate()
 {
-    if (imuState == ImuState::IMU_NOT_CALIBRATED || imuState == ImuState::IMU_CALIBRATED)
-    {
-        mahonyAlgorithm.updateIMU(getGx(), getGy(), getGz(), getAx(), getAy(), getAz());
-        tiltAngleCalculated = false;
-        // Start reading registers in DELAY_BTWN_CALC_AND_READ_REG us
-    }
-    else
-    {
-        calibrationSample++;
+    AbstractIMU::periodicIMUUpdate();
 
-        imuData.gyroOffsetRaw[ImuData::X] += imuData.gyroRaw[ImuData::X];
-        imuData.gyroOffsetRaw[ImuData::Y] += imuData.gyroRaw[ImuData::Y];
-        imuData.gyroOffsetRaw[ImuData::Z] += imuData.gyroRaw[ImuData::Z];
-        imuData.accOffsetRaw[ImuData::X] += imuData.accRaw[ImuData::X];
-        imuData.accOffsetRaw[ImuData::Y] += imuData.accRaw[ImuData::Y];
-        imuData.accOffsetRaw[ImuData::Z] += imuData.accRaw[ImuData::Z] - ACCELERATION_SENSITIVITY;
-
-        if (calibrationSample >= MPU6500_OFFSET_SAMPLES)
-        {
-            calibrationSample = 0;
-            imuData.gyroOffsetRaw[ImuData::X] /= MPU6500_OFFSET_SAMPLES;
-            imuData.gyroOffsetRaw[ImuData::Y] /= MPU6500_OFFSET_SAMPLES;
-            imuData.gyroOffsetRaw[ImuData::Z] /= MPU6500_OFFSET_SAMPLES;
-            imuData.accOffsetRaw[ImuData::X] /= MPU6500_OFFSET_SAMPLES;
-            imuData.accOffsetRaw[ImuData::Y] /= MPU6500_OFFSET_SAMPLES;
-            imuData.accOffsetRaw[ImuData::Z] /= MPU6500_OFFSET_SAMPLES;
-            imuState = ImuState::IMU_CALIBRATED;
-            mahonyAlgorithm.reset();
-        }
-    }
-
-    readRegistersTimeout.restart(delayBtwnCalcAndReadReg);
+    readTimeout.restart(delayBtwnCalcAndReadReg);
 
     imuHeater.runTemperatureController(getTemp());
-
-    addValidationErrors();
 }
 
 bool Mpu6500::read()
@@ -219,7 +130,7 @@ bool Mpu6500::read()
     PT_BEGIN();
     while (true)
     {
-        PT_WAIT_UNTIL(readRegistersTimeout.execute());
+        PT_WAIT_UNTIL(readTimeout.execute());
 
         mpuNssLow();
         tx = MPU6500_ACCEL_XOUT_H | MPU6500_READ_BIT;
@@ -229,9 +140,9 @@ bool Mpu6500::read()
         PT_CALL(Board::ImuSpiMaster::transfer(txBuff, rxBuff, ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE));
         mpuNssHigh();
 
-        (*processRawMpu6500DataFn)(rxBuff, imuData.accRaw, imuData.gyroRaw);
+        processRawMpu6500Data(rxBuff, imuData.accRaw, imuData.gyroRaw);
 
-        imuData.temperature = rxBuff[6] << 8 | rxBuff[7];
+        imuData.temperature = parseTemp(static_cast<float>(rxBuff[6] << 8 | rxBuff[7]));
 
         prevIMUDataReceivedTime = tap::arch::clock::getTimeMicroseconds();
     }
@@ -241,16 +152,6 @@ bool Mpu6500::read()
 #endif
 }
 
-float Mpu6500::getTiltAngle()
-{
-    if (!tiltAngleCalculated)
-    {
-        tiltAngle = modm::toDegree(acosf(
-            cosf(mahonyAlgorithm.getPitchRadians()) * cosf(mahonyAlgorithm.getRollRadians())));
-        tiltAngleCalculated = true;
-    }
-    return validateReading(tiltAngle);
-}
 
 // Hardware interface functions (blocking functions, for initialization only)
 
@@ -317,28 +218,9 @@ void Mpu6500::mpuNssHigh()
 #endif
 }
 
-/**
- * Add any errors to the error handler that have came up due to calls to validateReading.
- */
-void Mpu6500::addValidationErrors()
-{
-    if (errorState & (1 << static_cast<uint8_t>(ImuState::IMU_NOT_CALIBRATED)))
-    {
-        RAISE_ERROR(drivers, "IMU data requested but IMU not calibrated");
-    }
-    else if (errorState & (1 << static_cast<uint8_t>(ImuState::IMU_CALIBRATING)))
-    {
-        RAISE_ERROR(drivers, "Reading IMU data but IMU calibrating");
-    }
-    else if (errorState & (1 << static_cast<uint8_t>(ImuState::IMU_NOT_CONNECTED)))
-    {
-        RAISE_ERROR(drivers, "Failed to initialize IMU properly");
-    }
 
-    errorState = 0;
-}
 
-void Mpu6500::defaultProcessRawMpu6500Data(
+void Mpu6500::processRawMpu6500Data(
     const uint8_t (&rxBuff)[ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE],
     modm::Vector3f &accel,
     modm::Vector3f &gyro)

@@ -3,26 +3,49 @@
 
 #include "tap/algorithms/MahonyAHRS.h"
 #include "tap/communication/sensors/imu/imu_interface.hpp"
-#include "tap/communication/sensors/imu_heater/imu_heater.hpp"
+#include "tap/architecture/timeout.hpp"
 
 namespace tap::communication::sensors::imu {
 
 class AbstractIMU : public ImuInterface {
 public:
     explicit AbstractIMU(tap::Drivers *drivers)
-        : drivers(drivers), imuHeater(drivers) {}
+        : drivers(drivers){}
 
     virtual ~AbstractIMU() = default;
 
     virtual void initialize(float sampleFrequency, float mahonyKp, float mahonyKi);
+
+    /**
+     * When this function is called, the bmi088 enters a calibration state during which time,
+     * gyro/accel calibration offsets will be computed and the mahony algorithm reset. When
+     * calibrating, angle, accelerometer, and gyroscope values will return 0. When calibrating
+     * the BMI088 should be level, otherwise the IMU will be calibrated incorrectly.
+     */
     virtual void requestCalibration();
+
+    /**
+     * Call this function at same rate as intialized sample frequency.
+     * Performs the mahony AHRS algorithm to compute pitch/roll/yaw.
+     */
     virtual void periodicIMUUpdate();
+    
     virtual bool read() = 0;  
 
     virtual float getYaw() final { return mahonyAlgorithm.getYaw(); }
     virtual float getPitch() final { return mahonyAlgorithm.getPitch(); }
     virtual float getRoll() final { return mahonyAlgorithm.getRoll(); }
 
+    /**
+     * Returns the state of the IMU. Can be not connected, connected but not calibrated, or
+     * calibrated. When not connected, IMU data will be garbage. When not calibrated, IMU data is
+     * valid but the computed yaw angle data will drift. When calibrating, the IMU data is invalid.
+     * When calibrated, the IMU data is valid and assuming proper calibration the IMU data should
+     * not drift.
+     *
+     * To be safe, whenever you call the functions below, call this function to ensure
+     * the data you are about to receive is not garbage.
+     */
     virtual ImuState getImuState() const final { return imuState; }
 
     inline float getAx()  override { return imuData.accG[ImuData::X]; }
@@ -34,6 +57,21 @@ public:
     inline float getGz()  override { return imuData.gyroDegPerSec[ImuData::Z]; }
 
     inline float getTemp() override { return imuData.temperature; }
+
+     /**
+     * Returns yaw angle in degrees.
+     */
+    inline float getYaw() final_mockable { return validateReading(mahonyAlgorithm.getYaw()); }
+
+    /**
+     * Returns pitch angle in degrees.
+     */
+    inline float getPitch() final_mockable { return validateReading(mahonyAlgorithm.getPitch()); }
+
+    /**
+     * Returns roll angle in degrees.
+     */
+    inline float getRoll() final_mockable { return validateReading(mahonyAlgorithm.getRoll()); }
 
     struct ImuData
     {
@@ -54,11 +92,15 @@ public:
         float temperature = 0;
     };
 
+    void setCalibrationSamples(int sampleCount) {
+        offsetSampleCount = sampleCount;
+    }
+
 protected:
     virtual void resetOffsets() = 0;
     virtual void computeOffsets() = 0;
 
-    virtual float getAccelerationSenstivity() = 0;
+    virtual inline float getAccelerationSenstivity() = 0;
 
     tap::Drivers *drivers;
 
@@ -66,8 +108,13 @@ protected:
     
     ImuState imuState = ImuState::IMU_NOT_CONNECTED;
     int calibrationSample = 0;
+    int offsetSampleCount = 1000;
     
     ImuData imuData;
+
+    tap::arch::MicroTimeout readTimeout;
+    
+    uint32_t prevIMUDataReceivedTime = 0;
 };
 
 }  // namespace tap::communication::sensors::imu
