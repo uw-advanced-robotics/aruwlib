@@ -61,17 +61,17 @@ public:
      /**
      * Returns yaw angle in degrees.
      */
-    inline float getYaw() final_mockable { return (mahonyAlgorithm.getYaw()); }
+    inline float getYaw() override { return (mahonyAlgorithm.getYaw()); }
 
     /**
      * Returns pitch angle in degrees.
      */
-    inline float getPitch() final_mockable { return (mahonyAlgorithm.getPitch()); }
+    inline float getPitch() override { return (mahonyAlgorithm.getPitch()); }
 
     /**
      * Returns roll angle in degrees.
      */
-    inline float getRoll() final_mockable { return (mahonyAlgorithm.getRoll()); }
+    inline float getRoll() override { return (mahonyAlgorithm.getRoll()); }
 
     struct ImuData
     {
