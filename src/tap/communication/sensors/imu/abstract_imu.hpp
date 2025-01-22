@@ -29,7 +29,7 @@ public:
      * Performs the mahony AHRS algorithm to compute pitch/roll/yaw.
      */
     virtual void periodicIMUUpdate();
-    
+
     virtual bool read() = 0;  
 
     virtual float getYaw() final { return mahonyAlgorithm.getYaw(); }
@@ -61,17 +61,17 @@ public:
      /**
      * Returns yaw angle in degrees.
      */
-    inline float getYaw() final_mockable { return validateReading(mahonyAlgorithm.getYaw()); }
+    inline float getYaw() final_mockable { return (mahonyAlgorithm.getYaw()); }
 
     /**
      * Returns pitch angle in degrees.
      */
-    inline float getPitch() final_mockable { return validateReading(mahonyAlgorithm.getPitch()); }
+    inline float getPitch() final_mockable { return (mahonyAlgorithm.getPitch()); }
 
     /**
      * Returns roll angle in degrees.
      */
-    inline float getRoll() final_mockable { return validateReading(mahonyAlgorithm.getRoll()); }
+    inline float getRoll() final_mockable { return (mahonyAlgorithm.getRoll()); }
 
     struct ImuData
     {
