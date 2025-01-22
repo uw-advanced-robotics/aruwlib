@@ -27,6 +27,8 @@ def build(env):
     env.copy("imu_interface.hpp")
     env.copy("imu_terminal_serial_handler.hpp")
     env.copy("imu_terminal_serial_handler.cpp")
+    env.copy("abstract_imu.hpp")
+    env.copy("abstract_imu.cpp")
 
     if (env.has_module("taproot:display")):
         env.copy("imu_menu.hpp")
