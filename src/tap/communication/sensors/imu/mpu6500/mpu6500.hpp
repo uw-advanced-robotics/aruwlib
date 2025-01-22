@@ -75,7 +75,7 @@ public:
      * @note this function can block for approximately 12 seconds.
      */
     mockable void initialize(float sampleFrequency, float mahonyKp, float mahonyKi) override;
-
+    mockable inline void init(float sampleFrequency, float mahonyKp, float mahonyKi) { initialize(sampleFrequency, mahonyKp, mahonyKi); }
     /**
      * Calculates the IMU's pitch, roll, and yaw angles usign the Mahony AHRS algorithm.
      * Also runs a controller to keep the temperature constant.
