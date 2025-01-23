@@ -130,7 +130,6 @@ private:
 
     inline float getAccelerationSensitivity() override { return ACCELERATION_SENSITIVITY; }
 
-    void processRawData(const uint8_t (&rxBuff)[ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE]);
 
     /**
      * The number of samples we take while calibrating in order to determine the mpu offsets.
@@ -196,12 +195,6 @@ private:
      */
     void spiReadRegisters(uint8_t regAddr, uint8_t *pData, uint8_t len);
 
-    /// Default processing function when IMU is lying flat on the robot.
-    void defaultProcessRawMpu6500Data(
-        const uint8_t (&rxBuff)[ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE],
-        modm::Vector3f &accel,
-        modm::Vector3f &gyro,
-        ImuData &imuData);
 
     float parseTemp(float temperature) { return 21.0f + temperature / 333.87f; }
 };
