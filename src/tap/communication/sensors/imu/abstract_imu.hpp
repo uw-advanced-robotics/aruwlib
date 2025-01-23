@@ -102,9 +102,8 @@ protected:
 
     virtual inline float getAccelerationSensitivity() = 0;
 
-    tap::algorithms::transforms::Transform mountingTransform;
-
     tap::Drivers *drivers;
+    tap::algorithms::transforms::Transform mountingTransform;
 
     Mahony mahonyAlgorithm;
     
