@@ -20,9 +20,9 @@ namespace tap::communication::sensors::imu {
 class AbstractIMU : public ImuInterface {
 public:
     explicit AbstractIMU(tap::Drivers *drivers)
-        : drivers(drivers){}
+    : drivers(drivers), mountingTransform(Transform::identity()){}
 
-    AbstractIMU(const Transform& mountingTransform = Transform(Transform.identity()));
+    AbstractIMU(const Transform& mountingTransform = Transform(Transform::identity()));
     void setMountingTransform(const Transform& transform);
 
     virtual ~AbstractIMU() = default;
