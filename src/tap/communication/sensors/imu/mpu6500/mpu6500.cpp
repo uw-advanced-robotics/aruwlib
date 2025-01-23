@@ -119,6 +119,8 @@ void Mpu6500::periodicIMUUpdate()
     readTimeout.restart(delayBtwnCalcAndReadReg);
 
     imuHeater.runTemperatureController(getTemp());
+
+    processRawData(rxBuff);
 }
 
 void Mpu6500::processRawData(const uint8_t (&rxBuff)[ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE]) {
