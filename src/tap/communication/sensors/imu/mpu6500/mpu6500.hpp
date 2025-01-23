@@ -135,7 +135,7 @@ private:
         return ACCELERATION_SENSITIVITY;
     }
 
-    void processRawData(const uint8_t (&rxBuff)[ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE]) override;
+    void processRawData(const uint8_t (&rxBuff)[ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE]);
 
     /**
      * The number of samples we take while calibrating in order to determine the mpu offsets.
