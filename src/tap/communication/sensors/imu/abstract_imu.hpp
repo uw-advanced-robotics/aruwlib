@@ -10,10 +10,7 @@ namespace tap
 {
 class Drivers;
 }
-namespace tap::algorithms::transforms
-{
-class Transform;
-}
+using tap::algorithms::transforms::Transform;
 namespace tap::communication::sensors::imu {
 
 class AbstractIMU : public ImuInterface {
@@ -21,10 +18,8 @@ public:
     explicit AbstractIMU(tap::Drivers *drivers)
         : drivers(drivers){}
 
-    AbstractIMU(const Transform& mountingTransform = Transform());
+    AbstractIMU(const Transform& mountingTransform = Transform(Transform.identity()));
     void setMountingTransform(const Transform& transform);
-
-    ImuData getTransformedData() const;
 
     virtual ~AbstractIMU() = default;
 
@@ -102,9 +97,6 @@ protected:
     void computeOffsets();
 
     virtual inline float getAccelerationSensitivity() = 0;
-
-    modm::Vector3f gravity; 
-    virtual void processRawData(const uint8_t (&rxBuff)[ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE]) = 0;
 
     tap::algorithms::transforms::Transform mountingTransform;
 
