@@ -12,7 +12,7 @@ class Drivers;
 }
 namespace tap::algorithms::transforms
 {
-    Class Transform;
+class Transform;
 }
 namespace tap::communication::sensors::imu {
 
