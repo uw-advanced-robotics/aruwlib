@@ -157,13 +157,13 @@ void Mpu6500::processRawData(const uint8_t (&rxBuff)[ACC_GYRO_TEMPERATURE_BUFF_R
         )
     );
 
-    imuData.accG[ImuData::X] = transformedAccel.pitch - transformedGravity.pitch;
-    imuData.accG[ImuData::Y] = transformedAccel.roll - transformedGravity.roll;
-    imuData.accG[ImuData::Z] = transformedAccel.yaw - transformedGravity.yaw;
+    imuData.accG[ImuData::X] = transformedAccel.pitch() - transformedGravity.pitch();
+    imuData.accG[ImuData::Y] = transformedAccel.roll() - transformedGravity.roll();
+    imuData.accG[ImuData::Z] = transformedAccel.yaw() - transformedGravity.yaw();
 
-    imuData.gyroDegPerSec[ImuData::X] = transformedGyro.pitch;
-    imuData.gyroDegPerSec[ImuData::Y] = transformedGyro.roll;
-    imuData.gyroDegPerSec[ImuData::Z] = transformedGyro.yaw;
+    imuData.gyroDegPerSec[ImuData::X] = transformedGyro.pitch();
+    imuData.gyroDegPerSec[ImuData::Y] = transformedGyro.roll();
+    imuData.gyroDegPerSec[ImuData::Z] = transformedGyro.yaw();
 
     imuData.temperature = parseTemp(static_cast<float>(rxBuff[6] << 8 | rxBuff[7]));
 }
