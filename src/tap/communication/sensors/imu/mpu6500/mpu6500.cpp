@@ -121,6 +121,35 @@ void Mpu6500::periodicIMUUpdate()
     imuHeater.runTemperatureController(getTemp());
 }
 
+void Mpu6500::processRawData(const uint8_t (&rxBuff)[ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE]) {
+    modm::Vector3f rawAccel(
+        LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff),
+        LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 2),
+        LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 4)
+    );
+
+    modm::Vector3f rawGyro(
+        LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 8),
+        LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 10),
+        LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 12)
+    );
+
+    auto transformedAccel = mountingTransform.apply(rawAccel);
+    auto transformedGyro = mountingTransform.apply(rawGyro);
+
+    auto transformedGravity = mountingTransform.apply(gravity);
+
+    transformedAccel -= transformedGravity;
+
+    imuData.accG[ImuData::X] = transformedAccel.x;
+    imuData.accG[ImuData::Y] = transformedAccel.y;
+    imuData.accG[ImuData::Z] = transformedAccel.z;
+
+    imuData.gyroDegPerSec[ImuData::X] = transformedGyro.x;
+    imuData.gyroDegPerSec[ImuData::Y] = transformedGyro.y;
+    imuData.gyroDegPerSec[ImuData::Z] = transformedGyro.z;
+}
+
 bool Mpu6500::read()
 {
 #ifndef PLATFORM_HOSTED
@@ -137,7 +166,6 @@ bool Mpu6500::read()
         PT_CALL(Board::ImuSpiMaster::transfer(txBuff, rxBuff, ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE));
         mpuNssHigh();
 
-        // Process raw acceleration data
         imuData.accRaw[0] = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff);
         imuData.accRaw[1] = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 2);
         imuData.accRaw[2] = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 4);
@@ -149,7 +177,6 @@ bool Mpu6500::read()
         imuData.accRaw[2] = (imuData.accRaw[2] - imuData.accOffsetRaw[ImuData::Z]) * 
                             ACCELERATION_GRAVITY / ACCELERATION_SENSITIVITY;
 
-        // Process raw gyroscope data
         imuData.gyroRaw[0] = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 8);
         imuData.gyroRaw[1] = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 10);
         imuData.gyroRaw[2] = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 12);
@@ -161,7 +188,6 @@ bool Mpu6500::read()
         imuData.gyroRaw[2] = (imuData.gyroRaw[2] - imuData.gyroOffsetRaw[ImuData::Z]) / 
                              LSB_D_PER_S_TO_D_PER_S;
 
-        // Process temperature
         imuData.temperature = parseTemp(static_cast<float>(rxBuff[6] << 8 | rxBuff[7]));
 
         prevIMUDataReceivedTime = tap::arch::clock::getTimeMicroseconds();

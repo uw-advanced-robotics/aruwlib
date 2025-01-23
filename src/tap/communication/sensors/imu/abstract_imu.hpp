@@ -4,18 +4,27 @@
 #include "tap/algorithms/MahonyAHRS.h"
 #include "tap/communication/sensors/imu/imu_interface.hpp"
 #include "tap/architecture/timeout.hpp"
+#include "tap/algorithms/transforms/transform.hpp"
 
 namespace tap
 {
 class Drivers;
 }
-
+namespace tap::algorithms::transforms
+{
+    Class Transform;
+}
 namespace tap::communication::sensors::imu {
 
 class AbstractIMU : public ImuInterface {
 public:
     explicit AbstractIMU(tap::Drivers *drivers)
         : drivers(drivers){}
+
+    AbstractIMU(const Transform& mountingTransform = Transform());
+    void setMountingTransform(const Transform& transform);
+
+    ImuData getTransformedData() const;
 
     virtual ~AbstractIMU() = default;
 
@@ -93,6 +102,11 @@ protected:
     void computeOffsets();
 
     virtual inline float getAccelerationSensitivity() = 0;
+
+    modm::Vector3f gravity; 
+    virtual void processRawData(const uint8_t (&rxBuff)[ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE]) = 0;
+
+    tap::algorithms::transforms::Transform mountingTransform;
 
     tap::Drivers *drivers;
 

@@ -2,6 +2,11 @@
 
 namespace tap::communication::sensors::imu {
 
+AbstractIMU(const tap::algorithms::transforms::Transform& mountingTransform = Transform())
+        : gravity(0, 0, 9.81), mountingTransform(mountingTransform) {}
+
+
+
 void AbstractIMU::initialize(float sampleFrequency, float mahonyKp, float mahonyKi) {
     mahonyAlgorithm.begin(sampleFrequency, mahonyKp, mahonyKi);
     imuState = ImuState::IMU_NOT_CALIBRATED;
@@ -16,15 +21,23 @@ void AbstractIMU::requestCalibration() {
 }
 
 
+void AbstractIMU::setMountingTransform(const Transform& transform) {
+    mountingTransform = transform;
+}
+
+
 void AbstractIMU::periodicIMUUpdate() {
     if (imuState == ImuState::IMU_CALIBRATED) {
-         mahonyAlgorithm.updateIMU(
+        // Update Mahony algorithm
+        mahonyAlgorithm.updateIMU(
             imuData.gyroDegPerSec[ImuData::X],
             imuData.gyroDegPerSec[ImuData::Y],
             imuData.gyroDegPerSec[ImuData::Z],
             imuData.accG[ImuData::X],
             imuData.accG[ImuData::Y],
             imuData.accG[ImuData::Z]);
+
+        processRawImuData(rawBuffer); // rawBuffer should be populated by the derived class
     } else if (imuState == ImuState::IMU_CALIBRATING) {
         computeOffsets();
     }
