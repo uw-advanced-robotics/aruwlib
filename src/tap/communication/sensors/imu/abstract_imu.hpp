@@ -89,8 +89,8 @@ public:
     }
 
 protected:
-    virtual void resetOffsets() = 0;
-    virtual void computeOffsets() = 0;
+    void resetOffsets();
+    void computeOffsets();
 
     virtual inline float getAccelerationSensitivity() = 0;
 
