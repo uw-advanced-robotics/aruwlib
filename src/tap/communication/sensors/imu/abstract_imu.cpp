@@ -32,7 +32,6 @@ void AbstractIMU::periodicIMUUpdate() {
             imuData.accG[ImuData::Y],
             imuData.accG[ImuData::Z]);
 
-        processRawImuData(rawBuffer); // rawBuffer should be populated by the derived class
     } else if (imuState == ImuState::IMU_CALIBRATING) {
         computeOffsets();
     }
