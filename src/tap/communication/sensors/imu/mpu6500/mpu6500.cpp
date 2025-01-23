@@ -35,12 +35,7 @@ using namespace tap::arch;
 
 namespace tap::communication::sensors::imu::mpu6500
 {
-Mpu6500::Mpu6500(Drivers *drivers)
-    : AbstractIMU(drivers),
-      drivers(drivers),
-      imuHeater(drivers)
-{
-}
+Mpu6500::Mpu6500(Drivers *drivers) : AbstractIMU(drivers), drivers(drivers), imuHeater(drivers) {}
 
 void Mpu6500::initialize(float sampleFrequency, float mahonyKp, float mahonyKi)
 {
@@ -121,43 +116,27 @@ void Mpu6500::periodicIMUUpdate()
     imuHeater.runTemperatureController(getTemp());
 }
 
-void Mpu6500::processRawData(const uint8_t (&rxBuff)[ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE]) {
+void Mpu6500::processRawData(const uint8_t (&rxBuff)[ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE])
+{
     modm::Vector3f rawAccel(
         LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff),
         LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 2),
-        LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 4)
-    );
+        LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 4));
 
     modm::Vector3f rawGyro(
         LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 8),
         LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 10),
-        LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 12)
-    );
+        LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 12));
 
-    auto transformedAccel = mountingTransform.apply(
-        Orientation(
-            rawAccel.x,
-            rawAccel.y,
-            rawAccel.z
-        )
-    );
-    auto transformedGyro = mountingTransform.apply(
-        Orientation(
-            rawGyro.x,
-            rawGyro.y,
-            rawGyro.z
-        )
-    );
+    auto transformedAccel =
+        mountingTransform.apply(Orientation(rawAccel.x, rawAccel.y, rawAccel.z));
+    auto transformedGyro = mountingTransform.apply(Orientation(rawGyro.x, rawGyro.y, rawGyro.z));
 
-    auto transformedGravity = mountingTransform.apply(
-        Orientation(
-            0.0f,
-            0.0f,
-            ACCELERATION_GRAVITY
-        )
-    );
+    auto transformedGravity =
+        mountingTransform.apply(Orientation(0.0f, 0.0f, ACCELERATION_GRAVITY));
 
-    imuData.accG[ImuData::X] = modm::toDegree(transformedAccel.pitch() - transformedGravity.pitch());
+    imuData.accG[ImuData::X] =
+        modm::toDegree(transformedAccel.pitch() - transformedGravity.pitch());
     imuData.accG[ImuData::Y] = modm::toDegree(transformedAccel.roll() - transformedGravity.roll());
     imuData.accG[ImuData::Z] = modm::toDegree(transformedAccel.yaw() - transformedGravity.yaw());
 
@@ -188,23 +167,23 @@ bool Mpu6500::read()
         imuData.accRaw[1] = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 2);
         imuData.accRaw[2] = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 4);
 
-        imuData.accRaw[0] = (imuData.accRaw[0] - imuData.accOffsetRaw[ImuData::X]) * 
+        imuData.accRaw[0] = (imuData.accRaw[0] - imuData.accOffsetRaw[ImuData::X]) *
                             ACCELERATION_GRAVITY / ACCELERATION_SENSITIVITY;
-        imuData.accRaw[1] = (imuData.accRaw[1] - imuData.accOffsetRaw[ImuData::Y]) * 
+        imuData.accRaw[1] = (imuData.accRaw[1] - imuData.accOffsetRaw[ImuData::Y]) *
                             ACCELERATION_GRAVITY / ACCELERATION_SENSITIVITY;
-        imuData.accRaw[2] = (imuData.accRaw[2] - imuData.accOffsetRaw[ImuData::Z]) * 
+        imuData.accRaw[2] = (imuData.accRaw[2] - imuData.accOffsetRaw[ImuData::Z]) *
                             ACCELERATION_GRAVITY / ACCELERATION_SENSITIVITY;
 
         imuData.gyroRaw[0] = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 8);
         imuData.gyroRaw[1] = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 10);
         imuData.gyroRaw[2] = LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 12);
 
-        imuData.gyroRaw[0] = (imuData.gyroRaw[0] - imuData.gyroOffsetRaw[ImuData::X]) / 
-                             LSB_D_PER_S_TO_D_PER_S;
-        imuData.gyroRaw[1] = (imuData.gyroRaw[1] - imuData.gyroOffsetRaw[ImuData::Y]) / 
-                             LSB_D_PER_S_TO_D_PER_S;
-        imuData.gyroRaw[2] = (imuData.gyroRaw[2] - imuData.gyroOffsetRaw[ImuData::Z]) / 
-                             LSB_D_PER_S_TO_D_PER_S;
+        imuData.gyroRaw[0] =
+            (imuData.gyroRaw[0] - imuData.gyroOffsetRaw[ImuData::X]) / LSB_D_PER_S_TO_D_PER_S;
+        imuData.gyroRaw[1] =
+            (imuData.gyroRaw[1] - imuData.gyroOffsetRaw[ImuData::Y]) / LSB_D_PER_S_TO_D_PER_S;
+        imuData.gyroRaw[2] =
+            (imuData.gyroRaw[2] - imuData.gyroOffsetRaw[ImuData::Z]) / LSB_D_PER_S_TO_D_PER_S;
 
         imuData.temperature = parseTemp(static_cast<float>(rxBuff[6] << 8 | rxBuff[7]));
 
@@ -217,8 +196,6 @@ bool Mpu6500::read()
     return false;
 #endif
 }
-
-
 
 // Hardware interface functions (blocking functions, for initialization only)
 
@@ -284,6 +261,5 @@ void Mpu6500::mpuNssHigh()
     Board::ImuNss::setOutput(modm::GpioOutput::High);
 #endif
 }
-
 
 }  // namespace tap::communication::sensors::imu::mpu6500

@@ -98,7 +98,6 @@ public:
      * @note This function blocks for 129 microseconds to read registers from the BMI088.
      */
     mockable void read() override;
-    
 
     inline const char *getName() const final_mockable { return "bmi088"; }
 
@@ -120,7 +119,6 @@ private:
     /// Offset parsed temperature reading by this amount if > RAW_TEMPERATURE_TO_APPLY_OFFSET.
     static constexpr int16_t RAW_TEMPERATURE_OFFSET = -2048;
 
-
     imu_heater::ImuHeater imuHeater;
 
     Acc::AccBandwidth accOversampling = Acc::AccBandwidth::NORMAL;
@@ -130,7 +128,6 @@ private:
 
     Gyro::GyroBandwidth gyroOutputRate = Gyro::GyroBandwidth::ODR1000_BANDWIDTH116;
     void initializeGyro();
-
 
     void setAndCheckAccRegister(Acc::Register reg, Acc::Registers_t value);
 

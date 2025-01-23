@@ -18,29 +18,33 @@
  */
 #include "abstract_imu.hpp"
 
-namespace tap::communication::sensors::imu {
-
-void AbstractIMU::initialize(float sampleFrequency, float mahonyKp, float mahonyKi) {
+namespace tap::communication::sensors::imu
+{
+void AbstractIMU::initialize(float sampleFrequency, float mahonyKp, float mahonyKi)
+{
     mahonyAlgorithm.begin(sampleFrequency, mahonyKp, mahonyKi);
     imuState = ImuState::IMU_NOT_CALIBRATED;
 }
 
-void AbstractIMU::requestCalibration() {
-    if (imuState == ImuState::IMU_NOT_CALIBRATED || imuState == ImuState::IMU_CALIBRATED) {
+void AbstractIMU::requestCalibration()
+{
+    if (imuState == ImuState::IMU_NOT_CALIBRATED || imuState == ImuState::IMU_CALIBRATED)
+    {
         resetOffsets();
         calibrationSample = 0;
         imuState = ImuState::IMU_CALIBRATING;
     }
 }
 
-
-void AbstractIMU::setMountingTransform(const Transform& transform) {
+void AbstractIMU::setMountingTransform(const Transform& transform)
+{
     mountingTransform = transform;
 }
 
-
-void AbstractIMU::periodicIMUUpdate() {
-    if (imuState == ImuState::IMU_CALIBRATED) {
+void AbstractIMU::periodicIMUUpdate()
+{
+    if (imuState == ImuState::IMU_CALIBRATED)
+    {
         // Update Mahony algorithm
         mahonyAlgorithm.updateIMU(
             imuData.gyroDegPerSec[ImuData::X],
@@ -49,20 +53,24 @@ void AbstractIMU::periodicIMUUpdate() {
             imuData.accG[ImuData::X],
             imuData.accG[ImuData::Y],
             imuData.accG[ImuData::Z]);
-
-    } else if (imuState == ImuState::IMU_CALIBRATING) {
+    }
+    else if (imuState == ImuState::IMU_CALIBRATING)
+    {
         computeOffsets();
     }
 }
 
-void AbstractIMU::resetOffsets(){
-    for(int i = 0; i < 3; i++){
+void AbstractIMU::resetOffsets()
+{
+    for (int i = 0; i < 3; i++)
+    {
         imuData.accOffsetRaw[i] = 0;
         imuData.gyroOffsetRaw[i] = 0;
     }
 }
 
-void AbstractIMU::computeOffsets(){
+void AbstractIMU::computeOffsets()
+{
     calibrationSample++;
 
     imuData.gyroOffsetRaw[ImuData::X] += imuData.gyroRaw[ImuData::X];

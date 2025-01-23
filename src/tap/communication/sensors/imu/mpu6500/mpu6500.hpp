@@ -23,14 +23,13 @@
 #include <cstdint>
 
 #include "tap/algorithms/MahonyAHRS.h"
+#include "tap/communication/sensors/imu/abstract_imu.hpp"
 #include "tap/communication/sensors/imu/imu_interface.hpp"
 #include "tap/communication/sensors/imu_heater/imu_heater.hpp"
 #include "tap/util_macros.hpp"
-#include "tap/communication/sensors/imu/abstract_imu.hpp"
 
 #include "modm/math/geometry.hpp"
 #include "modm/processing/protothread.hpp"
-
 
 #define LITTLE_ENDIAN_INT16_TO_FLOAT(buff) \
     (static_cast<float>(static_cast<int16_t>((*(buff) << 8) | *(buff + 1))))
@@ -60,7 +59,6 @@ public:
      */
     static constexpr uint8_t ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE = 14;
 
-
     Mpu6500(Drivers *drivers);
     DISALLOW_COPY_AND_ASSIGN(Mpu6500)
     mockable ~Mpu6500() = default;
@@ -72,7 +70,10 @@ public:
      * @note this function can block for approximately 12 seconds.
      */
     mockable void initialize(float sampleFrequency, float mahonyKp, float mahonyKi) override;
-    mockable inline void init(float sampleFrequency, float mahonyKp, float mahonyKi) { initialize(sampleFrequency, mahonyKp, mahonyKi); }
+    mockable inline void init(float sampleFrequency, float mahonyKp, float mahonyKi)
+    {
+        initialize(sampleFrequency, mahonyKp, mahonyKi);
+    }
     /**
      * Calculates the IMU's pitch, roll, and yaw angles usign the Mahony AHRS algorithm.
      * Also runs a controller to keep the temperature constant.
@@ -103,10 +104,7 @@ public:
 
     virtual inline const char *getName() const { return "mpu6500"; }
 
-
-
     mockable inline uint32_t getPrevIMUDataReceivedTime() const { return prevIMUDataReceivedTime; }
-
 
     /**
      * Use for converting from gyro values we receive to more conventional degrees / second.
@@ -121,7 +119,6 @@ public:
     }
 
 private:
-
     Drivers *drivers;
 
     static constexpr float ACCELERATION_GRAVITY = 9.80665f;
@@ -131,9 +128,7 @@ private:
      */
     static constexpr float ACCELERATION_SENSITIVITY = 4096.0f;
 
-    inline float getAccelerationSensitivity() override {
-        return ACCELERATION_SENSITIVITY;
-    }
+    inline float getAccelerationSensitivity() override { return ACCELERATION_SENSITIVITY; }
 
     void processRawData(const uint8_t (&rxBuff)[ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE]);
 
@@ -169,10 +164,8 @@ private:
 
     imu_heater::ImuHeater imuHeater;
 
-
     uint8_t txBuff[ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE] = {0};
     uint8_t rxBuff[ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE] = {0};
-
 
     // Functions for interacting with hardware directly.
 
@@ -209,10 +202,8 @@ private:
         modm::Vector3f &accel,
         modm::Vector3f &gyro,
         ImuData &imuData);
-    
-    float parseTemp(float temperature){
-        return 21.0f + temperature / 333.87f;
-    }
+
+    float parseTemp(float temperature) { return 21.0f + temperature / 333.87f; }
 };
 
 }  // namespace tap::communication::sensors::imu::mpu6500

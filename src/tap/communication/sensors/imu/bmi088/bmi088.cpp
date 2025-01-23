@@ -44,10 +44,9 @@ namespace tap::communication::sensors::imu::bmi088
 #define DELAY_US(us) modm::delay_us(us);
 #endif
 
-Bmi088::Bmi088(tap::Drivers *drivers) : AbstractIMU(drivers), drivers(drivers), imuHeater(drivers) {}
-
-
-
+Bmi088::Bmi088(tap::Drivers *drivers) : AbstractIMU(drivers), drivers(drivers), imuHeater(drivers)
+{
+}
 
 void Bmi088::initialize(float sampleFrequency, float mahonyKp, float mahonyKi)
 {
@@ -70,7 +69,6 @@ void Bmi088::initialize(float sampleFrequency, float mahonyKp, float mahonyKi)
     initializeGyro();
 
     imuHeater.initialize();
-
 }
 
 void Bmi088::initializeAcc()

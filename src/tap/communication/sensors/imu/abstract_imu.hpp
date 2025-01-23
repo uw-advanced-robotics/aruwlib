@@ -21,25 +21,28 @@
 #define TAPROOT_ABSTRACT_IMU_HPP_
 
 #include "tap/algorithms/MahonyAHRS.h"
-#include "tap/communication/sensors/imu/imu_interface.hpp"
-#include "tap/architecture/timeout.hpp"
-#include "tap/algorithms/transforms/transform.hpp"
 #include "tap/algorithms/transforms/orientation.hpp"
-
+#include "tap/algorithms/transforms/transform.hpp"
+#include "tap/architecture/timeout.hpp"
+#include "tap/communication/sensors/imu/imu_interface.hpp"
 
 namespace tap
 {
 class Drivers;
 }
-using tap::algorithms::transforms::Transform;
 using tap::algorithms::transforms::Orientation;
+using tap::algorithms::transforms::Transform;
 
-namespace tap::communication::sensors::imu {
-
-class AbstractIMU : public ImuInterface {
+namespace tap::communication::sensors::imu
+{
+class AbstractIMU : public ImuInterface
+{
 public:
-    explicit AbstractIMU(tap::Drivers *drivers)
-    : drivers(drivers), mountingTransform(Transform::identity()){}
+    explicit AbstractIMU(tap::Drivers* drivers)
+        : drivers(drivers),
+          mountingTransform(Transform::identity())
+    {
+    }
 
     AbstractIMU(const Transform& mountingTransform = Transform(Transform::identity()));
     void setMountingTransform(const Transform& transform);
@@ -62,9 +65,7 @@ public:
      */
     virtual void periodicIMUUpdate();
 
-    virtual bool read() = 0;  
-
-
+    virtual bool read() = 0;
 
     /**
      * Returns the state of the IMU. Can be not connected, connected but not calibrated, or
@@ -78,13 +79,13 @@ public:
      */
     virtual ImuState getImuState() const final { return imuState; }
 
-    inline float getAx()  override { return imuData.accG[ImuData::X]; }
-    inline float getAy()  override { return imuData.accG[ImuData::Y]; }
-    inline float getAz()  override { return imuData.accG[ImuData::Z]; }
+    inline float getAx() override { return imuData.accG[ImuData::X]; }
+    inline float getAy() override { return imuData.accG[ImuData::Y]; }
+    inline float getAz() override { return imuData.accG[ImuData::Z]; }
 
-    inline float getGx()  override { return imuData.gyroDegPerSec[ImuData::X]; }
-    inline float getGy()  override { return imuData.gyroDegPerSec[ImuData::Y]; }
-    inline float getGz()  override { return imuData.gyroDegPerSec[ImuData::Z]; }
+    inline float getGx() override { return imuData.gyroDegPerSec[ImuData::X]; }
+    inline float getGy() override { return imuData.gyroDegPerSec[ImuData::Y]; }
+    inline float getGz() override { return imuData.gyroDegPerSec[ImuData::Z]; }
 
     inline float getTemp() override { return imuData.temperature; }
 
@@ -111,9 +112,7 @@ public:
         float temperature = 0;
     };
 
-    void setCalibrationSamples(int sampleCount) {
-        offsetSampleCount = sampleCount;
-    }
+    void setCalibrationSamples(int sampleCount) { offsetSampleCount = sampleCount; }
 
 protected:
     void resetOffsets();
@@ -121,19 +120,19 @@ protected:
 
     virtual inline float getAccelerationSensitivity() = 0;
 
-    tap::Drivers *drivers;
+    tap::Drivers* drivers;
     tap::algorithms::transforms::Transform mountingTransform;
 
     Mahony mahonyAlgorithm;
-    
+
     ImuState imuState = ImuState::IMU_NOT_CONNECTED;
     int calibrationSample = 0;
     int offsetSampleCount = 1000;
-    
+
     ImuData imuData;
 
     tap::arch::MicroTimeout readTimeout;
-    
+
     uint32_t prevIMUDataReceivedTime = 0;
 };
 
