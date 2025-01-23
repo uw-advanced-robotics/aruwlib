@@ -119,8 +119,6 @@ void Mpu6500::periodicIMUUpdate()
     readTimeout.restart(delayBtwnCalcAndReadReg);
 
     imuHeater.runTemperatureController(getTemp());
-
-    processRawData(rxBuff);
 }
 
 void Mpu6500::processRawData(const uint8_t (&rxBuff)[ACC_GYRO_TEMPERATURE_BUFF_RX_SIZE]) {
@@ -159,13 +157,13 @@ void Mpu6500::processRawData(const uint8_t (&rxBuff)[ACC_GYRO_TEMPERATURE_BUFF_R
         )
     );
 
-    imuData.accG[ImuData::X] = transformedAccel.pitch() - transformedGravity.pitch();
-    imuData.accG[ImuData::Y] = transformedAccel.roll() - transformedGravity.roll();
-    imuData.accG[ImuData::Z] = transformedAccel.yaw() - transformedGravity.yaw();
+    imuData.accG[ImuData::X] = modm::toDegree(transformedAccel.pitch() - transformedGravity.pitch());
+    imuData.accG[ImuData::Y] = modm::toDegree(transformedAccel.roll() - transformedGravity.roll());
+    imuData.accG[ImuData::Z] = modm::toDegree(transformedAccel.yaw() - transformedGravity.yaw());
 
-    imuData.gyroDegPerSec[ImuData::X] = transformedGyro.pitch();
-    imuData.gyroDegPerSec[ImuData::Y] = transformedGyro.roll();
-    imuData.gyroDegPerSec[ImuData::Z] = transformedGyro.yaw();
+    imuData.gyroDegPerSec[ImuData::X] = modm::toDegree(transformedGyro.pitch());
+    imuData.gyroDegPerSec[ImuData::Y] = modm::toDegree(modm::transformedGyro.roll());
+    imuData.gyroDegPerSec[ImuData::Z] = modm::toDegree(transformedGyro.yaw());
 
     imuData.temperature = parseTemp(static_cast<float>(rxBuff[6] << 8 | rxBuff[7]));
 }
@@ -211,6 +209,8 @@ bool Mpu6500::read()
         imuData.temperature = parseTemp(static_cast<float>(rxBuff[6] << 8 | rxBuff[7]));
 
         prevIMUDataReceivedTime = tap::arch::clock::getTimeMicroseconds();
+
+        processRawData(rxBuff);
     }
     PT_END();
 #else
