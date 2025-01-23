@@ -162,7 +162,7 @@ void Mpu6500::processRawData(const uint8_t (&rxBuff)[ACC_GYRO_TEMPERATURE_BUFF_R
     imuData.accG[ImuData::Z] = modm::toDegree(transformedAccel.yaw() - transformedGravity.yaw());
 
     imuData.gyroDegPerSec[ImuData::X] = modm::toDegree(transformedGyro.pitch());
-    imuData.gyroDegPerSec[ImuData::Y] = modm::toDegree(modm::transformedGyro.roll());
+    imuData.gyroDegPerSec[ImuData::Y] = modm::toDegree(transformedGyro.roll());
     imuData.gyroDegPerSec[ImuData::Z] = modm::toDegree(transformedGyro.yaw());
 
     imuData.temperature = parseTemp(static_cast<float>(rxBuff[6] << 8 | rxBuff[7]));
