@@ -70,6 +70,7 @@ public:
      * @note this function can block for approximately 12 seconds.
      */
     mockable void initialize(float sampleFrequency, float mahonyKp, float mahonyKi) override;
+    
     mockable inline void init(float sampleFrequency, float mahonyKp, float mahonyKi)
     {
         initialize(sampleFrequency, mahonyKp, mahonyKi);
@@ -100,7 +101,6 @@ public:
      * temperature, and angle) data, call this function to ensure the data you are about to receive
      * is not undefined.
      */
-    // mockable inline ImuState getImuState() const { return imuState; }
 
     virtual inline const char *getName() const { return "mpu6500"; }
 
@@ -197,6 +197,8 @@ private:
 
 
     float parseTemp(float temperature) { return 21.0f + temperature / 333.87f; }
+
+
 };
 
 }  // namespace tap::communication::sensors::imu::mpu6500

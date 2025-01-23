@@ -52,7 +52,7 @@ namespace tap::communication::sensors::imu::bmi088
  *    expect
  *  - roll and pitch to be defined as.
  */
-class Bmi088 final_mockable : public Bmi088Data, public ImuInterface
+class Bmi088 final_mockable : public Bmi088Data, public AbstractIMU
 {
 public:
     static constexpr Acc::AccRange_t ACC_RANGE = Acc::AccRange::G3;
