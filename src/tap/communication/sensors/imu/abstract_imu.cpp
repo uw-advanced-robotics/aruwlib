@@ -2,11 +2,6 @@
 
 namespace tap::communication::sensors::imu {
 
-AbstractIMU(const tap::algorithms::transforms::Transform& mountingTransform = Transform())
-        : gravity(0, 0, 9.81), mountingTransform(mountingTransform) {}
-
-
-
 void AbstractIMU::initialize(float sampleFrequency, float mahonyKp, float mahonyKi) {
     mahonyAlgorithm.begin(sampleFrequency, mahonyKp, mahonyKi);
     imuState = ImuState::IMU_NOT_CALIBRATED;
