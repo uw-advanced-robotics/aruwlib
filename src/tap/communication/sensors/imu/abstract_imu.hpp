@@ -5,12 +5,16 @@
 #include "tap/communication/sensors/imu/imu_interface.hpp"
 #include "tap/architecture/timeout.hpp"
 #include "tap/algorithms/transforms/transform.hpp"
+#include "tap/algorithms/transforms/orientation.hpp"
+
 
 namespace tap
 {
 class Drivers;
 }
 using tap::algorithms::transforms::Transform;
+using tap::algorithms::transforms::Orientation;
+
 namespace tap::communication::sensors::imu {
 
 class AbstractIMU : public ImuInterface {

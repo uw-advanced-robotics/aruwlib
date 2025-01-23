@@ -134,10 +134,28 @@ void Mpu6500::processRawData(const uint8_t (&rxBuff)[ACC_GYRO_TEMPERATURE_BUFF_R
         LITTLE_ENDIAN_INT16_TO_FLOAT(rxBuff + 12)
     );
 
-    auto transformedAccel = mountingTransform.apply(rawAccel);
-    auto transformedGyro = mountingTransform.apply(rawGyro);
+    auto transformedAccel = mountingTransform.apply(
+        Orientation(
+            rawAccel.x,
+            rawAccel.y,
+            rawAccel.z
+        )
+    );
+    auto transformedGyro = mountingTransform.apply(
+        Orientation(
+            rawGyro.x,
+            rawGyro.y,
+            rawGyro.z
+        )
+    );
 
-    auto transformedGravity = mountingTransform.apply(gravity);
+    auto transformedGravity = mountingTransform.apply(
+        Orientation(
+            0.0f,
+            0.0f,
+            ACCELERATION_GRAVITY
+        )
+    );
 
     transformedAccel -= transformedGravity;
 
