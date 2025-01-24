@@ -21,28 +21,89 @@
 
 namespace tap::algorithms::transforms
 {
-
-// TODO: garbled mess
-Vector StaticTransform::apply(const Position& position, const Vector& velocity) const
+StaticTransform::StaticTransform(const Position& translation, const Orientation& rotation)
+    : translation(translation.coordinates()),
+      rotation(rotation.matrix()),
+      tRotation(rotation.matrix().transpose())
 {
-    // TODO: INFINITELY CURSED
-    // First add the extra velocities induced by angular/translational velocity then rotate like a
-    // vector
-    return Transform::apply(
-        Vector(velocity.coordinates() - transVel - cross(angVel, position.coordinates())));
+}
+
+StaticTransform::StaticTransform(Position&& translation, Orientation&& rotation)
+    : translation(std::move(translation.coordinates())),
+      rotation(std::move(rotation.matrix())),
+      tRotation(rotation.matrix().transpose())
+{
+}
+
+StaticTransform::StaticTransform(const CMSISMat<3, 1>& translation, const CMSISMat<3, 3>& rotation)
+    : translation(translation),
+      rotation(rotation),
+      tRotation(rotation.transpose())
+{
+}
+
+StaticTransform::StaticTransform(CMSISMat<3, 1>&& translation, CMSISMat<3, 3>&& rotation)
+    : translation(std::move(translation)),
+      rotation(std::move(rotation)),
+      tRotation(rotation.transpose())
+{
+}
+
+StaticTransform::StaticTransform(float x, float y, float z, float roll, float pitch, float yaw)
+    : translation({x, y, z}),
+      rotation(fromEulerAngles(roll, pitch, yaw)),
+      tRotation(rotation.transpose())
+{
+}
+
+Position StaticTransform::apply(const Position& position) const
+{
+    return Position(tRotation * (position.coordinates() - translation));
+}
+
+Vector StaticTransform::apply(const Vector& vector) const
+{
+    return Vector(tRotation * vector.coordinates());
+}
+
+Orientation StaticTransform::apply(const Orientation& orientation) const
+{
+    return Orientation(tRotation * orientation.matrix());
 }
 
 StaticTransform StaticTransform::getInverse() const
 {
-    return StaticTransform(Transform::getInverse(), -transVel, -angVel);
+    // negative transposed rotation matrix times original position = new position
+    CMSISMat<3, 1> invTranslation = tRotation * translation;
+    invTranslation = -invTranslation;
+    return StaticTransform(invTranslation, tRotation);
 }
 
 StaticTransform StaticTransform::compose(const StaticTransform& second) const
 {
-    CMSISMat<3, 1> transVel = this->transVel + this->getRotation().matrix() * second.transVel +
-                              cross(this->angVel, second.getTranslation().coordinates());
-    CMSISMat<3, 1> angVel = this->transVel + second.transVel;
-    return StaticTransform(Transform::compose(second), transVel, angVel);
+    CMSISMat<3, 3> newRot = this->rotation * second.rotation;
+    CMSISMat<3, 1> newPos = this->translation + this->rotation * second.translation;
+    return StaticTransform(newPos, newRot);
+}
+
+float StaticTransform::getRoll() const
+{
+    float jz = rotation.data[2 * 3 + 1];
+    float kz = rotation.data[2 * 3 + 2];
+    return atan2(jz, kz);
+}
+
+float StaticTransform::getPitch() const
+{
+    float iz = rotation.data[2 * 3 + 0];
+    return asinf(-iz);
+}
+
+float StaticTransform::getYaw() const
+{
+    float iy = rotation.data[1 * 3 + 0];
+    float ix = rotation.data[0 * 3 + 0];
+    return atan2(iy, ix);
 }
 
 }  // namespace tap::algorithms::transforms
