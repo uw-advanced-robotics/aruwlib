@@ -147,42 +147,47 @@ void Bmi088::initializeGyro()
 void Bmi088::periodicIMUUpdate()
 {
     AbstractImu::periodicIMUUpdate();
-    imuHeater.runTemperatureController(data.temperature);
+    imuHeater.runTemperatureController(imuData.temperature);
 }
 
-void Bmi088::read()
+bool Bmi088::read()
 {
+#ifndef PLATFORM_HOSTED
     uint8_t rxBuff[6] = {};
 
     Bmi088Hal::bmi088AccReadMultiReg(Acc::ACC_X_LSB, rxBuff, 6);
 
     prevIMUDataReceivedTime = tap::arch::clock::getTimeMicroseconds();
 
-    data.accRaw[ImuData::X] = bigEndianInt16ToFloat(rxBuff);
-    data.accRaw[ImuData::Y] = bigEndianInt16ToFloat(rxBuff + 2);
-    data.accRaw[ImuData::Z] = bigEndianInt16ToFloat(rxBuff + 4);
+    imuData.accRaw[ImuData::X] = bigEndianInt16ToFloat(rxBuff);
+    imuData.accRaw[ImuData::Y] = bigEndianInt16ToFloat(rxBuff + 2);
+    imuData.accRaw[ImuData::Z] = bigEndianInt16ToFloat(rxBuff + 4);
 
     Bmi088Hal::bmi088GyroReadMultiReg(Gyro::RATE_X_LSB, rxBuff, 6);
-    data.gyroRaw[ImuData::X] = bigEndianInt16ToFloat(rxBuff);
-    data.gyroRaw[ImuData::Y] = bigEndianInt16ToFloat(rxBuff + 2);
-    data.gyroRaw[ImuData::Z] = bigEndianInt16ToFloat(rxBuff + 4);
+    imuData.gyroRaw[ImuData::X] = bigEndianInt16ToFloat(rxBuff);
+    imuData.gyroRaw[ImuData::Y] = bigEndianInt16ToFloat(rxBuff + 2);
+    imuData.gyroRaw[ImuData::Z] = bigEndianInt16ToFloat(rxBuff + 4);
 
     Bmi088Hal::bmi088AccReadMultiReg(Acc::TEMP_MSB, rxBuff, 2);
-    data.temperature = parseTemp(rxBuff[0], rxBuff[1]);
+    imuData.temperature = parseTemp(rxBuff[0], rxBuff[1]);
 
-    data.gyroDegPerSec[ImuData::X] =
-        GYRO_DS_PER_GYRO_COUNT * (data.gyroRaw[ImuData::X] - data.gyroOffsetRaw[ImuData::X]);
-    data.gyroDegPerSec[ImuData::Y] =
-        GYRO_DS_PER_GYRO_COUNT * (data.gyroRaw[ImuData::Y] - data.gyroOffsetRaw[ImuData::Y]);
-    data.gyroDegPerSec[ImuData::Z] =
-        GYRO_DS_PER_GYRO_COUNT * (data.gyroRaw[ImuData::Z] - data.gyroOffsetRaw[ImuData::Z]);
+    imuData.gyroDegPerSec[ImuData::X] =
+        GYRO_DS_PER_GYRO_COUNT * (imuData.gyroRaw[ImuData::X] - imuData.gyroOffsetRaw[ImuData::X]);
+    imuData.gyroDegPerSec[ImuData::Y] =
+        GYRO_DS_PER_GYRO_COUNT * (imuData.gyroRaw[ImuData::Y] - imuData.gyroOffsetRaw[ImuData::Y]);
+    imuData.gyroDegPerSec[ImuData::Z] =
+        GYRO_DS_PER_GYRO_COUNT * (imuData.gyroRaw[ImuData::Z] - imuData.gyroOffsetRaw[ImuData::Z]);
 
-    data.accG[ImuData::X] =
-        ACC_G_PER_ACC_COUNT * (data.accRaw[ImuData::X] - data.accOffsetRaw[ImuData::X]);
-    data.accG[ImuData::Y] =
-        ACC_G_PER_ACC_COUNT * (data.accRaw[ImuData::Y] - data.accOffsetRaw[ImuData::Y]);
-    data.accG[ImuData::Z] =
-        ACC_G_PER_ACC_COUNT * (data.accRaw[ImuData::Z] - data.accOffsetRaw[ImuData::Z]);
+    imuData.accG[ImuData::X] =
+        ACC_G_PER_ACC_COUNT * (imuData.accRaw[ImuData::X] - imuData.accOffsetRaw[ImuData::X]);
+    imuData.accG[ImuData::Y] =
+        ACC_G_PER_ACC_COUNT * (imuData.accRaw[ImuData::Y] - imuData.accOffsetRaw[ImuData::Y]);
+    imuData.accG[ImuData::Z] =
+        ACC_G_PER_ACC_COUNT * (imuData.accRaw[ImuData::Z] - imuData.accOffsetRaw[ImuData::Z]);
+
+#else
+    return false;
+#endif
 }
 
 void Bmi088::setAndCheckAccRegister(Acc::Register reg, Acc::Registers_t value)
