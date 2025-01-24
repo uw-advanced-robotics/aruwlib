@@ -55,6 +55,10 @@ namespace tap::communication::sensors::imu::bmi088
 class Bmi088 final_mockable : public Bmi088Data, public AbstractIMU
 {
 public:
+    Bmi088::Bmi088(tap::Drivers *drivers) : AbstractIMU(drivers), drivers(drivers), imuHeater(drivers)
+{
+}
+
     static constexpr Acc::AccRange_t ACC_RANGE = Acc::AccRange::G3;
     static constexpr Gyro::GyroRange_t GYRO_RANGE = Gyro::GyroRange::DPS2000;
     /**
@@ -117,6 +121,7 @@ public:
 
 
 private:
+    Drivers *drivers;
 
     inline float getAccelerationSensitivity() override { return ACC_G_PER_ACC_COUNT; }
 
