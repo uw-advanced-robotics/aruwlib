@@ -17,13 +17,13 @@
  * along with Taproot.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "inertial_transform.hpp"
+#include "static_transform.hpp"
 
 namespace tap::algorithms::transforms
 {
 
 // TODO: garbled mess
-Vector InertialTransform::apply(const Position& position, const Vector& velocity) const
+Vector StaticTransform::apply(const Position& position, const Vector& velocity) const
 {
     // TODO: INFINITELY CURSED
     // First add the extra velocities induced by angular/translational velocity then rotate like a
@@ -32,17 +32,17 @@ Vector InertialTransform::apply(const Position& position, const Vector& velocity
         Vector(velocity.coordinates() - transVel - cross(angVel, position.coordinates())));
 }
 
-InertialTransform InertialTransform::getInverse() const
+StaticTransform StaticTransform::getInverse() const
 {
-    return InertialTransform(Transform::getInverse(), -transVel, -angVel);
+    return StaticTransform(Transform::getInverse(), -transVel, -angVel);
 }
 
-InertialTransform InertialTransform::compose(const InertialTransform& second) const
+StaticTransform StaticTransform::compose(const StaticTransform& second) const
 {
     CMSISMat<3, 1> transVel = this->transVel + this->getRotation().matrix() * second.transVel +
                               cross(this->angVel, second.getTranslation().coordinates());
     CMSISMat<3, 1> angVel = this->transVel + second.transVel;
-    return InertialTransform(Transform::compose(second), transVel, angVel);
+    return StaticTransform(Transform::compose(second), transVel, angVel);
 }
 
 }  // namespace tap::algorithms::transforms

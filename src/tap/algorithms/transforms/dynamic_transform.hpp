@@ -30,12 +30,12 @@ namespace tap::algorithms::transforms
 /**
  Represents a transformation from one coordinate frame to another.
 
-    A Transform from frame A to frame B defines a relationship between the two frames, such that a
-    spatial measurement in frame A can be represented equivalently in frame B by applying a
+    A DynamicTransform from frame A to frame B defines a relationship between the two frames, such
+ that a spatial measurement in frame A can be represented equivalently in frame B by applying a
     translational and rotational offset. This process is known as *applying* a transform.
 
-    Transforms are specified as a translation and rotation of some "target" frame relative to some
-    "source" frame. The "translation" is the target frame's origin in source frame, and the
+    DynamicTransforms are specified as a translation and rotation of some "target" frame relative to
+ some "source" frame. The "translation" is the target frame's origin in source frame, and the
     "rotation" is the target frame's orientation relative to the source frame's orientation.
 
     Conceptually, translations are applied "before" rotations. This means that the origin of the
@@ -47,22 +47,64 @@ namespace tap::algorithms::transforms
     @param SOURCE represents the source frame of the transformation.
     @param TARGET represents the target frame of the transformation.
  */
-class Transform
+class DynamicTransform
 {
 public:
     /**
+     * @param translation Initial translation of this transformation.
      * @param rotation Initial rotation of this transformation.
-     * @param position Initial translation of this transformation.
+     * @param velocity Translational velocity of this transformation.
+     * @param acceleration Translational åcceleration of this transformation.
+     * @param angularVelocity Angular velocity pseudovector of this transformation.
      */
-    Transform(const Position& translation, const Orientation& rotation);
-    Transform(Position&& translation, Orientation&& rotation);
+    DynamicTransform(
+        const Position& translation,
+        const Orientation& rotation,
+        const Vector& velocity,
+        const Vector& acceleration,
+        const Vector& angularVelocity);
 
     /**
+     * @param translation Initial translation of this transformation.
      * @param rotation Initial rotation of this transformation.
-     * @param position Initial translation of this transformation.
+     * @param velocity Translational velocity of this transformation.
+     * @param acceleration Translational åcceleration of this transformation.
+     * @param angularVelocity Angular velocity pseudovector of this transformation.
      */
-    Transform(const CMSISMat<3, 1>& translation, const CMSISMat<3, 3>& rotation);
-    Transform(CMSISMat<3, 1>&& translation, CMSISMat<3, 3>&& rotation);
+    DynamicTransform(
+        Position&& translation,
+        Orientation&& rotation,
+        Vector&& velocity,
+        Vector&& acceleration,
+        Vector&& angularVelocity);
+
+    /**
+     * @param translation Initial translation of this transformation.
+     * @param rotation Initial rotation of this transformation.
+     * @param velocity Translational velocity of this transformation.
+     * @param acceleration Translational åcceleration of this transformation.
+     * @param angularVelocity Angular velocity pseudovector of this transformation.
+     */
+    DynamicTransform(
+        const CMSISMat<3, 1>& translation,
+        const CMSISMat<3, 3>& rotation,
+        const CMSISMat<3, 1>& velocity,
+        const CMSISMat<3, 1>& acceleration,
+        const CMSISMat<3, 3>& angularVelocity);
+
+    /**
+     * @param translation Initial translation of this transformation.
+     * @param rotation Initial rotation of this transformation.
+     * @param velocity Translational velocity of this transformation.
+     * @param acceleration Translational åcceleration of this transformation.
+     * @param angularVelocity Angular velocity pseudovector of this transformation.
+     */
+    DynamicTransform(
+        CMSISMat<3, 1>&& translation,
+        CMSISMat<3, 3>&& rotation,
+        CMSISMat<3, 1>&& velocity,
+        CMSISMat<3, 1>&& acceleration,
+        CMSISMat<3, 3>&& angularVelocity);
 
     /**
      * Constructs rotations using XYZ Euler angles,
@@ -77,13 +119,13 @@ public:
      * @param B: Initial rotation angle about the y-axis.
      * @param C: Initial rotation angle about the z-axis.
      */
-    Transform(float x, float y, float z, float roll, float pitch, float yaw);
+    DynamicTransform(float x, float y, float z, float roll, float pitch, float yaw);
 
     // TODO: template specialization for transform between identical frames??
     /**
      * Constructs an identity transform.
      */
-    static inline Transform identity() { return Transform(0., 0., 0., 0., 0., 0.); }
+    static inline DynamicTransform identity() { return DynamicTransform(0., 0., 0., 0., 0., 0.); }
 
     /**
      * Apply this transform to a position.
@@ -169,20 +211,26 @@ public:
     }
 
     /**
-     * @return Inverse of this Transform.
+     * @return Inverse of this DynamicTransform.
      */
-    Transform getInverse() const;
+    DynamicTransform getInverse() const;
 
     /**
      * Returns the composed transformation of the given transformations.
-     * @return Transformation from frame A to frame C.
+     * @return DynamicTransformation from frame A to frame C.
      */
-    Transform compose(const Transform& second) const;
+    DynamicTransform compose(const DynamicTransform& second) const;
 
     /* Getters */
     inline Position getTranslation() const { return Position(translation); };
 
+    inline Vector getVelocity() const { return Vector(transVel); };
+
+    inline Vector getAcceleration() const { return Vector(transAcc); };
+
     inline Orientation getRotation() const { return Orientation(rotation); }
+
+    inline Vector getAngularVel() const { return Vector(angVel); };
 
     /**
      * Get the roll of this transformation
@@ -221,6 +269,16 @@ private:
     CMSISMat<3, 1> translation;
 
     /**
+     * Velocity vector.
+     */
+    CMSISMat<3, 1> transVel;
+
+    /**
+     * Acceleration vector.
+     */
+    CMSISMat<3, 1> transAcc;
+
+    /**
      * Rotation matrix.
      */
     CMSISMat<3, 3> rotation;
@@ -232,7 +290,12 @@ private:
      * The transpose of a rotation is its inverse.
      */
     CMSISMat<3, 3> tRotation;
-};  // class Transform
+
+    /**
+     * Angular velocity skew matrix.
+     */
+    CMSISMat<3, 3> angVel;
+};  // class DynamicTransform
 }  // namespace tap::algorithms::transforms
 
 #endif  // TAPROOT_TRANSFORM_HPP_

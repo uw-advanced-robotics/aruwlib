@@ -17,22 +17,22 @@
  * along with Taproot.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TAPROOT_INERTIAL_TRANSFORM_HPP_
-#define TAPROOT_INERTIAL_TRANSFORM_HPP_
+#ifndef TAPROOT_DYNAMIC_TRANSFORM_HPP_
+#define TAPROOT_DYNAMIC_TRANSFORM_HPP_
 
 #include "tap/algorithms/cmsis_mat.hpp"
 #include "tap/algorithms/math_user_utils.hpp"
 
+#include "dynamic_transform.hpp"
 #include "position.hpp"
-#include "transform.hpp"
 
 namespace tap::algorithms::transforms
 {
 // TODO: somewhat inaccurate name since rotational frames are not inertial
-class InertialTransform : protected Transform
+class StaticTransform : protected DynamicTransform
 {
 public:
-    InertialTransform(
+    StaticTransform(
         const Transform transform,
         float xVel,
         float yVel,
@@ -40,30 +40,30 @@ public:
         float rollVel,
         float pitchVel,
         float yawVel)
-        : Transform(transform),
+        : DynamicTransform(transform),
           transVel({xVel, yVel, zVel}),
           angVel({xVel, yVel, zVel})
     {
     }
 
-    InertialTransform(
+    StaticTransform(
         const Transform transform,
         const CMSISMat<3, 1>& transVel,
         const CMSISMat<3, 1>& angVel)
-        : Transform(transform),
+        : DynamicTransform(transform),
           transVel(transVel),
           angVel(angVel)
     {
     }
 
-    InertialTransform(const Transform transform, CMSISMat<3, 1>&& transVel, CMSISMat<3, 1>&& angVel)
-        : Transform(transform),
+    StaticTransform(const Transform transform, CMSISMat<3, 1>&& transVel, CMSISMat<3, 1>&& angVel)
+        : DynamicTransform(transform),
           transVel(std::move(transVel)),
           angVel(std::move(angVel))
     {
     }
 
-    inline InertialTransform(
+    inline StaticTransform(
         float x,
         float y,
         float z,
@@ -76,17 +76,17 @@ public:
         float rollVel,
         float pitchVel,
         float yawVel)
-        : Transform(x, y, z, roll, pitch, yaw),
+        : DynamicTransform(x, y, z, roll, pitch, yaw),
           transVel({xVel, yVel, zVel}),
           angVel({rollVel, pitchVel, yawVel})
     {
     }
 
-    using Transform::apply;
-    using Transform::getRotation;
-    using Transform::getTranslation;
-    using Transform::updateRotation;
-    using Transform::updateTranslation;
+    using DynamicTransform::apply;
+    using DynamicTransform::getRotation;
+    using DynamicTransform::getTranslation;
+    using DynamicTransform::updateRotation;
+    using DynamicTransform::updateTranslation;
 
     inline void updateTransVel(Vector transVel) { this->transVel = transVel.coordinates(); }
 
@@ -97,9 +97,9 @@ public:
 
     Vector apply(const Position& position, const Vector& velocity) const;
 
-    InertialTransform getInverse() const;
+    StaticTransform getInverse() const;
 
-    InertialTransform compose(const InertialTransform& second) const;
+    StaticTransform compose(const StaticTransform& second) const;
 
 private:
     /**
@@ -115,8 +115,8 @@ private:
      * The angular velocity of the target frame coordinates in the source frame.
      */
     CMSISMat<3, 1> angVel;
-};  // class InertialTransform
+};  // class StaticTransform
 
 }  // namespace tap::algorithms::transforms
 
-#endif  // TAPROOT_INERTIAL_TRANSFORM_HPP_
+#endif  // TAPROOT_DYNAMIC_TRANSFORM_HPP_
