@@ -35,6 +35,7 @@ using tap::algorithms::transforms::Transform;
 
 namespace tap::communication::sensors::imu
 {
+constexpr float GRAVITY_MPS2 = 9.81f;
 class AbstractIMU : public ImuInterface
 {
 public:
@@ -82,6 +83,7 @@ public:
     inline float getAx() override { return imuData.accG[ImuData::X]; }
     inline float getAy() override { return imuData.accG[ImuData::Y]; }
     inline float getAz() override { return imuData.accG[ImuData::Z]; }
+    inline float getAzMinusG() override { return imuData.accG[ImuData::Z] - GRAVITY_MPS2; }
 
     inline float getGx() override { return imuData.gyroDegPerSec[ImuData::X]; }
     inline float getGy() override { return imuData.gyroDegPerSec[ImuData::Y]; }
