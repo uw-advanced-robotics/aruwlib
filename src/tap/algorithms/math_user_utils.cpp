@@ -88,3 +88,11 @@ modm::Vector3f tap::algorithms::eulerAnglesFromQuaternion(modm::Quaternion<float
 
     return eulerAngles;
 }
+
+tap::algorithms::CMSISMat<3, 3> tap::algorithms::skewMatFromAngVel(
+    const float wx,
+    const float wy,
+    const float wz)
+{
+    return tap::algorithms::CMSISMat<3, 3>({0, -wz, wx, wz, 0, -wy, -wx, wz, 0});
+}
