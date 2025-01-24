@@ -83,7 +83,6 @@ public:
     static constexpr float ACC_G_PER_ACC_COUNT =
         modm::pow(2, ACC_RANGE.value + 1) * 1.5f * tap::algorithms::ACCELERATION_GRAVITY / 32768.0f;
 
-    Bmi088(tap::Drivers *drivers);
 
     /**
      * Starts and configures the bmi088. Blocks for < 200 ms.
