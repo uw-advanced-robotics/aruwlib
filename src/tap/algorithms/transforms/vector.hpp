@@ -36,7 +36,10 @@ public:
 
     Vector(const Vector& other) : coordinates_(CMSISMat(other.coordinates_)) {}
 
-    Vector(CMSISMat<3, 1>& coordinates) : coordinates_(CMSISMat(coordinates)) {}
+    /**
+     * Costly copy constructor
+     */
+    Vector(const CMSISMat<3, 1>& coordinates) : coordinates_(CMSISMat(coordinates)) {}
 
     Vector(CMSISMat<3, 1>&& coordinates) : coordinates_(std::move(coordinates)) {}
 
