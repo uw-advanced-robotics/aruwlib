@@ -55,7 +55,9 @@ namespace tap::communication::sensors::imu::bmi088
 class Bmi088 final_mockable : public Bmi088Data, public AbstractIMU
 {
 public:
-    
+    Bmi088(Drivers *drivers);
+    DISALLOW_COPY_AND_ASSIGN(Bmi088)
+    mockable ~Bmi088() = default;
 
     static constexpr Acc::AccRange_t ACC_RANGE = Acc::AccRange::G3;
     static constexpr Gyro::GyroRange_t GYRO_RANGE = Gyro::GyroRange::DPS2000;
