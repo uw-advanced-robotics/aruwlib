@@ -25,6 +25,7 @@
 #include "tap/communication/sensors/imu/imu_interface.hpp"
 #include "tap/communication/sensors/imu_heater/imu_heater.hpp"
 #include "tap/util_macros.hpp"
+#include "tap/communication/sensors/imu/abstract_imu.hpp"
 
 #include "modm/processing/protothread.hpp"
 
@@ -34,7 +35,6 @@ namespace tap
 {
 class Drivers;
 }
-
 namespace tap::communication::sensors::imu::bmi088
 {
 /**
@@ -52,7 +52,7 @@ namespace tap::communication::sensors::imu::bmi088
  *    expect
  *  - roll and pitch to be defined as.
  */
-class Bmi088 final_mockable : public Bmi088Data, public AbstractIMU
+class Bmi088 : public Bmi088Data, public AbstractIMU
 {
 public:
     static constexpr Acc::AccRange_t ACC_RANGE = Acc::AccRange::G3;
