@@ -119,6 +119,8 @@ public:
 protected:
     void resetOffsets();
     void computeOffsets();
+    void setAccrlOffset(float x, float y, float z);
+    void setGyroOffset(float x, float y, float z);
 
     virtual inline float getAccelerationSensitivity() = 0;
 

@@ -69,6 +69,22 @@ void AbstractIMU::resetOffsets()
     }
 }
 
+void AbstractIMU::setAccrlOffset(float x, float y, float z)
+{
+    imuData.accOffsetRaw[ImuData::X] = x;
+    imuData.accOffsetRaw[ImuData::Y] = y;
+    imuData.accOffsetRaw[ImuData::Z] = z;
+}
+
+void AbstractIMU::setGyroOffset(float x, float y, float z)
+{
+    imuData.gyroOffsetRaw[ImuData::X] = x;
+    imuData.gyroOffsetRaw[ImuData::Y] = y;
+    imuData.gyroOffsetRaw[ImuData::Z] = z;
+}
+
+
+
 void AbstractIMU::computeOffsets()
 {
     calibrationSample++;
