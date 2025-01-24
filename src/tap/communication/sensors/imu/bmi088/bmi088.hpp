@@ -52,7 +52,7 @@ namespace tap::communication::sensors::imu::bmi088
  *    expect
  *  - roll and pitch to be defined as.
  */
-class Bmi088 : public Bmi088Data, public AbstractIMU
+class Bmi088 final_mockable : public Bmi088Data, public AbstractIMU
 {
 public:
     static constexpr Acc::AccRange_t ACC_RANGE = Acc::AccRange::G3;
@@ -97,7 +97,7 @@ public:
      *
      * @note This function blocks for 129 microseconds to read registers from the BMI088.
      */
-    mockable void read() override;
+    mockable bool read() override;
 
     inline const char *getName() const final_mockable { return "bmi088"; }
 
