@@ -55,7 +55,7 @@ namespace tap::communication::sensors::imu::bmi088
 class Bmi088 final_mockable : public Bmi088Data, public AbstractIMU
 {
 public:
-    Bmi088::Bmi088(tap::Drivers *drivers) : AbstractIMU(drivers), drivers(drivers), imuHeater(drivers)
+    Bmi088(tap::Drivers *drivers) : AbstractIMU(drivers), drivers(drivers), imuHeater(drivers)
 {
 }
 
