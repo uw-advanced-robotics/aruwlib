@@ -142,7 +142,7 @@ void Bmi088::initializeGyro()
 
 void Bmi088::periodicIMUUpdate()
 {
-    AbstractImu::periodicIMUUpdate();
+    AbstractIMU::periodicIMUUpdate();
     imuHeater.runTemperatureController(imuData.temperature);
 }
 
