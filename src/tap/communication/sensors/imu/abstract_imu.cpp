@@ -43,9 +43,12 @@ void AbstractIMU::setMountingTransform(const Transform& transform)
 
 void AbstractIMU::periodicIMUUpdate()
 {
-    if (imuState == ImuState::IMU_CALIBRATED)
+    if (imuState == ImuState::IMU_CALIBRATING)
     {
-        // Update Mahony algorithm
+        computeOffsets();
+    }
+    else
+    {
         mahonyAlgorithm.updateIMU(
             imuData.gyroDegPerSec[ImuData::X],
             imuData.gyroDegPerSec[ImuData::Y],
@@ -53,10 +56,6 @@ void AbstractIMU::periodicIMUUpdate()
             imuData.accG[ImuData::X],
             imuData.accG[ImuData::Y],
             imuData.accG[ImuData::Z]);
-    }
-    else if (imuState == ImuState::IMU_CALIBRATING)
-    {
-        computeOffsets();
     }
 }
 

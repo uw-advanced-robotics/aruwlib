@@ -148,7 +148,6 @@ void Bmi088::periodicIMUUpdate()
 
 bool Bmi088::read()
 {
-#ifndef PLATFORM_HOSTED
     uint8_t rxBuff[6] = {};
 
     Bmi088Hal::bmi088AccReadMultiReg(Acc::ACC_X_LSB, rxBuff, 6);
@@ -182,9 +181,7 @@ bool Bmi088::read()
         ACC_G_PER_ACC_COUNT * (imuData.accRaw[ImuData::Z] - imuData.accOffsetRaw[ImuData::Z]);
     
     return true;
-#else
-    return false;
-#endif
+
 }
 
 void Bmi088::setAndCheckAccRegister(Acc::Register reg, Acc::Registers_t value)
