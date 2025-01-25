@@ -44,8 +44,6 @@ namespace tap::communication::sensors::imu::bmi088
 #define DELAY_US(us) modm::delay_us(us);
 #endif
 
-Bmi088::Bmi088(tap::Drivers *drivers) : AbstractIMU(drivers), drivers(drivers), imuHeater(drivers) {}
-
 void Bmi088::initialize(float sampleFrequency, float mahonyKp, float mahonyKi)
 {
     AbstractIMU::initialize(sampleFrequency, mahonyKp, mahonyKi);
@@ -182,7 +180,8 @@ bool Bmi088::read()
         ACC_G_PER_ACC_COUNT * (imuData.accRaw[ImuData::Y] - imuData.accOffsetRaw[ImuData::Y]);
     imuData.accG[ImuData::Z] =
         ACC_G_PER_ACC_COUNT * (imuData.accRaw[ImuData::Z] - imuData.accOffsetRaw[ImuData::Z]);
-
+    
+    return true;
 #else
     return false;
 #endif
