@@ -36,7 +36,6 @@ public:
     MOCK_METHOD(void, periodicIMUUpdate, (), (override));
     MOCK_METHOD(bool, read, (), (override));
     MOCK_METHOD(ImuState, getImuState, (), (const final override));
-    MOCK_METHOD(void, requestRecalibration, (), (override));
     MOCK_METHOD(float, getYaw, (), (override));
     MOCK_METHOD(float, getPitch, (), (override));
     MOCK_METHOD(float, getRoll, (), (override));
