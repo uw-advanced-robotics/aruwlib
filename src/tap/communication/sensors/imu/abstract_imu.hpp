@@ -78,7 +78,7 @@ public:
      * To be safe, whenever you call the functions below, call this function to ensure
      * the data you are about to receive is not garbage.
      */
-    virtual ImuState getImuState() const final { return imuState; }
+    virtual ImuState getImuState() const { return imuState; }
 
     inline float getAx() override { return imuData.accG[ImuData::X]; }
     inline float getAy() override { return imuData.accG[ImuData::Y]; }
