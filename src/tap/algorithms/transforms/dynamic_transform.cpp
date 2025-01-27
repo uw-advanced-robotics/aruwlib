@@ -21,35 +21,35 @@
 
 namespace tap::algorithms::transforms
 {
-DynamicTransform::DynamicTransform(
-    const Position& translation,
-    const Orientation& rotation,
-    const Vector& velocity,
-    const Vector& acceleration,
-    const Vector& angularVelocity)
-    : translation(translation.coordinates()),
-      transVel(velocity.coordinates()),
-      transAcc(acceleration.coordinates()),
-      rotation(rotation.matrix()),
-      tRotation(rotation.matrix().transpose()),
-      angVel(angularVelocity.coordinates())
-{
-}
+// DynamicTransform::DynamicTransform(
+//     const Position& translation,
+//     const Orientation& rotation,
+//     const Vector& velocity,
+//     const Vector& acceleration,
+//     const Vector& angularVelocity)
+//     : translation(translation.coordinates()),
+//       transVel(velocity.coordinates()),
+//       transAcc(acceleration.coordinates()),
+//       rotation(rotation.matrix()),
+//       tRotation(rotation.matrix().transpose()),
+//       angVel(angularVelocity.coordinates())
+// {
+// }
 
-DynamicTransform::DynamicTransform(
-    Position&& translation,
-    Orientation&& rotation,
-    Vector&& velocity,
-    Vector&& acceleration,
-    Vector&& angularVelocity)
-    : translation(std::move(translation.coordinates())),
-      transVel(std::move(velocity.coordinates())),
-      transAcc(std::move(acceleration.coordinates())),
-      rotation(std::move(rotation.matrix())),
-      tRotation(rotation.matrix().transpose()),
-      angVel(std::move(angularVelocity.coordinates()))
-{
-}
+// DynamicTransform::DynamicTransform(
+//     Position&& translation,
+//     Orientation&& rotation,
+//     Vector&& velocity,
+//     Vector&& acceleration,
+//     Vector&& angularVelocity)
+//     : translation(std::move(translation.coordinates())),
+//       transVel(std::move(velocity.coordinates())),
+//       transAcc(std::move(acceleration.coordinates())),
+//       rotation(std::move(rotation.matrix())),
+//       tRotation(rotation.matrix().transpose()),
+//       angVel(std::move(angularVelocity.coordinates()))
+// {
+// }
 
 DynamicTransform::DynamicTransform(
     const CMSISMat<3, 1>& translation,
@@ -81,9 +81,27 @@ DynamicTransform::DynamicTransform(
 {
 }
 
-DynamicTransform::DynamicTransform(float x, float y, float z, float roll, float pitch, float yaw)
+DynamicTransform::DynamicTransform(
+    float x,
+    float y,
+    float z,
+    float vx,
+    float vy,
+    float vz,
+    float ax,
+    float ay,
+    float az,
+    float roll,
+    float pitch,
+    float yaw,
+    float rollVel,
+    float pitchVel,
+    float yawVel)
     : translation({x, y, z}),
+      transVel({vx, vy, vz}),
+      transAcc({ax, ay, az}),
       rotation(fromEulerAngles(roll, pitch, yaw)),
+      angVel(skewMatFromAngVel(rollVel, pitchVel, yawVel)),
       tRotation(rotation.transpose())
 {
 }
@@ -113,16 +131,26 @@ DynamicTransform DynamicTransform::getInverse() const
 
 DynamicTransform DynamicTransform::compose(const DynamicTransform& second) const
 {
-    // 9 +
     CMSISMat<3, 3> newRot = this->rotation * second.rotation;
     CMSISMat<3, 1> newPos = this->translation + this->rotation * second.translation;
-    CMSISMat<3, 1> newVel = this->transAcc + this->angVel * this->rotation * second.translation +
+    CMSISMat<3, 1> newVel = this->transVel + this->angVel * this->rotation * second.translation +
                             this->rotation * second.transVel;
     CMSISMat<3, 1> newAcc =
         this->transAcc + this->angVel * this->angVel * this->rotation * second.translation +
         2 * this->angVel * this->rotation * second.transVel + this->rotation * second.transAcc;
     CMSISMat<3, 3> newAngVel = this->angVel + this->rotation * second.angVel * this->tRotation;
     return DynamicTransform(newPos, newRot, newVel, newAcc, newAngVel);
+}
+
+DynamicTransform DynamicTransform::projectForward(float dt) const
+{
+    CMSISMat<3, 3> velDt = CMSISMat<3, 3>();
+    velDt.constructIdentityMatrix();
+    velDt += sin(dt) * this->angVel + (1 - cos(dt)) * this->angVel * this->angVel;
+    CMSISMat<3, 3> newRot = velDt * this->rotation;
+    CMSISMat<3, 1> newPos = this->translation;  // I HAVE NO FUCKING CLUE RN
+    CMSISMat<3, 1> newVel = velDt * (this->transVel + this->transAcc * dt);  // IDK
+    return DynamicTransform(newPos, newRot, newVel, this->transAcc, this->angVel);
 }
 
 float DynamicTransform::getRoll() const

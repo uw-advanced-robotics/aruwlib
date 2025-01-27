@@ -57,12 +57,12 @@ public:
      * @param acceleration Translational åcceleration of this transformation.
      * @param angularVelocity Angular velocity pseudovector of this transformation.
      */
-    DynamicTransform(
-        const Position& translation,
-        const Orientation& rotation,
-        const Vector& velocity,
-        const Vector& acceleration,
-        const Vector& angularVelocity);
+    // DynamicTransform(
+    //     const Position& translation,
+    //     const Orientation& rotation,
+    //     const Vector& velocity,
+    //     const Vector& acceleration,
+    //     const Vector& angularVelocity);
 
     /**
      * @param translation Initial translation of this transformation.
@@ -71,12 +71,12 @@ public:
      * @param acceleration Translational åcceleration of this transformation.
      * @param angularVelocity Angular velocity pseudovector of this transformation.
      */
-    DynamicTransform(
-        Position&& translation,
-        Orientation&& rotation,
-        Vector&& velocity,
-        Vector&& acceleration,
-        Vector&& angularVelocity);
+    // DynamicTransform(
+    //     Position&& translation,
+    //     Orientation&& rotation,
+    //     Vector&& velocity,
+    //     Vector&& acceleration,
+    //     Vector&& angularVelocity);
 
     /**
      * @param translation Initial translation of this transformation.
@@ -119,13 +119,31 @@ public:
      * @param B: Initial rotation angle about the y-axis.
      * @param C: Initial rotation angle about the z-axis.
      */
-    DynamicTransform(float x, float y, float z, float roll, float pitch, float yaw);
+    DynamicTransform(
+        float x,
+        float y,
+        float z,
+        float vx,
+        float vy,
+        float vz,
+        float ax,
+        float ay,
+        float az,
+        float roll,
+        float pitch,
+        float yaw,
+        float rollVel,
+        float pitchVel,
+        float yawVel);
 
     // TODO: template specialization for transform between identical frames??
     /**
      * Constructs an identity transform.
      */
-    static inline DynamicTransform identity() { return DynamicTransform(0., 0., 0., 0., 0., 0.); }
+    static inline DynamicTransform identity()
+    {
+        return DynamicTransform(0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.);
+    }
 
     /**
      * Apply this transform to a position.
@@ -221,6 +239,8 @@ public:
      */
     DynamicTransform compose(const DynamicTransform& second) const;
 
+    DynamicTransform projectForward(float dt) const;
+
     /* Getters */
     inline Position getTranslation() const { return Position(translation); };
 
@@ -230,7 +250,7 @@ public:
 
     inline Orientation getRotation() const { return Orientation(rotation); }
 
-    inline Vector getAngularVel() const { return Vector(angVel); };
+    // inline Vector getAngularVel() const { return Vector(angVel); };
 
     /**
      * Get the roll of this transformation
