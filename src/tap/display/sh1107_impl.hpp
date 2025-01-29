@@ -23,56 +23,59 @@
 
 #include "sh1107_defines.hpp"
 
-namespace details {
-    inline void rotateBox(uint8_t *box)
+namespace details
+{
+inline void rotateBox(uint8_t *box)
+{
+    uint8_t temp[8] = {0};
+
+    for (int i = 0; i < 8; i++)
     {
-        uint8_t temp[8] = {0};
-
-        for (int i = 0; i < 8; i++)
+        for (int j = 0; j < 8; j++)
         {
-            for (int j = 0; j < 8; j++)
-            {
-                temp[i] |= ((box[j] >> i) & 1) << (8 - j - 1);
-            }
+            temp[i] |= ((box[j] >> i) & 1) << (8 - j - 1);
         }
-
-        for (int i = 0; i < 8; i++)  box[i] = temp[i];
     }
 
-    inline void rotateMatrix(int Height, int Width, uint8_t (&matrix)[16][128], uint8_t (&rotatedMatrix)[16][128])
-    {
-        for (int i = 0; i < Height / 8; i++)
-        {
-            for (int j = 0; j < Width / 8; j++)
-            {
-                uint8_t targetBytes[8];
-                for (int k = 0; k < 8; k++)
-                {
-                    targetBytes[k] = matrix[j][i * 8 + 7 - k];
-                }
-
-                rotateBox(targetBytes);
-
-                for (int k = 0; k < 8; k++)
-                {
-                    rotatedMatrix[i][j * 8 + k] = targetBytes[k];
-                }
-            }
-        }
-
-        for (int i = 0; i < Height / 8; i++)
-        {
-            for (int j = 0; j < Width / 2; j++)
-            {
-                uint8_t tmp = rotatedMatrix[i][j];
-                rotatedMatrix[i][j] = rotatedMatrix[i][Width - 1 - j];
-                rotatedMatrix[i][Width - 1 - j] = tmp;
-            }
-        }
-
-    }
+    for (int i = 0; i < 8; i++) box[i] = temp[i];
 }
 
+inline void rotateMatrix(
+    int Height,
+    int Width,
+    uint8_t (&matrix)[16][128],
+    uint8_t (&rotatedMatrix)[16][128])
+{
+    for (int i = 0; i < Height / 8; i++)
+    {
+        for (int j = 0; j < Width / 8; j++)
+        {
+            uint8_t targetBytes[8];
+            for (int k = 0; k < 8; k++)
+            {
+                targetBytes[k] = matrix[j][i * 8 + 7 - k];
+            }
+
+            rotateBox(targetBytes);
+
+            for (int k = 0; k < 8; k++)
+            {
+                rotatedMatrix[i][j * 8 + k] = targetBytes[k];
+            }
+        }
+    }
+
+    for (int i = 0; i < Height / 8; i++)
+    {
+        for (int j = 0; j < Width / 2; j++)
+        {
+            uint8_t tmp = rotatedMatrix[i][j];
+            rotatedMatrix[i][j] = rotatedMatrix[i][Width - 1 - j];
+            rotatedMatrix[i][Width - 1 - j] = tmp;
+        }
+    }
+}
+}  // namespace details
 
 template <
     typename SPI,
@@ -89,7 +92,7 @@ modm::ResumableResult<bool> tap::display::Sh1107<SPI, A0, Reset, Width, Height, 
 
     if (!writeToDisplay.testAndSet(false)) RF_RETURN(false);
 
-    if (Rotate) 
+    if (Rotate)
     {
         details::rotateMatrix(Height, Width, this->buffer, rotatedMatrix);
     }
@@ -100,15 +103,7 @@ modm::ResumableResult<bool> tap::display::Sh1107<SPI, A0, Reset, Width, Height, 
         a0.reset();
         RF_CALL(spi.transfer(SH1107_PAGE_ADDRESS | y));  // Row select
         RF_CALL(spi.transfer(SH1107_COL_ADDRESS_MSB));   // Column select high
-
-        if (Flipped)
-        {
-            RF_CALL(spi.transfer(SH1107_COL_ADDRESS_LSB | 0));  // Column select low
-        }
-        else
-        {
-            RF_CALL(spi.transfer(SH1107_COL_ADDRESS_LSB | 0));  // Column select low
-        }
+        RF_CALL(spi.transfer(SH1107_COL_ADDRESS_LSB));   // Column select low
 
         // switch to data mode
         a0.set();
