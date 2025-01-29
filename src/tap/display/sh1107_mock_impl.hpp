@@ -21,29 +21,29 @@
 #error "Don't include this file directly, use 'sh1107.hpp' instead!"
 #endif
 
-template <unsigned int Width, unsigned int Height, bool Flipped>
-modm::ResumableResult<bool> tap::display::Sh1107<Width, Height, Flipped>::updateNonblocking()
+template <unsigned int Width, unsigned int Height, bool Flipped, bool Rotate>
+modm::ResumableResult<bool> tap::display::Sh1107<Width, Height, Flipped, Rotate>::updateNonblocking()
 {
     RF_BEGIN(0);
     // no-op
     RF_END_RETURN(false);
 }
 
-template <unsigned int Width, unsigned int Height, bool Flipped>
-void tap::display::Sh1107<Width, Height, Flipped>::update()
+template <unsigned int Width, unsigned int Height, bool Flipped, bool Rotate>
+void tap::display::Sh1107<Width, Height, Flipped, Rotate>::update()
 {
     // no-op
 }
 
-template <unsigned int Width, unsigned int Height, bool Flipped>
-void tap::display::Sh1107<Width, Height, Flipped>::setInvert(bool invert)
+template <unsigned int Width, unsigned int Height, bool Flipped, bool Rotate>
+void tap::display::Sh1107<Width, Height, Flipped, Rotate>::setInvert(bool invert)
 {
     // no-op
 }
 
 // ----------------------------------------------------------------------------
-template <unsigned int Width, unsigned int Height, bool Flipped>
-void tap::display::Sh1107<Width, Height, Flipped>::initializeBlocking()
+template <unsigned int Width, unsigned int Height, bool Flipped, bool Rotate>
+void tap::display::Sh1107<Width, Height, Flipped, Rotate>::initializeBlocking()
 {
     this->clear();
     this->update();

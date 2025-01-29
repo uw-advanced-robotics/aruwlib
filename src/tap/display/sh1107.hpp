@@ -40,7 +40,8 @@ template <
 #endif
     unsigned int Width,
     unsigned int Height,
-    bool Flipped>
+    bool Flipped,
+    bool Rotate>
 class Sh1107 : public modm::MonochromeGraphicDisplayVertical<Width, Height>, modm::Resumable<1>
 {
 public:
@@ -76,12 +77,14 @@ protected:
 
 private:
     static constexpr uint8_t SH1107_COL_OFFSET = 2;
+    uint8_t rotatedMatrix[Height / 8][Width] = {0};
 
     /**
      * Variables used in `updateNonblocking`. Since it is generally not a good idea
      * to have local variables in protothreads these are stored by this class.
      */
     uint8_t x, y;
+    int balls = 0;
 
     modm::atomic::Flag writeToDisplay;
 };
