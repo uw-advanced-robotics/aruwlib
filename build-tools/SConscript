@@ -167,7 +167,10 @@ elif args["TARGET_ENV"] == "tests":
         env.AppendUnique(LIBS=COVERAGE_LIBS)
 else:  # hardware target env
     # Update linkerscript file
-    env["LINKFLAGS"].remove("-Tmodm/link/linkerscript.ld")
+    if sys.platform == "win32":
+        env["LINKFLAGS"].remove("-Tmodm\\link\\linkerscript.ld")
+    else:
+        env["LINKFLAGS"].remove("-Tmodm/link/linkerscript.ld")
     env.AppendUnique(LINKFLAGS=["-T" + LINKERSCRIPT_FILE])
 
 env.AppendUnique(CCFLAGS=["-Wno-misleading-indentation"])
