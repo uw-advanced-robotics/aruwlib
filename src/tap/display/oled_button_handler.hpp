@@ -28,11 +28,11 @@ namespace tap
 class Drivers;
 namespace display
 {
-
 /**
  * Struct to hold the analog values for the OLED buttons.
  */
-struct AnalogConfig{
+struct AnalogConfig
+{
     int ok;
     int left;
     int right;
@@ -74,12 +74,6 @@ public:
 private:
     static constexpr int BUTTON_DEBOUNCE_SAMPLES = 10;
     static constexpr int ADC_PRESSED_RANGE = 100;
-    // static constexpr int OK_ADC_VAL = 0;
-    // static constexpr int LEFT_ADC_VAL = 900;
-    // static constexpr int RIGHT_ADC_VAL = 1700;
-    // static constexpr int UP_ADC_VAL = 2500;
-    // static constexpr int DOWN_ADC_VAL = 3300;
-    int bals = 0;
 
     const struct AnalogConfig DEFAULT_ADC_CONFIG = {
         .ok = 0,
