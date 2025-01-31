@@ -17,8 +17,8 @@
  * along with Taproot.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TAPROOT_DYNAMIC_TRANSFORM_HPP_
-#define TAPROOT_DYNAMIC_TRANSFORM_HPP_
+#ifndef TAPROOT_STATIC_TRANSFORM_HPP_
+#define TAPROOT_STATIC_TRANSFORM_HPP_
 
 #include "tap/algorithms/cmsis_mat.hpp"
 #include "tap/algorithms/math_user_utils.hpp"
@@ -236,4 +236,4 @@ private:
 };  // class Transform
 }  // namespace tap::algorithms::transforms
 
-#endif  // TAPROOT_DYNAMIC_TRANSFORM_HPP_
+#endif  // TAPROOT_STATIC_TRANSFORM_HPP_
