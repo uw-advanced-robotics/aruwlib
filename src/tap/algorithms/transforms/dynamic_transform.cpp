@@ -146,10 +146,11 @@ DynamicTransform DynamicTransform::projectForward(float dt) const
 {
     CMSISMat<3, 3> velDt = CMSISMat<3, 3>();
     velDt.constructIdentityMatrix();
-    velDt += sin(dt) * this->angVel + (1 - cos(dt)) * this->angVel * this->angVel;
+    velDt = velDt + sin(dt) * this->angVel + (1 - cos(dt)) * this->angVel * this->angVel;
     CMSISMat<3, 3> newRot = velDt * this->rotation;
-    CMSISMat<3, 1> newPos = this->translation;  // I HAVE NO FUCKING CLUE RN
-    CMSISMat<3, 1> newVel = velDt * (this->transVel + this->transAcc * dt);  // IDK
+    CMSISMat<3, 1> newPos =
+        this->translation + dt * this->transVel + 0.5 * dt * dt * this->transAcc;
+    CMSISMat<3, 1> newVel = this->transVel + dt * this->transAcc;
     return DynamicTransform(newPos, newRot, newVel, this->transAcc, this->angVel);
 }
 
