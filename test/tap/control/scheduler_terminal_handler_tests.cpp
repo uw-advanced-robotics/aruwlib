@@ -91,18 +91,14 @@ TEST(
     tap::stub::TerminalDeviceStub terminalDevice(&drivers);
     modm::IOStream stream(terminalDevice);
 
-    ON_CALL(drivers.commandScheduler, cmdMapBegin).WillByDefault([&]() {
-        return drivers.commandScheduler.CommandScheduler::cmdMapBegin();
-    });
-    ON_CALL(drivers.commandScheduler, cmdMapEnd).WillByDefault([&]() {
-        return drivers.commandScheduler.CommandScheduler::cmdMapEnd();
-    });
-    ON_CALL(drivers.commandScheduler, subMapBegin).WillByDefault([&]() {
-        return drivers.commandScheduler.CommandScheduler::subMapBegin();
-    });
-    ON_CALL(drivers.commandScheduler, subMapEnd).WillByDefault([&]() {
-        return drivers.commandScheduler.CommandScheduler::subMapEnd();
-    });
+    ON_CALL(drivers.commandScheduler, cmdMapBegin)
+        .WillByDefault([&]() { return drivers.commandScheduler.CommandScheduler::cmdMapBegin(); });
+    ON_CALL(drivers.commandScheduler, cmdMapEnd)
+        .WillByDefault([&]() { return drivers.commandScheduler.CommandScheduler::cmdMapEnd(); });
+    ON_CALL(drivers.commandScheduler, subMapBegin)
+        .WillByDefault([&]() { return drivers.commandScheduler.CommandScheduler::subMapBegin(); });
+    ON_CALL(drivers.commandScheduler, subMapEnd)
+        .WillByDefault([&]() { return drivers.commandScheduler.CommandScheduler::subMapEnd(); });
 
     char input[] = "allsubcmd";
     EXPECT_TRUE(serialHandler.terminalSerialCallback(input, stream, false));
@@ -124,18 +120,14 @@ TEST(SchedulerTerminalHandler, terminalSerialCallback__prints_subsystems_command
     NiceMock<CommandMock> c1;
     NiceMock<CommandMock> c2;
 
-    ON_CALL(drivers.commandScheduler, cmdMapBegin).WillByDefault([&]() {
-        return drivers.commandScheduler.CommandScheduler::cmdMapBegin();
-    });
-    ON_CALL(drivers.commandScheduler, cmdMapEnd).WillByDefault([&]() {
-        return drivers.commandScheduler.CommandScheduler::cmdMapEnd();
-    });
-    ON_CALL(drivers.commandScheduler, subMapBegin).WillByDefault([&]() {
-        return drivers.commandScheduler.CommandScheduler::subMapBegin();
-    });
-    ON_CALL(drivers.commandScheduler, subMapEnd).WillByDefault([&]() {
-        return drivers.commandScheduler.CommandScheduler::subMapEnd();
-    });
+    ON_CALL(drivers.commandScheduler, cmdMapBegin)
+        .WillByDefault([&]() { return drivers.commandScheduler.CommandScheduler::cmdMapBegin(); });
+    ON_CALL(drivers.commandScheduler, cmdMapEnd)
+        .WillByDefault([&]() { return drivers.commandScheduler.CommandScheduler::cmdMapEnd(); });
+    ON_CALL(drivers.commandScheduler, subMapBegin)
+        .WillByDefault([&]() { return drivers.commandScheduler.CommandScheduler::subMapBegin(); });
+    ON_CALL(drivers.commandScheduler, subMapEnd)
+        .WillByDefault([&]() { return drivers.commandScheduler.CommandScheduler::subMapEnd(); });
 
     ON_CALL(c1, getName).WillByDefault(Return("c1"));
     ON_CALL(c2, getName).WillByDefault(Return("c2"));
@@ -185,18 +177,14 @@ TEST(SchedulerTerminalHandler, terminalSerialStreamCallback__repeatedly_prints_c
     NiceMock<CommandMock> c1;
     NiceMock<CommandMock> c2;
 
-    ON_CALL(drivers.commandScheduler, cmdMapBegin).WillByDefault([&]() {
-        return drivers.commandScheduler.CommandScheduler::cmdMapBegin();
-    });
-    ON_CALL(drivers.commandScheduler, cmdMapEnd).WillByDefault([&]() {
-        return drivers.commandScheduler.CommandScheduler::cmdMapEnd();
-    });
-    ON_CALL(drivers.commandScheduler, subMapBegin).WillByDefault([&]() {
-        return drivers.commandScheduler.CommandScheduler::subMapBegin();
-    });
-    ON_CALL(drivers.commandScheduler, subMapEnd).WillByDefault([&]() {
-        return drivers.commandScheduler.CommandScheduler::subMapEnd();
-    });
+    ON_CALL(drivers.commandScheduler, cmdMapBegin)
+        .WillByDefault([&]() { return drivers.commandScheduler.CommandScheduler::cmdMapBegin(); });
+    ON_CALL(drivers.commandScheduler, cmdMapEnd)
+        .WillByDefault([&]() { return drivers.commandScheduler.CommandScheduler::cmdMapEnd(); });
+    ON_CALL(drivers.commandScheduler, subMapBegin)
+        .WillByDefault([&]() { return drivers.commandScheduler.CommandScheduler::subMapBegin(); });
+    ON_CALL(drivers.commandScheduler, subMapEnd)
+        .WillByDefault([&]() { return drivers.commandScheduler.CommandScheduler::subMapEnd(); });
 
     ON_CALL(c1, getName).WillByDefault(Return("c1"));
     ON_CALL(c2, getName).WillByDefault(Return("c2"));

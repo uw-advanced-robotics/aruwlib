@@ -25,6 +25,7 @@
 #include "{{ include }}"
 %% endfor
 #include "tap/mock/command_scheduler_mock.hpp"
+#include "modm/processing/fiber.hpp"
 #else
 %% for include in src_driver_includes
 #include "{{ include }}"
@@ -52,7 +53,11 @@ protected:
 #else
           commandScheduler(this, true)
 #endif
-          {}
+    {
+#ifdef ENV_UNIT_TESTS
+        modm::fiber::Scheduler::run();
+#endif
+    }
 
 #if defined(PLATFORM_HOSTED) && defined(ENV_UNIT_TESTS)
 %% for object_and_mock in object_and_mocks

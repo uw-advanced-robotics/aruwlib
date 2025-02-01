@@ -26,8 +26,6 @@
 #include "tap/communication/sensors/imu_heater/imu_heater.hpp"
 #include "tap/util_macros.hpp"
 
-#include "modm/processing/protothread.hpp"
-
 #include "bmi088_data.hpp"
 
 namespace tap

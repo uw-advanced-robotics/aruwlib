@@ -230,7 +230,7 @@ float interpolateLinear2D(
     yy1 = yDesBounded - y1;
     xx1 = xDesBounded - x1;
     // it's essentially a weighted average
-    return 1.0 / (dx * dy) *
+    return 1.0f / (dx * dy) *
            (q11 * x2x * y2y + q21 * xx1 * y2y + q12 * x2x * yy1 + q22 * xx1 * yy1);
 }
 

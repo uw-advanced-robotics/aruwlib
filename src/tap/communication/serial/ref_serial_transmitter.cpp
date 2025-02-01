@@ -199,7 +199,7 @@ modm::ResumableResult<void> RefSerialTransmitter::deleteGraphicLayer(
     RF_BEGIN(0);
     if (drivers->refSerial.getRobotData().robotId == RefSerialTransmitter::RobotId::INVALID)
     {
-        RF_RETURN_1();
+        RF_RETURN();
     }
 
     deleteGraphicLayerMessage.deleteOperation = graphicOperation;
@@ -254,7 +254,7 @@ modm::ResumableResult<void> RefSerialTransmitter::sendGraphic_(
     RF_BEGIN(1);
     if (robotId == RefSerialTransmitter::RobotId::INVALID)
     {
-        RF_RETURN_1();
+        RF_RETURN();
     }
     if (configMsgHeader)
     {
@@ -387,18 +387,18 @@ modm::ResumableResult<void> RefSerialTransmitter::sendRobotToRobotMsg(
     if (msgId < 0x0200 || msgId >= 0x02ff)
     {
         RAISE_ERROR(drivers, "invalid msgId not between [0x200, 0x2ff)");
-        RF_RETURN_1();
+        RF_RETURN();
     }
 
     if (msgLen > 113)
     {
         RAISE_ERROR(drivers, "message length > 113-char maximum");
-        RF_RETURN_1();
+        RF_RETURN();
     }
 
     if (drivers->refSerial.getRobotData().robotId == RobotId::INVALID)
     {
-        RF_RETURN_1();
+        RF_RETURN();
     }
 
     configFrameHeader(

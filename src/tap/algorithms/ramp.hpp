@@ -78,7 +78,7 @@ private:
     float target;        /// The value's end goal.
     float value;         /// The value to be incremented towards the target.
     bool targetReached;  /// Whether or not target and value have converged.
-};                       // class Ramp
+};  // class Ramp
 
 }  // namespace algorithms
 

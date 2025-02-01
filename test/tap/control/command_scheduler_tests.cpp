@@ -1467,17 +1467,25 @@ TEST(CommandScheduler, iterators_many_cmds_subs_iterated_through_using_foreach)
 
     int i = 0;
     // Foreach with subsystem map
-    std::for_each(scheduler.subMapBegin(), scheduler.subMapEnd(), [&](Subsystem *sub) {
-        EXPECT_EQ(subs[i], sub);
-        i++;
-    });
+    std::for_each(
+        scheduler.subMapBegin(),
+        scheduler.subMapEnd(),
+        [&](Subsystem *sub)
+        {
+            EXPECT_EQ(subs[i], sub);
+            i++;
+        });
 
     i = 0;
     // Foreach with command map
-    std::for_each(scheduler.cmdMapBegin(), scheduler.cmdMapEnd(), [&](Command *cmd) {
-        EXPECT_EQ(&cmds[i], cmd);
-        i++;
-    });
+    std::for_each(
+        scheduler.cmdMapBegin(),
+        scheduler.cmdMapEnd(),
+        [&](Command *cmd)
+        {
+            EXPECT_EQ(&cmds[i], cmd);
+            i++;
+        });
 
     for (uint32_t i = 0; i < SUBS_CMDS_TO_CREATE; i++)
     {

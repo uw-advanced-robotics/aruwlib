@@ -117,7 +117,8 @@ public:
         bool isInverted,
         const char* name,
         uint16_t encoderWrapped = ENC_RESOLUTION / 2,
-        int64_t encoderRevolutions = 0);
+        int64_t encoderRevolutions = 0,
+        bool currentControl = false);
 
     mockable ~DjiMotor();
 
@@ -194,6 +195,8 @@ public:
     mockable tap::can::CanBus getCanBus() const;
 
     mockable const char* getName() const;
+
+    mockable bool isInCurrentControl() const;
 
     template <typename T>
     static void assertEncoderType()
@@ -273,6 +276,8 @@ private:
     uint16_t encoderHomePosition;
 
     tap::arch::MilliTimeout motorDisconnectTimeout;
+
+    bool currentControl;
 };
 
 }  // namespace tap::motor

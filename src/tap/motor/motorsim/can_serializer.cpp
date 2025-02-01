@@ -46,19 +46,19 @@ modm::can::Message CanSerializer::serializeFeedback(
     int16_t current,
     MotorId mid)
 {
+    uint8_t inData[8](
+        angle >> 8,
+        angle & 0xFF,
+        rpm >> 8,
+        rpm & 0xFF,
+        current >> 8,
+        current & 0xFF,
+        0,  // Cannot yet simulate temperature
+        0   // Null Byte
+    );
+
     // Construct message, desginate recipient as 0-based index + first motor's ID
-    modm::can::Message out(static_cast<int>(mid), FEEDBACK_MESSAGE_SEND_LENGTH, {}, false);
-
-    out.data[0] = angle >> 8;
-    out.data[1] = angle & 0xFF;
-    out.data[2] = rpm >> 8;
-    out.data[3] = rpm & 0xFF;
-    out.data[4] = current >> 8;
-    out.data[5] = current & 0xFF;
-    out.data[6] = 0;  // Cannot yet simulate temperature
-    out.data[7] = 0;  // Null Byte
-
-    return out;
+    return modm::can::Message{static_cast<uint32_t>(mid), FEEDBACK_MESSAGE_SEND_LENGTH, inData};
 }
 
 }  // namespace tap::motor::motorsim

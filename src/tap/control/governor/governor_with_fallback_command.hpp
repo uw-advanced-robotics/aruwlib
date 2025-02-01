@@ -54,9 +54,10 @@ public:
           commandGovernorList(commandGovernorList),
           stopFallbackCommandIfGovernorsReady(stopFallbackCommandIfGovernorsReady)
     {
-        std::for_each(subRequirements.begin(), subRequirements.end(), [&](auto sub) {
-            addSubsystemRequirement(sub);
-        });
+        std::for_each(
+            subRequirements.begin(),
+            subRequirements.end(),
+            [&](auto sub) { addSubsystemRequirement(sub); });
 
         assert(
             commandWhenGovernorsReady.getRequirementsBitwise() == this->getRequirementsBitwise());

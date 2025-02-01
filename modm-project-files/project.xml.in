@@ -8,6 +8,7 @@
     <option name="modm:build:project.name">taproot</option>
     <option name="modm:build:openocd.cfg">openocd.cfg</option>
     <option name="modm:build:scons:include_sconstruct">False</option>
+    <option name="modm:processing:protothread:use_fiber">yes</option>
     <option name="modm:target">{{ mcu }}</option>
 
 {% for o in modm_hal_options %}    {{ o }}{% endfor %}
@@ -28,7 +29,7 @@
     <module>modm:math:geometry</module>
     <module>modm:math:utils</module>
     <module>modm:math:interpolation</module>
-    <module>modm:math:saturated</module>
+    <module>modm:math:saturation</module>
     <module>modm:processing</module>
     <module>modm:processing:timer</module>
     <module>modm:processing:protothread</module>

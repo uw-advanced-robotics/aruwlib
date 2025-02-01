@@ -8,6 +8,7 @@
     <option name="modm:build:project.name">taproot-sim</option>
     <option name="modm:target">{{ hosted_target }}</option>
     <option name="modm:build:scons:include_sconstruct">False</option>
+    <option name="modm:processing:protothread:use_fiber">yes</option>
   </options>
   <modules>
     <module>modm:architecture:atomic</module>
@@ -19,7 +20,7 @@
     <module>modm:math:filter</module>
     <module>modm:math:geometry</module>
     <module>modm:math:interpolation</module>
-    <module>modm:math:saturated</module>
+    <module>modm:math:saturation</module>
     <module>modm:math:utils</module>
     <module>modm:platform:core</module>
     <module>modm:processing</module>

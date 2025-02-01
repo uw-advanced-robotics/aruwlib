@@ -151,9 +151,9 @@ TEST(ToggleCommandMapping, executeCommandMapping_single_command_removed_if_switc
     RemoteMapState ms2 = ms1;
     ToggleCommandMapping commandMapping(&drivers, {&tc}, ms1);
     bool cmdScheduled = false;
-    EXPECT_CALL(drivers.commandScheduler, addCommand(&tc)).Times(1).WillRepeatedly([&](Command *) {
-        cmdScheduled = true;
-    });
+    EXPECT_CALL(drivers.commandScheduler, addCommand(&tc))
+        .Times(1)
+        .WillRepeatedly([&](Command *) { cmdScheduled = true; });
     EXPECT_CALL(drivers.commandScheduler, removeCommand(&tc, false))
         .Times(1)
         .WillRepeatedly([&](Command *, bool) { cmdScheduled = false; });
@@ -180,9 +180,9 @@ TEST(
     ms2.initLMouseButton();
     ToggleCommandMapping commandMapping(&drivers, {&tc}, ms1);
     bool cmdScheduled = false;
-    EXPECT_CALL(drivers.commandScheduler, addCommand(&tc)).Times(1).WillRepeatedly([&](Command *) {
-        cmdScheduled = true;
-    });
+    EXPECT_CALL(drivers.commandScheduler, addCommand(&tc))
+        .Times(1)
+        .WillRepeatedly([&](Command *) { cmdScheduled = true; });
     EXPECT_CALL(drivers.commandScheduler, removeCommand).Times(0);
     ON_CALL(drivers.commandScheduler, isCommandScheduled)
         .WillByDefault(ReturnPointee(&cmdScheduled));
@@ -202,9 +202,9 @@ TEST(ToggleCommandMapping, executeCommandMapping_single_command_removed_if_key_b
     RemoteMapState ms2({Remote::Key::A, Remote::Key::B, Remote::Key::C}, {});
     ToggleCommandMapping commandMapping(&drivers, {&tc}, ms1);
     bool cmdScheduled = false;
-    EXPECT_CALL(drivers.commandScheduler, addCommand(&tc)).Times(1).WillRepeatedly([&](Command *) {
-        cmdScheduled = true;
-    });
+    EXPECT_CALL(drivers.commandScheduler, addCommand(&tc))
+        .Times(1)
+        .WillRepeatedly([&](Command *) { cmdScheduled = true; });
     EXPECT_CALL(drivers.commandScheduler, removeCommand)
         .Times(1)
         .WillRepeatedly([&](Command *, bool) { cmdScheduled = false; });
@@ -229,9 +229,9 @@ TEST(
     RemoteMapState ms2({Remote::Key::A, Remote::Key::B}, {});
     ToggleCommandMapping commandMapping(&drivers, {&tc}, ms1);
     bool cmdScheduled = false;
-    EXPECT_CALL(drivers.commandScheduler, addCommand(&tc)).Times(2).WillRepeatedly([&](Command *) {
-        cmdScheduled = true;
-    });
+    EXPECT_CALL(drivers.commandScheduler, addCommand(&tc))
+        .Times(2)
+        .WillRepeatedly([&](Command *) { cmdScheduled = true; });
     EXPECT_CALL(drivers.commandScheduler, removeCommand(&tc, false))
         .Times(2)
         .WillRepeatedly([&](Command *, bool) { cmdScheduled = false; });
@@ -262,9 +262,9 @@ TEST(
     RemoteMapState ms2({Remote::Key::A, Remote::Key::B}, {});
     ToggleCommandMapping commandMapping(&drivers, {&tc}, ms1);
     bool cmdScheduled = false;
-    EXPECT_CALL(drivers.commandScheduler, addCommand(&tc)).Times(2).WillRepeatedly([&](Command *) {
-        cmdScheduled = true;
-    });
+    EXPECT_CALL(drivers.commandScheduler, addCommand(&tc))
+        .Times(2)
+        .WillRepeatedly([&](Command *) { cmdScheduled = true; });
     EXPECT_CALL(drivers.commandScheduler, removeCommand(&tc, false))
         .Times(2)
         .WillRepeatedly([&](Command *, bool) { cmdScheduled = false; });
@@ -343,9 +343,9 @@ TEST(
     RemoteMapState ms2 = RemoteMapState();
     ToggleCommandMapping commandMapping(&drivers, {&tc}, ms1);
     bool cmdScheduled = false;
-    EXPECT_CALL(drivers.commandScheduler, addCommand(&tc)).Times(2).WillRepeatedly([&](Command *) {
-        cmdScheduled = true;
-    });
+    EXPECT_CALL(drivers.commandScheduler, addCommand(&tc))
+        .Times(2)
+        .WillRepeatedly([&](Command *) { cmdScheduled = true; });
     EXPECT_CALL(drivers.commandScheduler, removeCommand(&tc, false))
         .Times(1)
         .WillRepeatedly([&](Command *, bool) { cmdScheduled = false; });

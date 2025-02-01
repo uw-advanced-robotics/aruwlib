@@ -124,7 +124,7 @@ public:
             tap::communication::serial::RefSerialData::Tx::getWaitTimeAfterGraphicSendMs(graphic));
         RF_WAIT_UNTIL(delayTimeout.execute());
 
-        RF_END();
+        RF_END_RETURN(true);
     }
 
     modm::ResumableResult<bool> draw()
@@ -140,7 +140,7 @@ public:
                     graphic));
             RF_WAIT_UNTIL(delayTimeout.execute());
         }
-        RF_END();
+        RF_END_RETURN(true);
     }
 
     void setIndicatorState(T newIndicatorState)

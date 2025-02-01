@@ -55,22 +55,17 @@ TEST_F(DjiMotorSimHandlerTest, registering_sims_then_resetting)
 
 TEST_F(DjiMotorSimHandlerTest, parseMotorMessage_no_sims_registered)
 {
-    modm::can::Message msg(static_cast<uint32_t>(MOTOR1), 8, {}, false);
+    modm::can::Message msg(static_cast<uint32_t>(MOTOR1), 8);
+    msg.setExtended(false);
+
     EXPECT_FALSE(handler.parseMotorMessage(CanBus::CAN_BUS1, msg));
 }
 
 TEST_F(DjiMotorSimHandlerTest, parseMotorMessage_single_sim_registered_low_mid)
 {
-    modm::can::Message msgLow(
-        DjiMotorTxHandler::CAN_DJI_LOW_IDENTIFIER,
-        8,
-        0xffff'ffff'ffff'ffff,
-        false);
-    modm::can::Message msgHigh(
-        DjiMotorTxHandler::CAN_DJI_HIGH_IDENTIFIER,
-        8,
-        0xffff'ffff'ffff'ffff,
-        false);
+    uint8_t inData[8] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+    modm::can::Message msgLow(DjiMotorTxHandler::CAN_DJI_LOW_IDENTIFIER, 8, inData, false);
+    modm::can::Message msgHigh(DjiMotorTxHandler::CAN_DJI_HIGH_IDENTIFIER, 8, inData, false);
     std::shared_ptr<MotorSim> sim(new MotorSim(MotorSim::M3508_CONFIG));
     handler.registerSim(sim, std::tuple<CanBus, MotorId>(CanBus::CAN_BUS1, MOTOR1));
 
@@ -85,16 +80,9 @@ TEST_F(DjiMotorSimHandlerTest, parseMotorMessage_single_sim_registered_low_mid)
 
 TEST_F(DjiMotorSimHandlerTest, parseMotorMessage_single_sim_registered_high_mid_can2)
 {
-    modm::can::Message msgLow(
-        DjiMotorTxHandler::CAN_DJI_LOW_IDENTIFIER,
-        8,
-        0xffff'ffff'ffff'ffff,
-        false);
-    modm::can::Message msgHigh(
-        DjiMotorTxHandler::CAN_DJI_HIGH_IDENTIFIER,
-        8,
-        0xffff'ffff'ffff'ffff,
-        false);
+    uint8_t inData[8] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+    modm::can::Message msgLow(DjiMotorTxHandler::CAN_DJI_LOW_IDENTIFIER, 8, inData, false);
+    modm::can::Message msgHigh(DjiMotorTxHandler::CAN_DJI_HIGH_IDENTIFIER, 8, inData, false);
     std::shared_ptr<MotorSim> sim(new MotorSim(MotorSim::M3508_CONFIG));
     handler.registerSim(sim, std::tuple<CanBus, MotorId>(CanBus::CAN_BUS2, MOTOR8));
 
@@ -117,13 +105,17 @@ TEST_F(DjiMotorSimHandlerTest, encodeMessage_nullptr_msg_return_false)
 
 TEST_F(DjiMotorSimHandlerTest, encodeMessage_nothing_registered_return_false)
 {
-    modm::can::Message msg(static_cast<uint32_t>(MOTOR1), 8, {}, false);
+    modm::can::Message msg(static_cast<uint32_t>(MOTOR1), 8);
+    msg.setExtended(false);
+
     EXPECT_FALSE(handler.encodeMessage(CanBus::CAN_BUS1, &msg));
 }
 
 TEST_F(DjiMotorSimHandlerTest, encodeMessage_can1_message_only_can2_motors_registered_returns_false)
 {
-    modm::can::Message msg(static_cast<uint32_t>(MOTOR1), 8, {}, false);
+    modm::can::Message msg(static_cast<uint32_t>(MOTOR1), 8);
+    msg.setExtended(false);
+
     std::shared_ptr<MotorSim> sim(new MotorSim(MotorSim::M3508_CONFIG));
     handler.registerSim(sim, std::tuple<CanBus, MotorId>(CanBus::CAN_BUS2, MOTOR1));
 
@@ -132,7 +124,8 @@ TEST_F(DjiMotorSimHandlerTest, encodeMessage_can1_message_only_can2_motors_regis
 
 TEST_F(DjiMotorSimHandlerTest, encodeMessage_encodes_motor_data)
 {
-    modm::can::Message msg(0, 8, {}, false);
+    modm::can::Message msg(0, 8);
+    msg.setExtended(false);
 
     std::shared_ptr<MotorSim> sim(new MotorSim(MotorSim::M3508_CONFIG));
     sim->setMotorInput(1'000);

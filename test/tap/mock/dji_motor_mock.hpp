@@ -41,7 +41,8 @@ public:
         bool isInverted,
         const char* name,
         uint16_t encWrapped = ENC_RESOLUTION / 2,
-        int64_t encRevolutions = 0);
+        int64_t encRevolutions = 0,
+        bool currentControl = false);
     virtual ~DjiMotorMock();
 
     MOCK_METHOD(void, initialize, (), (override));
@@ -53,6 +54,7 @@ public:
     MOCK_METHOD(void, setDesiredOutput, (int32_t desiredOutput), (override));
     MOCK_METHOD(void, resetEncoderValue, (), (override));
     MOCK_METHOD(bool, isMotorOnline, (), (const override));
+    MOCK_METHOD(bool, isInCurrentControl, (), (const override));
     MOCK_METHOD(void, serializeCanSendData, (modm::can::Message * txMessage), (const override));
 
     MOCK_METHOD(int16_t, getOutputDesired, (), (const override));

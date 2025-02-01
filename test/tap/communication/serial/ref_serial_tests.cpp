@@ -737,11 +737,14 @@ TEST(RefSerial, messageReceiveCallback__robot_to_robot_data_simple_message)
 
     refSerial.attachRobotToRobotMessageHandler(0x201, &handler);
 
-    EXPECT_CALL(handler, functorOp).WillOnce([&](const DJISerial::ReceivedSerialMessage &message) {
-        EXPECT_EQ('h', message.data[sizeof(RefSerial::Tx::InteractiveHeader)]);
-        EXPECT_EQ('i', message.data[sizeof(RefSerial::Tx::InteractiveHeader) + 1]);
-        EXPECT_EQ(sizeof(SpecialData), message.header.dataLength);
-    });
+    EXPECT_CALL(handler, functorOp)
+        .WillOnce(
+            [&](const DJISerial::ReceivedSerialMessage &message)
+            {
+                EXPECT_EQ('h', message.data[sizeof(RefSerial::Tx::InteractiveHeader)]);
+                EXPECT_EQ('i', message.data[sizeof(RefSerial::Tx::InteractiveHeader) + 1]);
+                EXPECT_EQ(sizeof(SpecialData), message.header.dataLength);
+            });
 
     refSerial.messageReceiveCallback(msg);
 }
