@@ -21,9 +21,6 @@
 
 namespace tap::mock
 {
-EncoderInterfaceMock::EncoderInterfaceMock()
-    : EncoderInterface()
-{
-}
+EncoderInterfaceMock::EncoderInterfaceMock() : EncoderInterface() {}
 EncoderInterfaceMock::~EncoderInterfaceMock() {}
 }  // namespace tap::mock

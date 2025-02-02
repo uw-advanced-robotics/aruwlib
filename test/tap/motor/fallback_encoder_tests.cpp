@@ -19,9 +19,8 @@
 
 #include <gtest/gtest.h>
 
-#include "tap/motor/fallback_encoder.hpp"
-
 #include "tap/mock/encoder_interface_mock.hpp"
+#include "tap/motor/fallback_encoder.hpp"
 
 using namespace tap::motor;
 using namespace tap::mock;
@@ -32,10 +31,10 @@ TEST(FallbackEncoderTests, constructing_fallback_encoder_succeeds_when_first_enc
     EncoderInterfaceMock mock;
     EncoderInterfaceMock mock2;
 
-    std::array<EncoderInterface*, 1> encoders = {&mock};
+    std::array<EncoderInterface *, 1> encoders = {&mock};
     FallbackEncoder<1> fallback(encoders);
 
-    std::array<EncoderInterface*, 2> encoders2 = {&mock, &mock2};
+    std::array<EncoderInterface *, 2> encoders2 = {&mock, &mock2};
     FallbackEncoder<2> fallback2(encoders2);
 }
 
@@ -50,7 +49,7 @@ TEST(FallbackEncoderTests, initialize_calls_internal_initialize)
     EncoderInterfaceMock mock;
     EncoderInterfaceMock mock2;
 
-    std::array<EncoderInterface*, 3> encoders = {&mock, &mock2, nullptr};
+    std::array<EncoderInterface *, 3> encoders = {&mock, &mock2, nullptr};
     FallbackEncoder<3> fallback(encoders);
 
     EXPECT_CALL(mock, initialize);
@@ -64,7 +63,7 @@ TEST(FallbackEncoderTests, is_online_when_primary_is_online)
     EncoderInterfaceMock mock;
     EncoderInterfaceMock mock2;
 
-    std::array<EncoderInterface*, 2> encoders = {&mock, &mock2};
+    std::array<EncoderInterface *, 2> encoders = {&mock, &mock2};
     FallbackEncoder<2> fallback(encoders);
 
     EXPECT_CALL(mock, isOnline).WillRepeatedly(Return(true));
@@ -78,7 +77,7 @@ TEST(FallbackEncoderTests, is_online_when_all_internal_are_online)
     EncoderInterfaceMock mock;
     EncoderInterfaceMock mock2;
 
-    std::array<EncoderInterface*, 2> encoders = {&mock, &mock2};
+    std::array<EncoderInterface *, 2> encoders = {&mock, &mock2};
     FallbackEncoder<2> fallback(encoders);
 
     EXPECT_CALL(mock, isOnline).WillRepeatedly(Return(true));
@@ -93,7 +92,7 @@ TEST(FallbackEncoderTests, is_offline_when_all_internal_are_offline)
     EncoderInterfaceMock mock;
     EncoderInterfaceMock mock2;
 
-    std::array<EncoderInterface*, 2> encoders = {&mock, &mock2};
+    std::array<EncoderInterface *, 2> encoders = {&mock, &mock2};
     FallbackEncoder<2> fallback(encoders);
 
     EXPECT_CALL(mock, isOnline).WillRepeatedly(Return(false));
@@ -107,7 +106,7 @@ TEST(FallbackEncoderTests, is_offline_when_primary_is_offline)
     EncoderInterfaceMock mock;
     EncoderInterfaceMock mock2;
 
-    std::array<EncoderInterface*, 2> encoders = {&mock, &mock2};
+    std::array<EncoderInterface *, 2> encoders = {&mock, &mock2};
     FallbackEncoder<2> fallback(encoders);
 
     EXPECT_CALL(mock, isOnline).WillRepeatedly(Return(false));
@@ -121,12 +120,13 @@ TEST(FallbackEncoderTests, is_offline_when_primary_goes_offline_and_secondary_is
     EncoderInterfaceMock mock;
     EncoderInterfaceMock mock2;
 
-    std::array<EncoderInterface*, 2> encoders = {&mock, &mock2};
+    std::array<EncoderInterface *, 2> encoders = {&mock, &mock2};
     FallbackEncoder<2> fallback(encoders);
 
     EXPECT_CALL(mock, isOnline)
-        .WillOnce(Return(true)).WillOnce(Return(true)) // First call
-        .WillOnce(Return(false)); // Second call
+        .WillOnce(Return(true))
+        .WillOnce(Return(true))    // First call
+        .WillOnce(Return(false));  // Second call
     EXPECT_CALL(mock2, isOnline).WillRepeatedly(Return(false));
 
     EXPECT_TRUE(fallback.isOnline());
@@ -138,12 +138,13 @@ TEST(FallbackEncoderTests, is_online_when_primary_goes_offline_and_secondary_is_
     EncoderInterfaceMock mock;
     EncoderInterfaceMock mock2;
 
-    std::array<EncoderInterface*, 2> encoders = {&mock, &mock2};
+    std::array<EncoderInterface *, 2> encoders = {&mock, &mock2};
     FallbackEncoder<2> fallback(encoders);
 
     EXPECT_CALL(mock, isOnline)
-        .WillOnce(Return(true)).WillOnce(Return(true)) // First call
-        .WillOnce(Return(false)); // Second call
+        .WillOnce(Return(true))
+        .WillOnce(Return(true))    // First call
+        .WillOnce(Return(false));  // Second call
     EXPECT_CALL(mock2, isOnline).WillRepeatedly(Return(true));
     EXPECT_CALL(mock2, alignWith(&mock)).Times(1);
 
@@ -156,15 +157,16 @@ TEST(FallbackEncoderTests, is_offline_when_primary_goes_offline_and_secondary_go
     EncoderInterfaceMock mock;
     EncoderInterfaceMock mock2;
 
-    std::array<EncoderInterface*, 2> encoders = {&mock, &mock2};
+    std::array<EncoderInterface *, 2> encoders = {&mock, &mock2};
     FallbackEncoder<2> fallback(encoders);
 
     EXPECT_CALL(mock, isOnline)
-        .WillOnce(Return(true)).WillOnce(Return(true)) // First call
-        .WillOnce(Return(false)); // Second call
+        .WillOnce(Return(true))
+        .WillOnce(Return(true))    // First call
+        .WillOnce(Return(false));  // Second call
     EXPECT_CALL(mock2, isOnline)
-        .WillOnce(Return(false)) // First call
-        .WillRepeatedly(Return(true)); // Second call. Not called because of short circuiting.
+        .WillOnce(Return(false))        // First call
+        .WillRepeatedly(Return(true));  // Second call. Not called because of short circuiting.
 
     EXPECT_TRUE(fallback.isOnline());
     EXPECT_FALSE(fallback.isOnline());
@@ -175,15 +177,16 @@ TEST(FallbackEncoderTests, is_offline_when_primary_and_secondary_go_offline)
     EncoderInterfaceMock mock;
     EncoderInterfaceMock mock2;
 
-    std::array<EncoderInterface*, 2> encoders = {&mock, &mock2};
+    std::array<EncoderInterface *, 2> encoders = {&mock, &mock2};
     FallbackEncoder<2> fallback(encoders);
 
     EXPECT_CALL(mock, isOnline)
-        .WillOnce(Return(true)).WillOnce(Return(true)) // First call
-        .WillOnce(Return(false)); // Second call
+        .WillOnce(Return(true))
+        .WillOnce(Return(true))    // First call
+        .WillOnce(Return(false));  // Second call
     EXPECT_CALL(mock2, isOnline)
-        .WillOnce(Return(true)) // First call
-        .WillRepeatedly(Return(false)); // Second call.
+        .WillOnce(Return(true))          // First call
+        .WillRepeatedly(Return(false));  // Second call.
     EXPECT_CALL(mock2, alignWith(&mock)).Times(1);
 
     EXPECT_TRUE(fallback.isOnline());
@@ -195,15 +198,17 @@ TEST(FallbackEncoderTests, is_online_when_primary_goes_off_and_online_and_second
     EncoderInterfaceMock mock;
     EncoderInterfaceMock mock2;
 
-    std::array<EncoderInterface*, 2> encoders = {&mock, &mock2};
+    std::array<EncoderInterface *, 2> encoders = {&mock, &mock2};
     FallbackEncoder<2> fallback(encoders);
 
     EXPECT_CALL(mock, isOnline)
-        .WillOnce(Return(true)).WillOnce(Return(true)) // First call
-        .WillOnce(Return(false)) // Second call
-        .WillOnce(Return(true)).WillOnce(Return(true)); // Third call
+        .WillOnce(Return(true))
+        .WillOnce(Return(true))   // First call
+        .WillOnce(Return(false))  // Second call
+        .WillOnce(Return(true))
+        .WillOnce(Return(true));  // Third call
     EXPECT_CALL(mock, alignWith(&mock2)).Times(1);
-    
+
     EXPECT_CALL(mock2, isOnline).WillRepeatedly(Return(true));
     EXPECT_CALL(mock2, alignWith(&mock)).Times(1);
 
@@ -212,22 +217,23 @@ TEST(FallbackEncoderTests, is_online_when_primary_goes_off_and_online_and_second
     EXPECT_TRUE(fallback.isOnline());
 }
 
-#define SETUP_TEST(PRIMARY_ONLINE, SECONDARY_ONLINE) \
-    EncoderInterfaceMock mock;\
-    EncoderInterfaceMock mock2;\
-                               \
-    std::array<EncoderInterface*, 2> encoders = {&mock, &mock2};\
-    FallbackEncoder<2> fallback(encoders);\
-                                          \
-    EXPECT_CALL(mock, isOnline).WillRepeatedly(Return(PRIMARY_ONLINE));\
-    EXPECT_CALL(mock2, isOnline).WillRepeatedly(Return(SECONDARY_ONLINE));\
-    EXPECT_CALL(mock2, alignWith(&mock)).Times(PRIMARY_ONLINE & SECONDARY_ONLINE)
+#define SETUP_TEST(PRIMARY_ONLINE, SECONDARY_ONLINE)                       \
+    EncoderInterfaceMock mock;                                             \
+    EncoderInterfaceMock mock2;                                            \
+                                                                           \
+    std::array<EncoderInterface *, 2> encoders = {&mock, &mock2};          \
+    FallbackEncoder<2> fallback(encoders);                                 \
+                                                                           \
+    EXPECT_CALL(mock, isOnline).WillRepeatedly(Return(PRIMARY_ONLINE));    \
+    EXPECT_CALL(mock2, isOnline).WillRepeatedly(Return(SECONDARY_ONLINE)); \
+    EXPECT_CALL(mock2, alignWith(&mock)).Times(PRIMARY_ONLINE &SECONDARY_ONLINE)
 
 TEST(FallbackEncoderTests, get_position_averages_positions)
 {
     SETUP_TEST(true, true);
 
-    EXPECT_CALL(mock, getPosition).WillOnce(Return(tap::algorithms::WrappedFloat(M_PI, 0, M_TWOPI)));
+    EXPECT_CALL(mock, getPosition)
+        .WillOnce(Return(tap::algorithms::WrappedFloat(M_PI, 0, M_TWOPI)));
     EXPECT_CALL(mock2, getPosition).WillOnce(Return(tap::algorithms::WrappedFloat(0, 0, M_TWOPI)));
 
     EXPECT_FLOAT_EQ(fallback.getPosition().getUnwrappedValue(), M_PI_2);
@@ -237,7 +243,8 @@ TEST(FallbackEncoderTests, get_position_averages_online_positions)
 {
     SETUP_TEST(true, false);
 
-    EXPECT_CALL(mock, getPosition).WillOnce(Return(tap::algorithms::WrappedFloat(M_PI, 0, M_TWOPI)));
+    EXPECT_CALL(mock, getPosition)
+        .WillOnce(Return(tap::algorithms::WrappedFloat(M_PI, 0, M_TWOPI)));
     EXPECT_CALL(mock2, getPosition).Times(0);
 
     EXPECT_FLOAT_EQ(fallback.getPosition().getUnwrappedValue(), M_PI);
