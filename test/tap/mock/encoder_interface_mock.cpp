@@ -17,25 +17,13 @@
  * along with Taproot.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TAPROOT_ENCODER_INTERFACE_HPP_
-#define TAPROOT_ENCODER_INTERFACE_HPP_
+#include "encoder_interface_mock.hpp"
 
-#include "tap/algorithms/wrapped_float.hpp"
-
-namespace tap::motor
+namespace tap::mock
 {
-class EncoderInterface
+EncoderInterfaceMock::EncoderInterfaceMock()
+    : EncoderInterface()
 {
-public:
-    virtual void initialize() = 0;
-    virtual bool isOnline() const = 0;
-    virtual void resetEncoderValue() = 0;
-    virtual tap::algorithms::WrappedFloat getPosition() const = 0;
-    // rad/s
-    virtual float getVelocity() const = 0;
-    virtual void alignWith(EncoderInterface* other) = 0;
-};
-
-}  // namespace tap::motor
-
-#endif  // TAPROOT_ENCODER_INTERFACE_HPP_
+}
+EncoderInterfaceMock::~EncoderInterfaceMock() {}
+}  // namespace tap::mock

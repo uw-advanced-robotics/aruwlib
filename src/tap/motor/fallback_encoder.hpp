@@ -95,7 +95,7 @@ public:
         }
 
         return tap::algorithms::WrappedFloat(
-            position / onlineEncoders,
+            onlineEncoders == 0 ? 0 : position / onlineEncoders,
             0,
             static_cast<float>(M_TWOPI));
     }
@@ -115,7 +115,7 @@ public:
             }
         }
 
-        return velocity / onlineEncoders;
+        return onlineEncoders == 0 ? 0 : velocity / onlineEncoders;
     };
 
     void resetEncoderValue() override
@@ -124,13 +124,22 @@ public:
 
         for (uint32_t i = 0; i < COUNT; i++)
         {
-            if (this->validEncoder(i))
+            if (this->encoders[i] != nullptr)
             {
                 this->encoders[i]->resetEncoderValue();
             }
-            else
+        }
+    }
+
+    void alignWith(EncoderInterface* other) override
+    {
+        this->syncEncoders();
+
+        for (uint32_t i = 0; i < COUNT; i++)
+        {
+            if (this->encoders[i] != nullptr)
             {
-                this->seenEncoders &= ~(1 << i);
+                this->encoders[i]->alignWith(other);
             }
         }
     }
@@ -148,20 +157,30 @@ private:
         {
             for (uint32_t i = 1; i < COUNT; i++)
             {
-                if (this->encoders[i] != nullptr && this->encoders[i]->isOnline() &&
-                    !this->seenEncoder(i))
+                bool online = this->encoders[i] != nullptr && this->encoders[i]->isOnline();
+                if (online && !this->seenEncoder(i))
                 {
+                    // Sync the newly discovered encoder to the primary encoder
                     this->seenEncoders |= 1 << i;
-                    // encoders[i]->zeroTo(encoders[0]);
+                    encoders[i]->alignWith(encoders[0]);
                 }
-                // We reset the encoder positions but the primary encoder was not online
                 else if (validEncoder(i) && !seenEncoder(0))
                 {
+                    // Primary encoder disappeared but came back, resync it.
                     this->seenEncoders |= 1;
-                    // encoders[0]->zeroTo(encoders(i));
+                    encoders[0]->alignWith(encoders[i]);
+                }
+                else if (!online)
+                {
+                    // This encoder disappeared, remove it
+                    this->seenEncoders &= ~(1 << i);
                 }
             }
             this->seenEncoders |= 1;
+        }
+        else
+        {
+            this->seenEncoders &= ~(1);
         }
     }
 
