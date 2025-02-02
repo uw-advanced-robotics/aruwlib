@@ -40,12 +40,6 @@ public:
 
     MOCK_METHOD(float, getVelocity, (), (const override));
 
-    MOCK_METHOD(int64_t, getEncoderUnwrapped, (), (const));
-
-    MOCK_METHOD(uint16_t, getEncoderWrapped, (), (const));
-
-    MOCK_METHOD(int16_t, getShaftRPM, (), (const));
-
     MOCK_METHOD(void, resetEncoderValue, (), (override));
 
     MOCK_METHOD(void, alignWith, (EncoderInterface*), (override));

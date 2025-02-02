@@ -122,11 +122,11 @@ public:
     {
         this->syncEncoders();
 
-        for (uint32_t i = 0; i < COUNT; i++)
+        for (EncoderInterface*& encoder : this->encoders)
         {
-            if (this->encoders[i] != nullptr)
+            if (encoder != nullptr)
             {
-                this->encoders[i]->resetEncoderValue();
+                encoder->resetEncoderValue();
             }
         }
     }
@@ -135,11 +135,11 @@ public:
     {
         this->syncEncoders();
 
-        for (uint32_t i = 0; i < COUNT; i++)
+        for (EncoderInterface*& encoder : this->encoders)
         {
-            if (this->encoders[i] != nullptr)
+            if (encoder != nullptr)
             {
-                this->encoders[i]->alignWith(other);
+                encoder->alignWith(other);
             }
         }
     }
